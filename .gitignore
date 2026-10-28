@@ -1,0 +1,35 @@
+# secrets
+.env
+*.env
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# node
+node_modules/
+frontend/dist/
+
+# data and caches (live in DATA_DIR outside the repo)
+data/
+*.tif
+*.tiff
+*.zip
+cache/
+runs/*.jsonl
+!demo/runs/*.jsonl
+
+# old prototype (contains a hard-coded key — never commit)
+_legacy/
+backend_legacy/
+
+# os/editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# personal notes (not for the public repo)
+ИНСТРУКЦИЯ.md

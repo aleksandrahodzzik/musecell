@@ -1,0 +1,185 @@
+{
+  "base_url": "https://api.meta.ai/v1",
+  "openai_sdk": "3.40.0",
+  "checks": [
+    {
+      "name": "a) GET /v1/models",
+      "status": "PASS",
+      "detail": "9 models; all 3 required present",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cost_usd": 0.0,
+      "seconds": 1.384690299979411,
+      "extra": {
+        "ids": [
+          "muse-image-1.0",
+          "muse-spark-1.1",
+          "muse-spark-1.2",
+          "muse-spark-1.2-contributor",
+          "muse-spark-1.3",
+          "muse-spark-1.3-contributor",
+          "muse-voice-transcribe-1.0",
+          "muse-wonder-1.0",
+          "sam-3.1"
+        ]
+      }
+    },
+    {
+      "name": "b) text, muse-spark-1.3",
+      "status": "PASS",
+      "detail": "DAPI stains double-stranded DNA, primarily in the cell nucleus.",
+      "input_tokens": 21,
+      "output_tokens": 579,
+      "reasoning_tokens": 556,
+      "cost_usd": 0.0024869999999999996,
+      "seconds": 3.220875500002876,
+      "extra": {}
+    },
+    {
+      "name": "c) vision + json_schema strict",
+      "status": "PASS",
+      "detail": "valid JSON, blob_count=3 (truth 3)",
+      "input_tokens": 118,
+      "output_tokens": 941,
+      "reasoning_tokens": 872,
+      "cost_usd": 0.00414675,
+      "seconds": 4.326529800076969,
+      "extra": {
+        "response": {
+          "background": "black",
+          "blob_count": 3,
+          "blobs": [
+            {
+              "position": "top left",
+              "relative_size": "medium"
+            },
+            {
+              "position": "top right",
+              "relative_size": "large"
+            },
+            {
+              "position": "bottom center",
+              "relative_size": "small"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "d) tool calling loop",
+      "status": "PASS",
+      "detail": "args={'rationale': 'User asked for cell count in well B04, so I need to measure it.', 'well_id': 'B04'}; final='417'",
+      "input_tokens": 1314,
+      "output_tokens": 287,
+      "reasoning_tokens": 177,
+      "cost_usd": 0.00286225,
+      "seconds": 3.3585388000356033,
+      "extra": {
+        "tool_args": {
+          "rationale": "User asked for cell count in well B04, so I need to measure it.",
+          "well_id": "B04"
+        },
+        "final": "417"
+      }
+    },
+    {
+      "name": "e) SAM 3.1 stream + parser",
+      "status": "PASS",
+      "detail": "responses.stream; per prompt {'circle': 0, 'blob': 3}; 3 boxes (truth 3), 3 masks, conf=[0.507692277431488, 0.5241636037826538, 0.507692277431488]",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cost_usd": 0.005,
+      "seconds": 3.3232050999067724,
+      "extra": {
+        "method": "responses.stream",
+        "boxes_per_prompt": {
+          "circle": 0,
+          "blob": 3
+        },
+        "outcome": "completed",
+        "boxes": [
+          {
+            "kind": "box",
+            "order": 0,
+            "object_id": "0",
+            "left": 33,
+            "top": 42,
+            "right": 90,
+            "bottom": 102,
+            "frame": null,
+            "confidence": 0.507692277431488
+          },
+          {
+            "kind": "box",
+            "order": 2,
+            "object_id": "1",
+            "left": 140,
+            "top": 51,
+            "right": 222,
+            "bottom": 134,
+            "frame": null,
+            "confidence": 0.5241636037826538
+          },
+          {
+            "kind": "box",
+            "order": 4,
+            "object_id": "2",
+            "left": 97,
+            "top": 170,
+            "right": 143,
+            "bottom": 216,
+            "frame": null,
+            "confidence": 0.507692277431488
+          }
+        ],
+        "mask_areas": [
+          2701,
+          5285,
+          1661
+        ],
+        "diagnostics": [],
+        "raw_output_head": "<0f>0<|box;x1=33;y1=42;x2=89;y2=101;w=256;h=256;c=0.507692277431488|><|mask;x=0;y=0;c=0.507692277431488;data=60,57,~!!!5t#Lh/FRI=#OKtv/4eiuq==y%BU`NXeW:H+9DJ%U$U4HI`Sd(/R3Vd5&E[GNy:gcfk14Y9f[gBQx_Gy`axgvN)Q`O6I1^n0u5B^zo`EI@@dxs$%8VsbOQkH&khd!-V+#XWc/V[q4u:h!{dR/0L'@4HJ)8=AC%^sSW`JPsnDLnn+Q7XDBH8ZHu",
+        "usage": {
+          "input_tokens": 0,
+          "input_tokens_details": {
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "output_tokens": 0,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 0,
+          "images_processed": 1
+        }
+      }
+    },
+    {
+      "name": "reasoning_effort (spark)",
+      "status": "PASS",
+      "detail": "low: '391' (214 rt); max: '391' (149 rt)",
+      "input_tokens": 42,
+      "output_tokens": 383,
+      "reasoning_tokens": 363,
+      "cost_usd": 0.0016802499999999999,
+      "seconds": 3.5883622999535874,
+      "extra": {
+        "efforts": {
+          "low": {
+            "ok": true,
+            "answer": "391",
+            "reasoning_tokens": 214
+          },
+          "max": {
+            "ok": true,
+            "answer": "391",
+            "reasoning_tokens": 149
+          }
+        }
+      }
+    }
+  ],
+  "total_usd": 0.01617625
+}

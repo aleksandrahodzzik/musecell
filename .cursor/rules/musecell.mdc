@@ -1,0 +1,19 @@
+---
+description: MuseCell project rules — always apply
+alwaysApply: true
+---
+
+# MuseCell — rules for every chat
+
+1. `docs/MASTER_SPEC.md` is the source of truth. Read the relevant section before coding. Log any deviation in `docs/DECISIONS.md` (date, what, why).
+2. Work only on the phase you were asked for. At the end of a phase: run the verification commands, show their real output, commit, and STOP with a short report (done / not done / next).
+3. Never invent API details. Meta Model API: base `https://api.meta.ai/v1`, key env `MODEL_API_KEY`, model ids `muse-spark-1.3`, `muse-wonder-1.0`, `sam-3.1` — confirm with `GET /v1/models`. When unsure, read https://dev.meta.ai/docs or the installed package source.
+4. No fake results. No hard-coded "AI" outputs, no canned fallbacks shown as live, no invented PMIDs, ClinVar ids, confidence percentages or benchmark numbers. Every number in the UI comes from code that computed it. Failures surface as visible error events.
+5. Secrets live only in `backend/.env` (gitignored). Never write a key into code, tests, docs, prompts or commit messages. Never print a key to logs.
+6. Blinded runs must not leak the compound identity to the model or the browser (opaque ids only). Keep the leak test passing.
+7. Windows + PowerShell: chain with `;` (not `&&`), use `python -m pip`, `python -m uvicorn`, venv at `.venv`. Ports: backend 8787, Vite 5174. Never 8000/8001/3000.
+8. Data lives in `DATA_DIR` outside the repo and outside OneDrive. Never commit raw images; only small files in `demo/`.
+9. Small, frequent commits with clear messages (judges check that work happened during Oct 26 – Nov 4).
+10. Prefer boring, robust code over clever code. Type hints, Pydantic models, pytest for tools and guardrails. Keep functions small; no 1,000-line files.
+11. UI: follow spec §8 tokens and copy rules exactly. Stain colors only for their channels. Sentence case. One orchestrated animation (unblinding). Respect reduced motion.
+12. If a step will cost more than $2 of API credits or download more than 2 GB, print the estimate and ask first.
