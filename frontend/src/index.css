@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #17202A; background: #E8ECEF; }
+  body { margin: 0; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+  /* Visible keyboard focus everywhere (spec §8 quality floor). */
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid #17202A; outline-offset: 2px; border-radius: 4px; }
+  .on-dark :focus-visible, .on-dark:focus-visible { outline-color: #FFFFFF; }
+  button:disabled { cursor: not-allowed; }
+}
+
+@layer components {
+  .panel { @apply bg-sheet rounded-panel border border-rule; }
+  .btn { @apply inline-flex items-center gap-1.5 rounded-control px-3 h-8 text-sm font-medium border border-rule bg-sheet text-ink hover:bg-white transition-colors disabled:opacity-50 disabled:hover:bg-sheet; }
+  .btn-primary { @apply inline-flex items-center gap-1.5 rounded-control px-4 h-9 text-sm font-medium bg-ink text-sheet hover:bg-[#2a3542] transition-colors disabled:opacity-40 disabled:hover:bg-ink; }
+  .chip { @apply inline-flex items-center gap-1 rounded-control px-1.5 py-0.5 text-xs border border-rule bg-white/60 text-ink; }
+  .label { @apply text-xs text-graphite; }
+  .serif { @apply font-serif; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  html, body { background: #FFFFFF !important; }
+  .no-print { display: none !important; }
+  .print-break { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}
+
+/* Composite thumbnails re-tinted to the stain tokens (components/StainTint.tsx). */
+.stain-tint { filter: url(#stain-tint); }

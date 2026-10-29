@@ -147,3 +147,42 @@ Client: `openai.OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MO
 - 1/3 correct. Both misses follow the atlas/tubulin signal into a neighbouring class (Eg5 vs stabilizer; Epithelial is the baseline's weakest class, 1/8). In run 1 the reviewer pointed at the right problem (the 4-dose atlas favoured Eg5) but the requested free check did not flip the call. Agent behaviour: it acquires high + mid dose first, then lower doses; it used replicates 0 times. Not tuned here on purpose (the 38 compounds are the eval set).
 - Leak re-check of the three recorded logs (all events before `unblinded`, 55/156/109 terms): clean. Phase-4 API spend: $0.96 for the three runs; ≈ $1.07 for the day.
 - 2026-10-29 — Correction to the Phase-3 note: `NCBI_EMAIL` **is set** in `backend/.env` (checked without printing it; `Settings.ncbi_email` loads). PubMed requests carry `tool=musecell&email=…`; the Phase-4 live runs already used it. No action needed.
+
+## Phase 5 — frontend (2026-10-29)
+
+### Stack and structure
+- `frontend/`: Vite 5.4.21, React 18.3.1, TypeScript 5.6, Tailwind 3.4.15, framer-motion 11.11.17, lucide-react 0.460, exact pins. Dev on 5174 (`strictPort`), `/api` → 127.0.0.1:8787. Build → `frontend/dist`, served by FastAPI's static mount at http://127.0.0.1:8787 (checked).
+- `npm audit`: one moderate advisory left (esbuild ≤ 0.24.2, **dev server only**: a website could read responses from a running `vite` dev server). The fix is Vite 6+/8, a major upgrade; not done mid-hackathon. Production is the built bundle served by FastAPI, so it is unaffected. postcss and vite were bumped to patched versions.
+- Hash routing (`#/run/<id>`, `#/dossier/<id>`, `#/benchmark`) so the static mount needs no SPA catch-all route.
+- Tokens from spec §8 are the **only** Tailwind colours (the default palette is removed), so a non-spec colour cannot slip in. Fonts: Source Serif 4 (narrative, headings) + IBM Plex Sans (UI, numbers; `tabular-nums` on body).
+- `useRunEvents(runId)` is the single source of run state: one EventSource, a listener per named event type (the server sets `event:`, so `onmessage` never fires), reducer in `lib/runState.ts`, dedupe by `seq`, reconnect via the browser's Last-Event-ID and then manual `?after=<seq>` with backoff; closes on `run_finished`. Replays use the same screen; `run_started.replay` drives the permanent badge.
+- framer-motion is used for the unblinding only (≈1.2 s: name → structure 0.3 s → ChEMBL 0.6–0.8 s → verdict 1.0 s), plus the header label swap that is part of the same moment. Hypothesis bars use a CSS width transition. `prefers-reduced-motion` disables both (framer `useReducedMotion` + a global CSS rule).
+
+### Backend additions for the UI (tests in `test_api.py`)
+- `GET /api/recorded`: finished recorded runs for "Watch a recorded run" — specimen label, date, wells, cost, model ids; **no compound, MoA or verdict** (a replay is still a blinded story; test runs the blinding scanner over it).
+- `POST /api/runs/{id}/stop`: cancels a live run (the loop already emits "The run was stopped.") or a replay (emits `error` "Replay stopped." + `run_finished`). The spec's "■ Stop" needed it.
+- `GET /api/runs/{id}/dossier.{md,json}`: the files the loop writes; a replay id maps to its source run.
+- `GET /api/fields/{field_id}/cells` (per-cell measurements from the atlas cache, centroids as fractions, phenotype flags vs `reference.json`) and `/labels` (cells + nuclei label maps at half resolution, uint16 LE, gzip ≈ 14 KB). Used for mask outlines and hover hit-testing, so every hover number is the one `cell_features` computed. 404 when the cache is absent (fresh clone) — the UI says so.
+- `GET /api/eval/{results|baseline}`: the eval files as written.
+
+### `eval/results.json` contract for Phase 6 (the Benchmark page reads this)
+`{generated_at, models: {role: id}, n_compounds, blinding_leak_test, notes?: [str], rows: [{method, label, budget (wells per compound, null = all wells → drawn as a reference line), accuracy (0–1), correct?, n?, mean_wells?, mean_cost_usd?, mean_latency_s?, citation_validity? (0–1)}]}`. Rows with the same `label` form one line on the chart. Until the file exists the page shows an empty state plus the measured NSC baseline from `eval/baseline.json`. The chart was checked with a clearly labelled fixture injected by Playwright route interception (scratchpad only, never saved to the repo).
+
+### Display choices
+- Microscope: the three grayscale channel PNGs are composed on a canvas, each tinted with its stain token (additive). Masks are drawn in neutral white/grey (they are not stains). If a field has no channel PNGs (some demo thumbnails) the channels are split from the 8-bit composite, so the toggles still work and a note says so.
+- Spec §8 model line names SAM 3.1 for segmentation, but SAM lost the Phase-2 bake-off; the UI shows `model_ids.segmentation` from the server ("classical watershed (scikit-image)"), never a hard-coded SAM claim.
+- Plate map shows 3 replicate columns (more only if the agent used them); doses with more wells (taxol 0.3 µM has 21: plate positive control) show "+n".
+- Tool names are shown in plain words ("Acquire well", "Describe phenotype"); feature ids map to plain names (`tub_glcm_contrast` → "Tubulin texture"), raw id in the tooltip.
+
+### Screenshot critique (`scripts/screenshots.py` → `docs/screens/`, 1280×720, replay of run_39e2d32f1edc / run_87e2787d1f1e)
+Five issues found against §8 in the first pass, all fixed:
+1. **Stain colours inconsistent.** Thumbnails (notebook, dossier) showed the raw composite (pure RGB) while the microscope used the token tints, so one stain had two colours. Fix: an SVG `feColorMatrix` (`.stain-tint`) maps composite R/G/B onto the actin/tubulin/DNA tokens, matching the canvas composite exactly.
+2. **Hover card escaped the microscope pane** over the plate map, and its estimated height let it overflow the bottom. Fix: clamp to the pane horizontally, measure the card height, `overflow-hidden` on the pane.
+3. **Plate map header wrapped** ("Rep / 1") and labels read ambiguously ("8 1 µM"). Fix: "Replicate" column group with 1–3, dose index and concentration in separate columns. (The taxol replay then showed 21 replicates overflowing; capped as above.)
+4. **Unblinding did not fit 1280×720.** A 200-px empty structure placeholder pushed the reflection below the fold. Fix: no placeholder box (one line of text), 150-px structure, centre area grows from 56 % to 66 % of the height on the Unblinding tab.
+5. **Dossier experiments table cramped** ("Rep Cells" headers touching, evidence id against the thumbnail). Fix: fixed column widths, right-aligned numbers, padding, evidence id on its own line.
+Also fixed: duplicate "(blinded)" + "Blinded" chip in the run header; chart end-labels overlapping when values are close; the specimen radiogroup now has one tab stop + arrow keys; and a real bug the screenshot script's console check caught — EventSource's native `error` event (no data) hit the listener for the server's `error` event type → `JSON.parse(undefined)`. The script now fails on any console error; final pass: 0.
+
+### Not done / known
+- Thinking notes in the three recorded runs are cut at 1,000 chars by the loop version that recorded them (current loop: 2,000); the UI shows them as recorded.
+- Recorded runs live in gitignored `runs/` for now; `demo/runs/` + thumbnails are Phase 6. In a fresh clone without DATA_DIR, masks/hover and channel images are unavailable (the UI says so).

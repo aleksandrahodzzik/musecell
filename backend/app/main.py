@@ -1,4 +1,5 @@
-"""FastAPI app (spec §5, §7): runs, SSE events, specimens, replay, images, health; serves frontend/dist at /.
+"""FastAPI app (spec §5, §7): runs, SSE events, specimens, replay, stop, dossier, images, field segmentation,
+eval files, health; serves frontend/dist at /.
 
 Run with:  python -m uvicorn app.main:app --app-dir backend --port 8787
 """
@@ -12,17 +13,21 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from app import fields
 from app.agent.schemas import RunMode
 from app.config import MAX_BUDGET_WELLS, ROOT
 from app.runs.manager import RunManager, RunRequestError
-from app.runs.store import RunBus, snapshot_path
+from app.runs.recorded import list_recorded
+from app.runs.store import DEMO_RUNS_DIR, RunBus, snapshot_path
 
 HEARTBEAT_S = 15.0
 IMAGE_ID = re.compile(r"^(f_[0-9a-f]{6,64})\.(composite|dna|tubulin|actin)$")
+FIELD_ID = re.compile(r"^f_[0-9a-f]{6,64}$")
+EVAL_FILES = {"results": ROOT / "eval" / "results.json", "baseline": ROOT / "eval" / "baseline.json"}
 DEMO_THUMBS = ROOT / "demo" / "thumbnails"
 FRONTEND_DIST = ROOT / "frontend" / "dist"
 
@@ -76,10 +81,8 @@ async def get_run(run_id: str, request: Request) -> dict:
     m = mgr(request)
     if run_id in m.runs:
         return m.runs[run_id].model_dump(mode="json")
-    bus = m.bus(run_id)
-    if bus is not None and bus.events and bus.events[0].data.get("replay"):
-        run_id = bus.events[0].data["replay"]["replay_of"]
-    path = snapshot_path(run_id, (m.runs_dir, ROOT / "demo" / "runs"))
+    run_id = m.source_run_id(run_id)
+    path = snapshot_path(run_id, (m.runs_dir, DEMO_RUNS_DIR))
     if path is None:
         raise HTTPException(status_code=404, detail=f"No run '{run_id}'.")
     return json.loads(path.read_text(encoding="utf-8"))
@@ -119,6 +122,74 @@ async def replay_run(run_id: str, request: Request, speed: float = Query(1.0, gt
         return await mgr(request).start_replay(run_id, speed)
     except RunRequestError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from None
+
+
+@app.post("/api/runs/{run_id}/stop")
+async def stop_run(run_id: str, request: Request) -> dict:
+    try:
+        await mgr(request).stop(run_id)
+    except RunRequestError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+    return {"stopped": run_id}
+
+
+@app.get("/api/runs/{run_id}/dossier.{fmt}")
+async def dossier(run_id: str, fmt: str, request: Request):
+    """The dossier files the loop wrote (spec §8 screen 4: export Markdown + JSON)."""
+    if fmt not in ("md", "json"):
+        raise HTTPException(status_code=404, detail="Dossier formats: md, json.")
+    m = mgr(request)
+    source = m.source_run_id(run_id)
+    if not source.replace("_", "").isalnum():
+        raise HTTPException(status_code=404, detail=f"No run '{run_id}'.")
+    for folder in (m.runs_dir, DEMO_RUNS_DIR):
+        path = folder / f"{source}.dossier.{fmt}"
+        if path.exists():
+            media = "text/markdown; charset=utf-8" if fmt == "md" else "application/json"
+            return FileResponse(path, media_type=media, filename=f"musecell_{source}.dossier.{fmt}")
+    raise HTTPException(status_code=404, detail="No dossier for this run yet. It is written when the run finishes.")
+
+
+@app.get("/api/recorded")
+async def recorded(request: Request) -> list[dict]:
+    """Finished recorded runs that can be replayed; no compound, MoA or verdict."""
+    m = mgr(request)
+    labels = {s["specimen_id"]: s["label"] for s in m.specimen_list()}
+    return list_recorded([(DEMO_RUNS_DIR, "demo"), (m.runs_dir, "local")], labels)
+
+
+@app.get("/api/fields/{field_id}/cells")
+async def field_cells(field_id: str, request: Request) -> dict:
+    m = mgr(request)
+    if not FIELD_ID.match(field_id) or m.catalog is None:
+        raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
+    table = fields.cell_table(m.settings.cells_dir, field_id, m.reference)
+    if table is None:
+        raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
+    return table
+
+
+@app.get("/api/fields/{field_id}/labels")
+async def field_labels(field_id: str, request: Request):
+    """Half-resolution label maps, gzip([cells | nuclei] uint16 LE); size in X-Label-Width / X-Label-Height."""
+    m = mgr(request)
+    maps = fields.label_maps(m.settings.cells_dir, field_id) if FIELD_ID.match(field_id) and m.catalog else None
+    if maps is None:
+        raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
+    body, w, h = maps
+    return Response(body, media_type="application/octet-stream",
+                    headers={"Content-Encoding": "gzip", "X-Label-Width": str(w), "X-Label-Height": str(h),
+                             "Access-Control-Expose-Headers": "X-Label-Width, X-Label-Height",
+                             "Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/api/eval/{name}")
+async def eval_file(name: str):
+    """eval/results.json (Phase 6, scripts/evaluate.py) and eval/baseline.json, as written by the scripts."""
+    path = EVAL_FILES.get(name)
+    if path is None or not path.exists():
+        raise HTTPException(status_code=404, detail=f"eval/{name}.json does not exist yet.")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @app.get("/api/images/{image_id}")

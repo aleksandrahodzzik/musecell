@@ -18,6 +18,7 @@ from app.agent.schemas import AgentRun, RunMode
 from app.agent.specimens import Specimen, SpecimenCatalog
 from app.config import MAX_BUDGET_WELLS, Settings, get_settings
 from app.external.chembl import ChemblClient
+from app.fields import load_reference
 from app.external.pubchem import PubChemClient
 from app.external.pubmed import PubMedClient
 from app.llm import CostMeter, LLMClient
@@ -37,6 +38,7 @@ class RunManager:
         self.runs_dir = runs_dir
         self.catalog: SpecimenCatalog | None = None
         self.atlas = None
+        self.reference = None  # DMSO medians for per-cell phenotype flags (microscope hover)
         self.moa_classes: list[str] = []
         self.llm: LLMClient | None = None
         self.data_error: str | None = None
@@ -55,6 +57,7 @@ class RunManager:
             self.catalog = SpecimenCatalog.load(self.settings)
             self.atlas = Atlas.load(self.settings.atlas_dir)
             self.moa_classes = load_moa_classes(self.settings.moa_csv)
+            self.reference = load_reference(self.settings.atlas_dir)
             _ = self.catalog.specimens
         except (OSError, KeyError, ValueError) as exc:
             self.catalog, self.data_error = None, (f"BBBC021 data not found under DATA_DIR ({type(exc).__name__}). "
@@ -143,6 +146,27 @@ class RunManager:
         self.buses[replay_id] = target
         self.tasks[replay_id] = asyncio.create_task(replay(source, target, speed))
         return {"run_id": replay_id, **replay_info(source)}
+
+    async def stop(self, run_id: str) -> None:
+        """Stop a live run (the loop reports "The run was stopped.") or a replay."""
+        task, bus = self.tasks.get(run_id), self.buses.get(run_id)
+        if task is None or bus is None or task.done():
+            raise RunRequestError(f"Run '{run_id}' is not running.")
+        task.cancel()
+        try:
+            await task
+        except (asyncio.CancelledError, Exception):  # noqa: BLE001 - the loop already emitted its error event
+            pass
+        if not bus.finished:  # a replay: its recorded events stop here
+            bus.emit("error", {"message": "Replay stopped.", "fatal": True})
+            bus.emit("run_finished", {"status": "failed", "error": "Replay stopped."})
+
+    def source_run_id(self, run_id: str) -> str:
+        """A replay's recorded run id; any other id unchanged."""
+        bus = self.buses.get(run_id)
+        if bus is not None and bus.events and bus.events[0].data.get("replay"):
+            return bus.events[0].data["replay"]["replay_of"]
+        return run_id
 
     async def aclose(self) -> None:
         for task in self.tasks.values():

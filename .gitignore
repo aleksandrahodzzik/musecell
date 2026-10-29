@@ -12,6 +12,7 @@ __pycache__/
 # node
 node_modules/
 frontend/dist/
+*.tsbuildinfo
 
 # data and caches (live in DATA_DIR outside the repo)
 data/

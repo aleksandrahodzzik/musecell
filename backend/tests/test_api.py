@@ -151,3 +151,60 @@ def test_bus_late_subscriber_and_replay_pacing():
     asyncio.run(R.replay(bus, target, speed=2, sleep=fake_sleep))
     assert waits == [2.0, R.MAX_GAP_S / 2] and target.finished
     assert target.events[0].data["replay"]["replay_of"] == "r"
+
+
+def test_ui_endpoints_recorded_dossier_eval_stop(client):
+    c, m = client
+    sid = c.get("/api/specimens").json()[0]["specimen_id"]
+    run_id = c.post("/api/runs", json={"specimen_id": sid, "budget": 3}).json()["run_id"]
+    sse_events(c, run_id)
+
+    # the recorded list carries no compound, MoA or verdict (a replay is still a blinded story)
+    rec = [r for r in c.get("/api/recorded").json() if r["run_id"] == run_id]
+    assert len(rec) == 1 and rec[0]["specimen_label"] == "Specimen 1" and rec[0]["status"] == "finished"
+    assert "verdict" not in rec[0]
+    assert BlindingScanner(m.catalog.get(sid).blinding_terms(SYNONYMS)).scan(rec) == []
+
+    md = c.get(f"/api/runs/{run_id}/dossier.md")
+    assert md.status_code == 200 and md.headers["content-type"].startswith("text/markdown")
+    assert c.get(f"/api/runs/{run_id}/dossier.json").json()
+    assert c.get(f"/api/runs/{run_id}/dossier.exe").status_code == 404
+    assert c.get("/api/runs/run_missing/dossier.md").status_code == 404
+
+    assert c.get("/api/eval/secrets").status_code == 404
+    assert c.post(f"/api/runs/{run_id}/stop").status_code == 409  # already finished
+
+    # stopping a replay ends its stream with a visible error and run_finished
+    m.buses[run_id].events[1].ts = m.buses[run_id].events[0].ts.replace(year=2100)  # a long recorded pause
+    rep = c.post(f"/api/runs/{run_id}/replay?speed=1").json()["run_id"]
+    assert c.post(f"/api/runs/{rep}/stop").json() == {"stopped": rep}
+    tail = [e["type"] for e in sse_events(c, rep)]
+    assert tail[-2:] == ["error", "run_finished"]
+
+
+def test_field_segmentation_endpoints(client, tmp_path):
+    import gzip
+
+    import numpy as np
+    import pandas as pd
+
+    c, m = client
+    fid = m.catalog.index["field_id"].iloc[0]
+    assert c.get(f"/api/fields/{fid}/cells").status_code == 404  # nothing cached yet
+    m.settings.data_dir = str(tmp_path / "data")
+    cells_dir = m.settings.cells_dir
+    cells_dir.mkdir(parents=True)
+    labels = np.zeros((8, 10), np.uint16)
+    labels[2:6, 2:6] = 1
+    np.savez_compressed(cells_dir / f"{fid}.npz", nuclei=labels, cells=labels)
+    row = {"label": 1, "centroid_x": 3.5, "centroid_y": 3.5, "touches_border": False, "nuc_in_cluster": False,
+           **{k: 1.0 for k in ["nuc_area", "nuc_dna_mean", "nuc_dna_integrated", "nuc_solidity", "cell_area",
+                               "cell_roundness", "tub_mean", "act_mean", "act_tub_ratio"]}}
+    pd.DataFrame([row]).to_parquet(cells_dir / f"{fid}.parquet")
+    table = c.get(f"/api/fields/{fid}/cells").json()
+    assert table["width"] == 10 and table["cells"][0]["x"] == 0.35 and table["cells"][0]["label"] == 1
+    r = c.get(f"/api/fields/{fid}/labels")
+    w, h = int(r.headers["x-label-width"]), int(r.headers["x-label-height"])
+    raw = r.content if len(r.content) == 2 * 2 * w * h else gzip.decompress(r.content)
+    assert (w, h) == (5, 4) and np.frombuffer(raw, "<u2").reshape(2, h, w)[0, 1, 1] == 1
+    assert c.get("/api/fields/..%2Fx/cells").status_code == 404
