@@ -4,22 +4,158 @@
 
 *Research tool for cell-biology screening data. Not for clinical use.*
 
-> Work in progress. Built during the Meta AI Developer Hackathon (Oct 26 – Nov 4, 2026).
+![A recorded blinded run replayed at 6×: the agent acquires wells, the hypothesis board converges, the PI reviewer asks for one more experiment, then the compound is unblinded and the call is checked](docs/hero.gif)
 
-## Quickstart (Windows PowerShell)
+<sub>Replay of a recorded live run (`run_19b4ee810120`, Muse Spark 1.3 + Muse Wonder 1.0, 5 wells, $0.37), sped up 6×. Replays are labelled as such in the app.</sub>
+
+## Why this matters
+
+Phenotypic drug screens treat cells with thousands of compounds and image them. They find hits that target-based screens miss, but the slow part comes after: working out **how** a hit acts (mechanism of action, "MoA deconvolution"). Today a biologist compares images with reference compounds, orders follow-up doses, and reads the literature. MuseCell runs that loop end to end and **decides which experiment to run next** instead of labelling one picture. It does so under a blinded protocol: the agent commits to a call before it can see the compound's name, and code scores the call afterwards.
+
+Users are screening and computational biologists working with cell lines and small molecules. MuseCell never outputs diagnoses or treatment advice.
+
+## How it uses Meta AI
+
+Three Meta models play different roles in one run; every call is metered and capped.
+
+| Role | Model | What it does | Code |
+|---|---|---|---|
+| Scientist agent | `muse-spark-1.3` | Tool-calling loop over 9 strict-schema tools: plans which wells to image, reads the measurements, keeps a hypothesis board, submits a blinded conclusion, then writes the reflection | [`agent/loop.py#L166`](backend/app/agent/loop.py#L166), [`agent/tools.py#L135`](backend/app/agent/tools.py#L135) |
+| Microscopist | `muse-spark-1.3` (vision) | Looks at the treated composite + per-channel images next to a same-plate DMSO control, gets our measured top-deviating features, and returns a strict-schema morphology description that says which findings agree with the numbers | [`agent/tools.py#L337`](backend/app/agent/tools.py#L337), [`agent/microscopist.py`](backend/app/agent/microscopist.py) |
+| PI reviewer | `muse-wonder-1.0` | Reads the blinded evidence ledger and the conclusion; approves or requests one more experiment (one revision round) | [`agent/reviewer.py#L66`](backend/app/agent/reviewer.py#L66), [`agent/loop.py#L226`](backend/app/agent/loop.py#L226) |
+| Segmenter | `sam-3.1` | Benchmarked against classical segmentation and used as an independent check of the classical nuclei (median IoU 0.85 on DMSO tiles). Classical segmentation won the bake-off on full fields, so it produces the masks; SAM stays selectable with `NUCLEI_SEGMENTER=sam` | [`sam.py`](backend/app/sam.py), [`scripts/segmentation_bakeoff.py`](scripts/segmentation_bakeoff.py), [`docs/DECISIONS.md`](docs/DECISIONS.md) |
+
+One client, [`LLMClient`](backend/app/llm.py#L175), talks to `https://api.meta.ai/v1`. At startup it calls `GET /v1/models` and refuses to start with a model id that does not exist ([`check_models`](backend/app/llm.py#L198)). It retries on 429/5xx, counts tokens, prices every call, and enforces a per-run and a daily cost cap ([`llm.py#L218`](backend/app/llm.py#L218)).
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Browser["React UI (Vite + TypeScript)"]
+        UI["Plate map · microscope · hypothesis board · notebook · unblinding · dossier"]
+    end
+    subgraph Backend["FastAPI (one process, port 8787)"]
+        API["/api/runs + SSE events"]
+        Loop["AgentLoop<br/>blinded → review → unblinding → reflection"]
+        Tools["9 tools<br/>budget, schemas, phase gating"]
+        Guard["Guardrails<br/>blinding scanner · citation validator · cost caps"]
+        Store["Run store<br/>runs/*.jsonl · replay"]
+    end
+    subgraph Meta["Meta Model API"]
+        Spark["muse-spark-1.3<br/>Scientist + Microscopist"]
+        Wonder["muse-wonder-1.0<br/>PI reviewer"]
+        SAM["sam-3.1<br/>segmentation check"]
+    end
+    subgraph Science["Measurement (no model)"]
+        Seg["Segmentation<br/>scikit-image"]
+        Feat["Per-cell features<br/>robust z vs same-plate DMSO"]
+        Atlas["LOCO reference atlas<br/>38 compounds"]
+    end
+    subgraph External["Public databases (after unblinding only)"]
+        PubChem["PubChem"]
+        ChEMBL["ChEMBL"]
+        PubMed["PubMed E-utilities"]
+    end
+    Data[("BBBC021 images<br/>DATA_DIR")]
+
+    UI <-->|SSE| API
+    API --> Loop
+    Loop <--> Spark
+    Loop <--> Wonder
+    Loop --> Tools
+    Tools --> Seg --> Feat --> Atlas
+    Seg -.->|bake-off| SAM
+    Data --> Seg
+    Tools --> PubChem & ChEMBL & PubMed
+    Loop --> Guard
+    Loop --> Store
+```
+
+A run: the Scientist spends its well budget with `acquire_well` (a virtual microscope over real BBBC021 images), looks with `describe_phenotype`, compares with `compare_to_reference_atlas` and `dose_response`, updates its hypotheses, and calls `submit_conclusion`. The reviewer approves or asks for one more experiment. Only then do `lookup_compound` and `search_literature` unlock; code computes the verdict ([`loop.py#L263`](backend/app/agent/loop.py#L263)), and the agent writes a reflection and a dossier (Markdown + JSON) that cites only papers it actually retrieved.
+
+Layout: `backend/app/agent` (loop, tools, reviewer, guardrails), `backend/app/science` (segmentation, features, atlas, stats), `backend/app/external` (PubChem, ChEMBL, PubMed clients), `backend/app/runs` (event store, replay), `frontend/` (UI), `scripts/` (data pipeline, eval, demo recording), `demo/` (4 recorded runs + 40 thumbnails), `eval/` (benchmark results).
+
+## Quickstart
+
+### Replay mode — no API key, no data download (Windows PowerShell)
+
+Needs Python 3.12 and Node 18+ (tested with Node 24).
 
 ```powershell
+git clone https://github.com/aleksandrahodzzik/musecell.git; cd musecell
 py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1          # if blocked: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 python -m pip install -r backend/requirements.txt
-Copy-Item .env.example backend/.env   # then fill in MODEL_API_KEY
-python scripts/probe_meta_api.py
+cd frontend; npm ci; npm run build; cd ..
+python -m uvicorn app.main:app --app-dir backend --port 8787
 ```
+
+Open http://127.0.0.1:8787, choose **Watch a recorded run**, and pick one of the four recorded runs. Without a key and data the app says that live runs are off; replays, dossiers and the benchmark page work. Cell masks and hover measurements need the data.
+
+macOS / Linux: the same, with `python3.12 -m venv .venv`, `source .venv/bin/activate`, and `&&` or new lines instead of `;`.
+
+### Live mode — with a Meta Model API key
+
+```powershell
+Copy-Item .env.example backend/.env   # fill in MODEL_API_KEY, NCBI_EMAIL, DATA_DIR (outside the repo)
+python scripts/probe_meta_api.py      # checks the key and the model ids
+python scripts/fetch_bbbc021.py       # prints the download plan (~10.8 GB of HTTP range reads); downloads nothing
+python scripts/fetch_bbbc021.py fetch # downloads the planned TIFFs (resumable)
+python scripts/preprocess.py
+python scripts/build_atlas.py         # segmentation + features for 3,096 fields (~30 min with 10 workers)
+python -m uvicorn app.main:app --app-dir backend --port 8787
+```
+
+Then **Start blinded run** in the UI, or `python scripts/run_agent_cli.py --list` and `--specimen <id>` in the terminal. A full-price run costs about $0.20–0.55 (the four demo runs). Development: `npm run dev` in `frontend/` serves on port 5174 with `/api` proxied to 8787.
+
+## Evaluation
+
+`scripts/evaluate.py` runs the full agent (blinded loop, review, unblinding, literature, reflection) on all 38 MoA-annotated BBBC021 compounds at 2, 4 and 6 wells, leave-one-compound-out, and compares it with the nearest-neighbour (NSC) baseline. The table below is copied from [`eval/RESULTS.md`](eval/RESULTS.md), which the script writes.
+
+| Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
+|---|---|---|---|---|---|---|---|---|
+| NSC baseline, all wells | all | 71.0% | 27/38 | – | – | – | – | – |
+| NSC baseline, random wells | 2 | 50.5% ± 6.2 | – | – | 2.00 | – | – | – |
+| NSC baseline, random wells | 4 | 57.8% ± 5.8 | – | – | 4.00 | – | – | – |
+| NSC baseline, random wells | 6 | 61.3% ± 5.0 | – | – | 6.00 | – | – | – |
+| MuseCell agent (muse-spark-1.3-contributor) | 2 | 42.1% | 16/38 | 36.8% | 2.00 | $0.107 | 203 s | 103/103 (100.0%) |
+| MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
+| MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
+
+**The agent is below the classical baseline,** and more wells do not help it. The error analysis in [`eval/RESULTS.md`](eval/RESULTS.md) shows where it goes wrong. Strong cytoskeletal and mitotic phenotypes are nearly always right (microtubule destabilizers 12/12, Aurora kinase inhibitors 9/9, stabilizers 8/9). Subtle classes are never right: it over-calls "Microtubule stabilizers" (35 of 114 runs, 9 true) and never calls Epithelial, Protein degradation or Cholesterol-lowering. The PI review changed a wrong call to a right one in 3 runs and a right one to wrong in 1. Every cited PMID (320/320) was one the agent had retrieved in that run.
+
+The eval ran on `muse-spark-1.3-contributor` (same model, cheaper tier; allowed because BBBC021 is public); 114 runs cost $14.60. The demo runs and the app use `muse-spark-1.3`. Every run is logged in [`eval/agent_runs.jsonl`](eval/agent_runs.jsonl); `python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only` rebuilds the tables and chart from it without API calls (needs the data for the baselines).
+
+## Guardrails
+
+- **Blinding.** Specimens, wells and fields carry salted opaque ids. During a blinded run a scanner checks every event and every message sent to a model for the compound's name, PubChem synonyms, SMILES and plate/well names, and stops the run before a leak reaches the model or the browser ([`BlindingScanner`](backend/app/agent/guardrails.py#L145)). The database and literature tools unlock only after the conclusion. Tests: [`test_tools.py#L279`](backend/tests/test_tools.py#L279), [`test_loop.py#L209`](backend/tests/test_loop.py#L209), [`test_api.py#L85`](backend/tests/test_api.py#L85). In the eval the guard stopped one run; an offline re-scan of all 114 logs found 0 leaks.
+- **Citations.** The reflection and dossier may cite only PMIDs that `search_literature` returned in the same run; anything else is stripped and the UI shows "Citations verified: n/n" ([`validate_citations`](backend/app/agent/guardrails.py#L102)).
+- **Verdict by code.** Right or wrong is the agent's top MoA compared with the BBBC021 annotation, never a model's judgement.
+- **Budget and turns.** Wells are counted server-side (max 8), max 20 model turns per run, strict JSON schemas with Pydantic validation; a tool error is shown to the agent, not hidden.
+- **Cost caps.** Per-run cap (default $1.00) and daily cap (default $20) checked before every call; the daily ledger survives restarts. Models without a price are refused.
+- **No canned output.** A failed model call is a visible error event. Replays are real recorded runs and carry a permanent "Replay of a live run · date · models" badge.
 
 ## Data
 
-See [DATA_LICENSE.md](DATA_LICENSE.md). BBBC021v1 (Caie et al., 2010), Broad Bioimage Benchmark Collection; IDR idr0035, CC BY 4.0, images © AstraZeneca.
+Images: BBBC021v1 [Caie et al., *Molecular Cancer Therapeutics*, 2010], from the Broad Bioimage Benchmark Collection [Ljosa et al., *Nature Methods*, 2012]; also distributed as IDR idr0035 under CC BY 4.0. Images © AstraZeneca. MCF-7 breast cancer cells, 3 stains (DNA, β-tubulin, F-actin). Raw TIFFs are not in this repository; `demo/thumbnails/` holds 40 downscaled derivatives under the same license. Details: [DATA_LICENSE.md](DATA_LICENSE.md).
+
+Compound identity and mechanisms after unblinding come from [PubChem](https://pubchem.ncbi.nlm.nih.gov/) and [ChEMBL](https://www.ebi.ac.uk/chembl/); literature from [PubMed](https://pubmed.ncbi.nlm.nih.gov/) via NCBI E-utilities.
+
+## Limitations
+
+- **One cell line, one dataset.** MCF-7 cells, 38 annotated compounds in 12 MoA classes, a single public screen. Nothing here has been tested on other cell lines, stains or plates.
+- **The virtual microscope replays existing images.** "Acquiring a well" reads a well that was imaged in 2010; the agent chooses among doses and replicates that already exist and cannot order a new experiment.
+- **Crude features.** Hand-built per-cell features (intensity, shape, GLCM texture) from classical segmentation. Classical cell bodies have no independent check; SAM 3.1 was used to check nuclei only.
+- **Accuracy is below a simple baseline** (see Evaluation), measured on the contributor tier. Full-price accuracy was not benchmarked; the 4 demo runs and 3 earlier test runs are too few to say.
+- **Small eval.** 38 compounds is small, so differences of a few compounds are within noise. The 38 compounds are also the only annotated set, so prompts were not tuned on a held-out split.
+- **Replay without data.** In a fresh clone without `DATA_DIR`, masks, hover measurements and fields beyond the 40 shipped thumbnails are unavailable (the UI says so).
+
+## Built during the hackathon
+
+Built during the Meta AI Developer Hackathon (Oct 26 – Nov 4, 2026). All code, data processing, evaluation and recordings in this repository were made in that window; the commit history shows each phase (skeleton, data, science, agent, UI, eval, release). Decisions, surprises and measured costs are logged in [docs/DECISIONS.md](docs/DECISIONS.md); the spec is [docs/MASTER_SPEC.md](docs/MASTER_SPEC.md); screenshots are in [docs/screens/](docs/screens/).
 
 ## License
 
-Code: MIT ([LICENSE](LICENSE)).
+Code: MIT ([LICENSE](LICENSE)). Data: see [DATA_LICENSE.md](DATA_LICENSE.md).
+
+*Research tool for cell-biology screening data. Not for clinical use.*

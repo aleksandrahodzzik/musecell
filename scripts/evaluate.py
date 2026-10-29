@@ -15,7 +15,8 @@ Steps
 Usage
   python scripts/evaluate.py                                   # baselines + estimate, no API calls
   python scripts/evaluate.py --model muse-spark-1.3-contributor --yes
-  python scripts/evaluate.py --aggregate-only                  # rebuild the outputs from eval/agent_runs.jsonl
+  python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only
+      # rebuild the outputs from eval/agent_runs.jsonl; only runs of --model are used (default muse-spark-1.3)
 """
 
 from __future__ import annotations
