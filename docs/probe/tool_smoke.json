@@ -1,6 +1,6 @@
 {
  "run": {
-  "run_id": "smoke_692e15c6",
+  "run_id": "smoke_006df436",
   "mode": "blinded",
   "phase": "unblinded",
   "specimen_id": "s_01943ff958",
@@ -15,13 +15,13 @@
     "step": 1,
     "tool": "list_available_experiments",
     "args": {
-     "rationale": "I need to see available doses and budget before planning acquisitions."
+     "rationale": "I need to survey available doses and budget before planning acquisitions."
     },
-    "rationale": "I need to see available doses and budget before planning acquisitions.",
+    "rationale": "I need to survey available doses and budget before planning acquisitions.",
     "evidence_id": "e1",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:18.983786Z",
+    "started_at": "2026-10-29T08:32:16.103796Z",
     "seconds": 0.0
    },
    {
@@ -36,7 +36,7 @@
     "evidence_id": "e2",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:18.998270Z",
+    "started_at": "2026-10-29T08:32:16.118450Z",
     "seconds": 0.016
    },
    {
@@ -51,7 +51,7 @@
     "evidence_id": "e3",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:19.012850Z",
+    "started_at": "2026-10-29T08:32:16.134294Z",
     "seconds": 0.013
    },
    {
@@ -67,9 +67,9 @@
     "rationale": "smoke test of describe_phenotype",
     "evidence_id": "e4",
     "error": null,
-    "cost_usd": 0.02219575,
-    "started_at": "2026-10-29T08:17:33.767133Z",
-    "seconds": 14.754
+    "cost_usd": 0.022221249999999998,
+    "started_at": "2026-10-29T08:32:30.309476Z",
+    "seconds": 14.174
    },
    {
     "step": 5,
@@ -86,8 +86,8 @@
     "evidence_id": "e5",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.771188Z",
-    "seconds": 0.005
+    "started_at": "2026-10-29T08:32:30.316265Z",
+    "seconds": 0.006
    },
    {
     "step": 6,
@@ -100,7 +100,7 @@
     "evidence_id": "e6",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.774269Z",
+    "started_at": "2026-10-29T08:32:30.319779Z",
     "seconds": 0.004
    },
    {
@@ -139,7 +139,7 @@
     "evidence_id": "e7",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.774269Z",
+    "started_at": "2026-10-29T08:32:30.320788Z",
     "seconds": 0.0
    },
    {
@@ -158,7 +158,7 @@
     "evidence_id": "e8",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.774269Z",
+    "started_at": "2026-10-29T08:32:30.320788Z",
     "seconds": 0.0
    },
    {
@@ -172,8 +172,8 @@
     "evidence_id": "e9",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.848421Z",
-    "seconds": 0.014
+    "started_at": "2026-10-29T08:32:30.358133Z",
+    "seconds": 0.002
    },
    {
     "step": 10,
@@ -187,8 +187,8 @@
     "evidence_id": "e10",
     "error": null,
     "cost_usd": 0.0,
-    "started_at": "2026-10-29T08:17:33.873821Z",
-    "seconds": 0.025
+    "started_at": "2026-10-29T08:32:30.358133Z",
+    "seconds": 0.001
    }
   ],
   "hypotheses": [
@@ -312,7 +312,7 @@
      "acquired_wells": []
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:18.983786Z"
+    "created_at": "2026-10-29T08:32:16.103796Z"
    },
    {
     "evidence_id": "e2",
@@ -439,7 +439,7 @@
      "f_18df85058fc8.composite",
      "f_99b9f74b7ae5.composite"
     ],
-    "created_at": "2026-10-29T08:17:18.998270Z"
+    "created_at": "2026-10-29T08:32:16.118450Z"
    },
    {
     "evidence_id": "e3",
@@ -566,7 +566,7 @@
      "f_26ef3536d60e.composite",
      "f_9f930ec467b3.composite"
     ],
-    "created_at": "2026-10-29T08:17:19.012850Z"
+    "created_at": "2026-10-29T08:32:16.134294Z"
    },
    {
     "evidence_id": "e4",
@@ -586,21 +586,27 @@
       "candidate_mechanisms": [
        {
         "moa": "unknown",
-        "why": "Enlarged pale nuclei and larger spread cells without actin collapse, microtubule loss/bundling, or increased multinucleation/mitotic arrest; no listed class is specifically supported."
+        "why": "Enlarged smooth nuclei/cells with lower DAPI intensity but intact tubulin and actin, no mitotic arrest, multinucleation, bundling, depolymerization or actin collapse; pattern is nonspecific and does not match listed classes."
        }
       ],
       "cell_density": "lower",
       "notable_cells": [
        {
         "field_id": "f_26ef3536d60e",
-        "why": "Unusually large flat cell with large dim oval nucleus, example of increased cell/nuclear area.",
-        "x": 135,
-        "y": 395
+        "why": "Very large flat cell with expanded tubulin cytoplasm and large round dim nucleus, illustrating increased cell and nuclear area.",
+        "x": 150,
+        "y": 380
+       },
+       {
+        "field_id": "f_26ef3536d60e",
+        "why": "Large spread cell with large round nucleus of low DAPI intensity, example of nuclear enlargement.",
+        "x": 545,
+        "y": 560
        },
        {
         "field_id": "f_9f930ec467b3",
-        "why": "Large spread cell with large dim oval nucleus, example of increased cell/nuclear area.",
-        "x": 200,
+        "why": "Enlarged cell with large oval dim nucleus, example of hypertrophic phenotype.",
+        "x": 190,
         "y": 270
        }
       ],
@@ -608,40 +614,40 @@
        {
         "agrees_with_measurements": true,
         "channel": "dna",
-        "finding": "Nuclei larger in area and long axis vs DMSO, agrees with nuc_area z=4.22 and nuc_major_axis z=10.27."
+        "finding": "Nuclei are larger with longer major axis than DMSO; agrees with nuc_area z=4.22 and nuc_major_axis z=10.27."
        },
        {
         "agrees_with_measurements": true,
         "channel": "dna",
-        "finding": "Mean DAPI intensity paler/dimmer vs DMSO, agrees with nuc_dna_mean z=-6.08."
+        "finding": "Mean DAPI intensity per nucleus looks dimmer than DMSO; agrees with nuc_dna_mean z=-6.08."
        },
        {
         "agrees_with_measurements": true,
         "channel": "dna",
-        "finding": "Nuclei smooth oval with high solidity vs DMSO, agrees with nuc_solidity z=4.68."
+        "finding": "Nuclei mostly single, round-oval with smooth contours, no increase in fragmented or multiple nuclei; agrees with nuc_solidity z=4.68 and frac_multinucleate_proxy z=-2.86."
        },
        {
         "agrees_with_measurements": true,
         "channel": "composite",
-        "finding": "Cytoplasm more spread with larger cell area and long axis vs DMSO, agrees with cell_area z=3.40 and cell_major_axis z=2.93."
+        "finding": "Cells more spread with larger cytoplasmic area than DMSO, including occasional very large flat cells; agrees with cell_area z=3.40 and cell_major_axis z=2.93."
        },
        {
         "agrees_with_measurements": false,
         "channel": "tubulin",
-        "finding": "Microtubule network remains filamentous with no obvious loss or bundling; no tubulin-intensity measurement provided to compare."
+        "finding": "Microtubule network diffuse and intact, similar to DMSO, without obvious bundling, loss or spindle accumulation; no tubulin intensity measurement provided."
        },
        {
         "agrees_with_measurements": false,
         "channel": "actin",
-        "finding": "Cortical actin meshwork intact with no collapse or fragmentation; no actin measurement provided to compare."
+        "finding": "Cortical F-actin network intact and similar to DMSO, without collapse or loss; no actin measurement provided."
        },
        {
         "agrees_with_measurements": false,
         "channel": "composite",
-        "finding": "Few bright rounded mitotic figures vs DMSO; no direct mitotic-count measurement provided to compare."
+        "finding": "Monolayer shows small cell-free gaps and fewer nuclei per field than DMSO; no direct cell-count z-score provided."
        }
       ],
-      "uncertainty": "Nonspecific hypertrophy with pale nuclei only; single time/concentration, modest density difference could partly reflect plating; no specific cytoskeletal or mitotic hallmark to assign class."
+      "uncertainty": "Enlargement is mild and nonspecific, could reflect cytostasis or cell-cycle delay; low resolution limits exclusion of subtle chromatin or cytoskeletal changes."
      }
     },
     "image_ids": [
@@ -649,7 +655,7 @@
      "f_9f930ec467b3.composite",
      "f_b7ce3f874263.composite"
     ],
-    "created_at": "2026-10-29T08:17:33.766120Z"
+    "created_at": "2026-10-29T08:32:30.308467Z"
    },
    {
     "evidence_id": "e5",
@@ -726,7 +732,7 @@
      "f_d773afdff777.composite",
      "f_6003222ba01a.composite"
     ],
-    "created_at": "2026-10-29T08:17:33.771188Z"
+    "created_at": "2026-10-29T08:32:30.316265Z"
    },
    {
     "evidence_id": "e6",
@@ -753,7 +759,7 @@
      "note": "Need at least 3 wells over 2 concentrations for a dose trend."
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:33.774269Z"
+    "created_at": "2026-10-29T08:32:30.319779Z"
    },
    {
     "evidence_id": "e7",
@@ -789,7 +795,7 @@
      ]
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:33.774269Z"
+    "created_at": "2026-10-29T08:32:30.320788Z"
    },
    {
     "evidence_id": "e8",
@@ -806,7 +812,7 @@
      "rationale": "smoke test of submit_conclusion"
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:33.774269Z"
+    "created_at": "2026-10-29T08:32:30.320788Z"
    },
    {
     "evidence_id": "e9",
@@ -849,7 +855,7 @@
      }
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:33.848421Z"
+    "created_at": "2026-10-29T08:32:30.358133Z"
    },
    {
     "evidence_id": "e10",
@@ -901,7 +907,7 @@
      ]
     },
     "image_ids": [],
-    "created_at": "2026-10-29T08:17:33.873821Z"
+    "created_at": "2026-10-29T08:32:30.358133Z"
    }
   ],
   "allowed_pmids": [
@@ -930,10 +936,10 @@
     "model": "muse-spark-1.3",
     "purpose": "schema check",
     "input_tokens": 1894,
-    "output_tokens": 130,
-    "reasoning_tokens": 47,
-    "cost_usd": 0.00292,
-    "seconds": 1.736,
+    "output_tokens": 120,
+    "reasoning_tokens": 40,
+    "cost_usd": 0.0028775,
+    "seconds": 1.406,
     "attempts": 1,
     "finish_reason": "tool_calls"
    },
@@ -941,21 +947,21 @@
     "model": "muse-spark-1.3",
     "purpose": "microscopist",
     "input_tokens": 7050,
-    "output_tokens": 3149,
-    "reasoning_tokens": 2604,
-    "cost_usd": 0.02219575,
-    "seconds": 13.701,
+    "output_tokens": 3155,
+    "reasoning_tokens": 2514,
+    "cost_usd": 0.022221249999999998,
+    "seconds": 13.185,
     "attempts": 1,
     "finish_reason": "stop"
    }
   ],
-  "cost_usd": 0.02511575,
+  "cost_usd": 0.025098749999999996,
   "model_ids": {
    "scientist": "muse-spark-1.3",
    "microscopist": "muse-spark-1.3"
   },
-  "started_at": "2026-10-29T08:17:16.176777Z"
+  "started_at": "2026-10-29T08:32:13.921987Z"
  },
  "leak_hits": [],
- "total_cost_usd": 0.02511575
+ "total_cost_usd": 0.025098749999999996
 }
