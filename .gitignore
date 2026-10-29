@@ -19,7 +19,7 @@ data/
 *.tiff
 *.zip
 cache/
-runs/*.jsonl
+/runs/
 !demo/runs/*.jsonl
 
 # old prototype (contains a hard-coded key — never commit)

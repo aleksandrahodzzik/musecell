@@ -16,6 +16,7 @@ from app.llm import CallRecord
 
 RunMode = Literal["blinded", "open"]
 RunPhase = Literal["blinded", "review", "unblinded", "finished"]
+RunStatus = Literal["running", "finished", "failed"]
 EvidenceKind = Literal["experiments", "well", "phenotype", "atlas", "dose_response", "hypotheses",
                        "conclusion", "compound", "literature"]
 EventType = Literal["run_started", "thinking", "tool_call", "tool_result", "hypotheses_updated", "budget_updated",
@@ -80,6 +81,24 @@ class Unblinding(BaseModel):
     pubchem_cid: int | None = None
     structure_url: str | None = None
     chembl_mechanisms: list[dict[str, Any]] = Field(default_factory=list)
+    identity_check: str | None = None
+
+
+class Citation(BaseModel):
+    pmid: str
+    claim: str
+
+
+class Reflection(BaseModel):
+    """The Scientist's post-unblinding reflection, after citation validation."""
+
+    text: str
+    what_was_right: list[str]
+    what_was_wrong: list[str]
+    citations: list[Citation]  # only PMIDs search_literature returned in this run
+    next_experiment: str
+    citations_cited: list[str] = Field(default_factory=list)
+    citations_removed: list[str] = Field(default_factory=list)
 
 
 class Verdict(BaseModel):
@@ -103,10 +122,15 @@ class AgentRun(BaseModel):
     hypothesis_history: list[HypothesisSnapshot] = Field(default_factory=list)
     evidence: list[Evidence] = Field(default_factory=list)
     allowed_pmids: list[str] = Field(default_factory=list)  # every PMID search_literature returned in this run
-    conclusion: Conclusion | None = None
+    conclusion: Conclusion | None = None  # the final one
+    conclusion_history: list[Conclusion] = Field(default_factory=list)  # every submitted conclusion, in order
     review: Review | None = None
     unblinding: Unblinding | None = None
     verdict: Verdict | None = None
+    reflection: Reflection | None = None
+    status: RunStatus = "running"
+    error: str | None = None
+    turns: int = 0  # Scientist model turns used (spec §5: max 20)
     model_calls: list[CallRecord] = Field(default_factory=list)
     cost_usd: float = 0.0
     model_ids: dict[str, str] = Field(default_factory=dict)

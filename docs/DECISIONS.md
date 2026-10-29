@@ -113,3 +113,36 @@ Client: `openai.OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MO
 ### Smoke test (`scripts/tool_smoke.py`, output `docs/probe/tool_smoke.json`)
 - Specimen `s_01943ff958` (blinded; PD-169316, Kinase inhibitors). 10 tool calls, 0 failed, leak scan clean (113 terms). One real Scientist call (schema check; it called `list_available_experiments` with a sensible rationale) + one real Microscopist call.
 - **Cost of the final smoke run: $0.0251** (schema check $0.0029, Microscopist $0.0222). Phase-3 API spend today incl. two earlier smoke attempts: $0.0800.
+
+## Phase 4 — agent loop, reviewer, SSE, run store, replay (2026-10-29)
+
+### Loop (`backend/app/agent/loop.py`)
+- One `AgentLoop` per run: blinded tool loop → PI review (≤ 1 revision round) → unblinding → literature → reflection → dossier. The API and `scripts/run_agent_cli.py` share it through `runs/manager.py`.
+- **Turn cap split** (spec: max 20 model turns per run): blinded 13, revision 4, literature 2, reflection 1. The last blinded/revision turn offers only `submit_conclusion`; a call to a tool not offered that turn is refused server-side (one tool message per call id is still sent). No conclusion → the run fails visibly; nothing is filled in.
+- Parallel tool calls run in the order given; each gets one tool message with its call id, same order. Calls after a successful `submit_conclusion` in the same batch get a phase error, not silence.
+- The assistant message is re-sent as a plain dict (`role, content, tool_calls[id, type, function{name, arguments}]`), not the SDK object's dump.
+- Visible assistant text (not hidden reasoning) is streamed as `thinking {note}`. After unblinding, notes pass the citation validator too (a note in the first live run cited PMIDs).
+- **Unblinding:** the protocol (code, not the model) runs `lookup_compound` on the specimen as a recorded step + evidence **without** its own `tool_call`/`tool_result` events, so the `unblinded` event is the first payload that names the compound (first draft emitted the lookup's `tool_call` one event earlier; the test caught it). Verdict = exact match of canonical MoA strings, computed by code.
+- **Blinding guard at runtime:** during `blinded`/`review` every event (except `error`/`run_finished`) and every request to a model (Scientist messages + tools, tool results, reviewer ledger) is scanned with `BlindingScanner` (name, PubChem synonyms found via the dataset SMILES, SMILES, plates, well keys). A hit stops the run with an error that never names the term; the leaking evidence/steps are blanked in the run state so `GET /api/runs/{id}` cannot show them. Internal codes without SMILES get no PubChem synonyms (a name lookup would return an unrelated compound's synonyms).
+- Reflection is a separate strict-JSON call on a fresh context (ledger summaries + literature list), not the long tool history: smaller, and no tool-history/response_format mix on an unverified API path.
+
+### Reviewer (`agent/reviewer.py`)
+- `muse-wonder-1.0`, strict schema `{verdict: approve|request_experiment, critique, requested_experiment}`; "no request" is an empty string (nullable types in strict mode are unverified on the Meta API). `max_tokens=12000` because Wonder reasons first. It sees the same blinded ledger as the Scientist. No second review after a revision (cost; the spec allows one revision round).
+
+### Dossier (`agent/dossier.py`)
+- Markdown + JSON from the run state, by code. Every PMID in every reflection field and in the citation list counts as "cited"; only PMIDs `search_literature` returned in this run survive; label "Citations verified: n/m". Files: `runs/<run_id>.dossier.{md,json}`, run state `runs/<run_id>.json`, events `runs/<run_id>.jsonl` (`/runs/` is gitignored now, not just `*.jsonl`).
+
+### API (`backend/app/main.py`)
+- SSE without extra packages (`StreamingResponse`): `id:` = event seq, `event:` = type, heartbeat comment every 15 s, resume via `Last-Event-ID` or `?after=`. A late subscriber gets the whole run so far.
+- Startup: no data → replay-only; no `MODEL_API_KEY` → replay-only; key set → `GET /v1/models` and refuse to start if an id is missing. `/api/images/{f_….composite|dna|tubulin|actin}` only (regex), falling back to `demo/thumbnails/` for recorded runs.
+- Replay: recorded events unchanged on a new `replay_…` bus with original pacing / speed (0.25–20×); one recorded pause is capped at 60 s; `run_started` gains `replay {replay_of, recorded_at, model_ids}` for the badge. Replays are not re-recorded.
+- `model_ids.segmentation` says `classical (scikit-image)`: SAM did not win the bake-off, so the UI must not claim SAM 3.1 for masks.
+
+### Live runs (budget 4; specimens drawn with `random.Random(4).sample`, not picked by MoA)
+| Run | Specimen | Wells | Turns | Review | Conclusion | Truth (compound) | Verdict | Citations | Cost |
+|---|---|---|---|---|---|---|---|---|---|
+| run_87e2787d1f1e | s_7526ba207c | 4/4 | 14 | request → free re-look at low dose | Microtubule stabilizers 0.58 → 0.68 | Eg5 inhibitors (AZ-C) | wrong | 5/5 | $0.4074 |
+| run_39e2d32f1edc | s_89c9462717 | 3/4 | 11 | approve | Microtubule stabilizers 0.94 | Microtubule stabilizers (taxol) | correct | 3/3 | $0.2147 |
+| run_93391a0830e0 | s_2cdd0232ac | 4/4 | 12 | approve | Protein synthesis 0.70 | Epithelial (PP-2) | wrong | 3/3 | $0.3388 |
+- 1/3 correct. Both misses follow the atlas/tubulin signal into a neighbouring class (Eg5 vs stabilizer; Epithelial is the baseline's weakest class, 1/8). In run 1 the reviewer pointed at the right problem (the 4-dose atlas favoured Eg5) but the requested free check did not flip the call. Agent behaviour: it acquires high + mid dose first, then lower doses; it used replicates 0 times. Not tuned here on purpose (the 38 compounds are the eval set).
+- Leak re-check of the three recorded logs (all events before `unblinded`, 55/156/109 terms): clean. Phase-4 API spend: $0.96 for the three runs; ≈ $1.07 for the day.
