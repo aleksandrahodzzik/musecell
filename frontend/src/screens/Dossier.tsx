@@ -40,10 +40,19 @@ interface Snapshot {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="print-break flex flex-col gap-2 border-t border-rule pt-4">
-      <h2 className="font-serif text-[20px] font-semibold">{title}</h2>
-      {children}
+    <section className="print-break grid grid-cols-[170px_minmax(0,1fr)] gap-6 border-t border-rule pt-5">
+      <h2 className="font-serif text-[19px] leading-snug font-semibold">{title}</h2>
+      <div className="flex flex-col gap-2 min-w-0">{children}</div>
     </section>
+  );
+}
+
+function Stat({ value, label }: { value: ReactNode; label: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="font-serif text-[26px] leading-none font-semibold text-white print:text-ink">{value}</span>
+      <span className="text-[11px] text-mist print:text-graphite">{label}</span>
+    </div>
   );
 }
 
@@ -75,8 +84,8 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
   const cited = new Map((d.reflection?.citations ?? []).map((c) => [c.pmid, c.claim]));
 
   return (
-    <div className="mx-auto max-w-[880px] px-6 py-6 flex flex-col gap-5 bg-sheet print:bg-white min-h-full">
-      <div className="no-print flex items-center gap-2">
+    <div className="mx-auto max-w-[960px] px-8 pb-8 flex flex-col gap-6 bg-sheet print:bg-white min-h-full shadow-[0_0_0_1px_rgba(23,32,42,0.06),0_30px_80px_-40px_rgba(23,32,42,0.35)]">
+      <div className="dark no-print flex items-center gap-2 -mx-8 -mb-6 px-8 pt-5 pb-1 bg-night">
         <a className="btn" href={href({ name: "run", runId })}><ArrowLeft aria-hidden className="h-3.5 w-3.5" /> Back to the run</a>
         <span className="ml-auto" />
         <button className="btn" onClick={() => window.print()}><Printer aria-hidden className="h-3.5 w-3.5" /> Print</button>
@@ -84,49 +93,68 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
         <a className="btn" href={`/api/runs/${encodeURIComponent(runId)}/dossier.json`} download><Download aria-hidden className="h-3.5 w-3.5" /> Export JSON</a>
       </div>
 
-      <header className="flex flex-col gap-1">
-        <p className="text-sm text-graphite">MuseCell dossier · {d.mode} run {d.run_id}{snap.data && <> · {dateTime(snap.data.started_at)}</>}</p>
-        <h1 className="font-serif text-[32px] leading-tight font-semibold">
-          {d.unblinding?.compound ?? label}
-          {d.unblinding && <span className="font-sans text-base font-normal text-graphite ml-2">({label} before unblinding)</span>}
-        </h1>
-        <p className="text-sm text-graphite">
-          Scientist {modelName(d.model_ids.scientist)} · Reviewer {modelName(d.model_ids.reviewer)} · Segmentation {modelName(d.model_ids.segmentation)} ·{" "}
-          {d.budget.used} of {d.budget.total} wells · {d.turns} model turns · {d.model_calls.length} model calls · {usd(d.cost_usd)}
-        </p>
+      <header className="dark -mx-8 px-8 pt-5 pb-7 bg-night flex gap-8 items-start text-haze print:bg-white print:text-ink">
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          <p className="text-[12px] text-mist print:text-graphite">
+            MuseCell dossier · {d.mode} run <span className="ids">{d.run_id}</span>{snap.data && <> · {dateTime(snap.data.started_at)}</>}
+          </p>
+          <h1 className="font-serif text-[46px] leading-[1.05] font-semibold tracking-[-0.015em] text-white print:text-ink">
+            {d.unblinding?.compound ?? label}
+          </h1>
+          {d.unblinding && <p className="text-sm text-mist print:text-graphite">{label} before unblinding</p>}
+          {d.verdict && (
+            <div className={`mt-3 self-start -rotate-[0.6deg] rounded-panel border-2 px-4 py-2.5 ${d.verdict.correct
+              ? "border-verdict-yes-on-night text-verdict-yes-on-night print:border-verdict-yes print:text-verdict-yes"
+              : "border-verdict-no-on-night text-verdict-no-on-night print:border-verdict-no print:text-verdict-no"}`}>
+              <p className="flex items-center gap-2 font-serif text-[20px] font-semibold">
+                {d.verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
+                {d.verdict.correct ? "The agent's call matches" : "The agent's call does not match"}
+              </p>
+              <p className="text-[12px] text-haze print:text-ink mt-0.5">
+                Agent: {d.verdict.agent_moa}{final && ` (probability ${prob(final.probability)})`} · Annotated: {d.verdict.truth_moa}
+              </p>
+              <p className="text-[11px] text-mist print:text-graphite">Compared by code against the BBBC021 annotation, not judged by a model.</p>
+            </div>
+          )}
+          <div className="mt-5 grid grid-cols-5 gap-5 border-t border-line pt-4 print:border-rule">
+            <Stat value={`${d.budget.used}/${d.budget.total}`} label="wells imaged" />
+            <Stat value={d.turns} label="model turns" />
+            <Stat value={d.model_calls.length} label="model calls" />
+            <Stat value={usd(d.cost_usd)} label="API cost" />
+            <Stat value={d.citations_label.replace(/^Citations verified:\s*/, "")} label="citations verified" />
+          </div>
+          <p className="text-[12px] text-mist print:text-graphite">
+            Scientist {modelName(d.model_ids.scientist)} · Reviewer {modelName(d.model_ids.reviewer)} · Segmentation {modelName(d.model_ids.segmentation)}
+          </p>
+        </div>
+        {d.unblinding?.structure_url && (
+          <figure className="shrink-0 w-[200px] bg-white rounded-panel p-2.5 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.9)] print:shadow-none print:border print:border-rule">
+            <img src={d.unblinding.structure_url} alt={`2D structure of ${d.unblinding.compound} from PubChem`} className="w-full aspect-square object-contain" />
+            {d.unblinding.pubchem_cid && <figcaption className="text-[11px] text-graphite mt-1">PubChem CID {d.unblinding.pubchem_cid}</figcaption>}
+          </figure>
+        )}
       </header>
 
       <Section title="Question">
-        <p className="font-serif text-[16px]">{d.question}</p>
+        <p className="font-serif text-[21px] leading-snug">{d.question}</p>
       </Section>
 
-      {d.verdict && (
-        <div className={`print-break rounded-panel border-2 p-3 ${d.verdict.correct ? "border-verdict-yes" : "border-verdict-no"}`}>
-          <p className={`flex items-center gap-1.5 font-medium ${d.verdict.correct ? "text-verdict-yes" : "text-verdict-no"}`}>
-            {d.verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
-            {d.verdict.correct ? "Correct" : "Incorrect"}: the agent said {d.verdict.agent_moa}
-            {final && ` (probability ${prob(final.probability)})`}; the annotated mechanism is {d.verdict.truth_moa}.
-          </p>
-          <p className="text-xs text-graphite mt-1">Verdict compared by code against the BBBC021 annotation, not judged by a model.</p>
-        </div>
-      )}
-
       <Section title="Experiments run">
-        <table className="text-sm w-full">
+        <table className="text-sm w-full table-fixed">
           <thead className="text-xs text-graphite">
             <tr>
-              <th className="text-left font-normal w-[64px] pb-1">Well</th><th className="text-left font-normal w-[92px] pb-1">Field 1</th>
-              <th className="text-right font-normal w-[72px] pb-1 pr-4">Dose</th><th className="text-right font-normal w-[72px] pb-1 pr-4">Replicate</th>
-              <th className="text-right font-normal w-[56px] pb-1 pr-4">Cells</th><th className="text-left font-normal pb-1">Largest changes vs same-plate DMSO (robust z)</th>
+              <th className="text-left font-normal w-[44px] pb-1">Well</th><th className="text-left font-normal w-[114px] pb-1">Field 1</th>
+              <th className="text-right font-normal w-[76px] pb-1 pr-4">Dose</th><th className="text-right font-normal w-[84px] pb-1 pr-4">Replicate</th>
+              <th className="text-right font-normal w-[64px] pb-1 pr-4">Cells</th><th className="text-left font-normal pb-1">Largest changes vs DMSO (robust z)</th>
             </tr>
           </thead>
           <tbody>
             {d.experiments.map((x, i) => (
               <tr key={x.well_id} className="border-t border-rule align-top">
-                <td className="py-1.5">{i + 1}<span className="block text-graphite text-xs">{x.evidence_id}</span></td>
+                <td className="py-1.5"><span className="font-serif text-[18px] font-semibold">{i + 1}</span><span className="block text-graphite ids">{x.evidence_id}</span></td>
                 <td className="py-1.5">
                   {x.image_ids[0] && (
-                    <FieldThumb imageId={x.image_ids[0]} width={72} height={58} className="stain-tint bg-darkfield w-[72px] h-[58px] object-cover"
+                    <FieldThumb imageId={x.image_ids[0]} width={100} height={76} className="stain-tint bg-darkfield w-[100px] h-[76px] object-cover rounded-[3px]"
                                 alt={`Well ${i + 1}, field 1: composite of DNA, tubulin and actin`} />
                   )}
                 </td>
@@ -135,7 +163,7 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
                 <td className="py-1.5 pr-4 text-right">{x.cells_measured}</td>
                 <td className="py-1.5 text-xs leading-relaxed">
                   {x.top_deviations.map((t) => (
-                    <span key={t.feature} className="mr-3 whitespace-nowrap">{featureName(t.feature)} {signed(t.z)}</span>
+                    <span key={t.feature} className="block whitespace-nowrap truncate">{featureName(t.feature)} <span className="font-mono">{signed(t.z)}</span></span>
                   ))}
                 </td>
               </tr>
@@ -182,7 +210,7 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
       {d.review && (
         <Section title="Reviewer critique">
           <p className="text-sm font-medium">{d.review.verdict === "approve" ? "Approved" : "Asked for one more experiment"} · {modelName(d.model_ids.reviewer)}</p>
-          <p className="font-serif text-[15px]">{d.review.critique}</p>
+          <blockquote className="font-serif italic text-[16px] leading-relaxed border-l-[3px] border-ink pl-4">“{d.review.critique}”</blockquote>
           {d.review.requested_experiment && <p className="text-sm text-graphite">Requested: <span className="text-ink">{d.review.requested_experiment}</span></p>}
         </Section>
       )}
@@ -232,7 +260,7 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
       </Section>
 
       <Section title="Proposed next experiment in a real lab">
-        <p className="font-serif text-[16px]">{d.reflection?.next_experiment || final?.next_experiment_if_this_were_a_real_lab || "None proposed."}</p>
+        <p className="font-serif text-[18px] leading-snug">{d.reflection?.next_experiment || final?.next_experiment_if_this_were_a_real_lab || "None proposed."}</p>
       </Section>
 
       <Section title="Steps">

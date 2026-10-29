@@ -83,8 +83,9 @@ export default function AgentCircuit({ run }: { run: RunState }) {
   }, [open]);
 
   return (
-    <div ref={ref} className="dark relative shrink-0 h-12 flex items-center justify-center gap-0 px-3 bg-night border-b border-line overflow-x-auto"
+    <div ref={ref} className="dark relative shrink-0 h-12 flex items-center px-3 bg-night border-b border-line overflow-x-auto"
          role="group" aria-label="Who is working">
+      <div className="flex items-center w-max mx-auto">
       {list.map((n, i) => {
         const on = active === n.id;
         return (
@@ -114,6 +115,7 @@ export default function AgentCircuit({ run }: { run: RunState }) {
           </div>
         );
       })}
+      </div>
       {open && <Details node={list.find((n) => n.id === open)!} />}
     </div>
   );

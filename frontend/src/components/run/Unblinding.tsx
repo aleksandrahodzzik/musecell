@@ -65,7 +65,7 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
           {!u.structure_url && <p className="text-xs text-mist">No public structure to show for this compound.</p>}
         </div>
 
-        <div className={`grid gap-5 items-start ${u.structure_url ? "grid-cols-[168px_1fr]" : "grid-cols-1"}`}>
+        <div className={`grid gap-5 items-start ${u.structure_url ? "grid-cols-[128px_1fr] xl:grid-cols-[168px_1fr]" : "grid-cols-1"}`}>
           {u.structure_url && (
             <Beat at={0.3}>
               <figure className="bg-white rounded-panel p-2 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.9)]">
@@ -110,7 +110,7 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
                     {verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
                     {verdict.correct ? "The agent's call matches" : "The agent's call does not match"}
                   </p>
-                  <dl className="mt-1.5 grid grid-cols-[150px_1fr] gap-y-0.5 text-sm">
+                  <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm">
                     <dt className="text-mist">Agent's call</dt>
                     <dd className="text-white">{verdict.agent_moa}{probability != null && <span className="text-mist"> · probability {probability.toFixed(2)} in its conclusion</span>}</dd>
                     <dt className="text-mist">Annotated mechanism</dt>

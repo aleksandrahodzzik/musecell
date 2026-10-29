@@ -4,6 +4,7 @@
 import { Lock, Play, RefreshCw, Shuffle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type React from "react";
+import HowItWorks from "../components/HowItWorks";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
 import { ApiError, postJSON } from "../lib/api";
 import { dateTime, modelName, usd } from "../lib/format";
@@ -175,6 +176,8 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
       </div>
 
       {showRecorded && <div ref={recordedRef}><RecordedRuns /></div>}
+
+      <HowItWorks ids={health?.model_ids} />
     </div>
   );
 }

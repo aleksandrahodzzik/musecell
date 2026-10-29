@@ -27,6 +27,20 @@ Three Meta models play different roles in one run; every call is metered and cap
 
 One client, [`LLMClient`](backend/app/llm.py#L175), talks to `https://api.meta.ai/v1`. At startup it calls `GET /v1/models` and refuses to start with a model id that does not exist ([`check_models`](backend/app/llm.py#L198)). It retries on 429/5xx, counts tokens, prices every call, and enforces a per-run and a daily cost cap ([`llm.py#L218`](backend/app/llm.py#L218)).
 
+## What you see
+
+| | |
+|---|---|
+| ![Start screen: a real BBBC021 field in the eyepiece, sealed specimen slides, budget wells](docs/screens/01_choose_specimen.png) | ![Run view: agent circuit, plate map with imaged wells, microscope beside the same-plate DMSO control, hypothesis board, notebook](docs/screens/03_run_view.png) |
+| **Start.** A real BBBC021 field in the eyepiece (toggle the stains, pan with the pointer); specimens are sealed slides; the budget is a row of wells. | **Run.** The agent circuit lights the model working right now. Wells fill with their own fields; the microscope sits beside the same-plate DMSO control. |
+| ![Unblinding: compound name, PubChem structure, ChEMBL mechanism and the verdict computed by code](docs/screens/05_unblinding.png) | ![Dossier: title band with the verdict, run statistics, experiments with fields and z-scores](docs/screens/06_dossier.png) |
+| **Unblinding.** The name resolves, the structure and ChEMBL mechanism appear, and code stamps the verdict. | **Dossier.** Printable report with experiments, hypothesis history, review, reflection and verified citations; export Markdown or JSON. |
+
+Things to try in a replay:
+- Click a node of the **agent circuit** (Scientist, Microscopist, PI reviewer) for its per-call ledger: tokens in and out, reasoning tokens, seconds and cost of every Meta model call.
+- Switch the hypothesis board to **Over time** and scrub through the agent's board updates.
+- In the microscope: **1 2 3** toggle stains, **M** cell masks with hover measurements, **D** the same-plate DMSO control, **← →** fields, **+ −** zoom.
+
 ## Architecture
 
 ```mermaid

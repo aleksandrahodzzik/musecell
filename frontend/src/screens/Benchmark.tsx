@@ -18,7 +18,7 @@ export interface ResultRow {
   mean_latency_s?: number | null;
   citation_validity?: number | null;
 }
-interface Results {
+export interface Results {
   generated_at?: string;
   models?: Record<string, string>;
   n_compounds?: number;
@@ -152,7 +152,7 @@ const DASH = ["", "5 4", "1.5 3", "8 3 2 3"];
 const isAgent = (pts: ResultRow[]) => pts.some((p) => p.method === "agent");
 
 /** The headline: the agent and both baselines at the largest budget the eval ran, read from the rows. */
-function Finding({ rows }: { rows: ResultRow[] }) {
+export function Finding({ rows }: { rows: ResultRow[] }) {
   const agent = rows.filter((x) => x.method === "agent" && x.budget != null);
   if (!agent.length) return null;
   const b = Math.max(...agent.map((x) => x.budget!));

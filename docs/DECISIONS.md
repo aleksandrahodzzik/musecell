@@ -262,3 +262,9 @@ Owner asked for more interactivity. Everything added reads the run's own events;
 - **Eyepiece**: DNA / tubulin / actin toggle on the start screen (canvas composite from `fieldImage.compose`, the same code as the microscope); the field pans with the pointer.
 - **Microscope keys**: 1/2/3 stains, M masks, D same-plate DMSO, +/− zoom, F fit, ←/→ fields; ignored while typing or when radio groups, sliders or tabs have focus.
 - Screenshots (0 console errors) and `docs/hero.gif` (7.81 MB) re-recorded.
+
+## Polish pass (2026-10-29)
+- **Dossier** re-laid out as a report: dark title band (compound, verdict stamp, run statistics, PubChem structure; prints white), section titles in a left margin column, larger field thumbnails in a fixed-layout experiments table, reviewer critique as a block quote.
+- **Start screen** gains a second half: "One run, from sealed slide to verified dossier" (five steps naming the model or service behind each) and the benchmark headline from `eval/results.json` with a link to the full page. The headline states that the agent is below the baseline; it is derived from the rows, so it changes if the results do.
+- **Tablet width (1024 px)**: run header no longer truncates the compound (replay badge drops the model names below `xl`); the agent circuit scrolls instead of clipping its first node; unblinding and side columns narrow below `xl`.
+- README: "What you see" gallery (4 screens) and "Things to try in a replay". Screenshots now come from run_19b4ee810120 (it has a reviewer request); hero GIF 7.68 MB.

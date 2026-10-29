@@ -80,7 +80,7 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
           </ErrorNote>
         </div>
       )}
-      <div className={`shrink-0 ${tab === "unblinding" ? "h-[66%]" : "h-[56%]"} min-h-[320px] grid grid-cols-[220px_minmax(0,1fr)_280px] border-b border-rule`}>
+      <div className={`shrink-0 ${tab === "unblinding" ? "h-[66%]" : "h-[56%]"} min-h-[320px] grid grid-cols-[200px_minmax(0,1fr)_252px] xl:grid-cols-[220px_minmax(0,1fr)_280px] border-b border-rule`}>
         <section aria-label="Plate map" className="dark instrument border-r border-line min-h-0">
           <PlateMap doses={run.doses} nDoses={run.started.doses} wells={run.wells} selected={selectedId} onSelect={onSelectWell} />
         </section>
