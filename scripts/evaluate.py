@@ -246,6 +246,39 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
     return rows, notes
 
 
+def analysis(records: list[dict]) -> dict:
+    """Where the agent's calls go wrong, over all budgets: calls per class vs truth, per-class accuracy, review."""
+    truth = Counter(r["truth_moa"] for r in records)
+    called = Counter(r.get("agent_moa") or "(no conclusion)" for r in records)
+    per_class = {m: {"correct": sum(r["correct"] for r in records if r["truth_moa"] == m), "runs": n}
+                 for m, n in sorted(truth.items())}
+    return {
+        "runs": len(records), "total_cost_usd": round(sum(r["cost_usd"] for r in records), 2),
+        "calls_vs_truth": {m: {"called": called.get(m, 0), "true": truth.get(m, 0)}
+                           for m in sorted(set(called) | set(truth), key=lambda m: (-called.get(m, 0), m))},
+        "per_class": per_class,
+        "review": {"request_experiment": sum(r.get("review") == "request_experiment" for r in records),
+                   "approve": sum(r.get("review") == "approve" for r in records),
+                   "wrong_to_right": sum(r["correct"] and not r["first_correct"] for r in records),
+                   "right_to_wrong": sum(r["first_correct"] and not r["correct"] for r in records)},
+    }
+
+
+def analysis_markdown(a: dict) -> list[str]:
+    lines = ["## Where the agent goes wrong", "",
+             f"All {a['runs']} agent runs pooled over budgets (total API cost ${a['total_cost_usd']:.2f}).", "",
+             "| Mechanism class | Agent calls | True runs | Correct |", "|---|---|---|---|"]
+    for m, c in a["calls_vs_truth"].items():
+        pc = a["per_class"].get(m)
+        correct = f"{pc['correct']}/{pc['runs']}" if pc else "–"
+        lines.append(f"| {m} | {c['called']} | {c['true']} | {correct} |")
+    rv = a["review"]
+    lines += ["", f"PI review: {rv['request_experiment']} requests for another experiment, {rv['approve']} approvals; "
+              f"the final call changed from wrong to right in {rv['wrong_to_right']} runs and from right to wrong in "
+              f"{rv['right_to_wrong']}.", ""]
+    return lines
+
+
 def write_markdown(res: dict, path: Path) -> None:
     def pct(x):
         return "–" if x is None else f"{100 * x:.1f}%"
@@ -277,6 +310,8 @@ def write_markdown(res: dict, path: Path) -> None:
     lines += ["", "± = standard deviation over random well draws. \"Before review\" = the agent's first conclusion, "
               "before the PI reviewer's critique and any requested experiment.", "",
               "![Accuracy against wells per compound](accuracy_vs_budget.png)", ""]
+    if res.get("analysis"):
+        lines += analysis_markdown(res["analysis"])
     if res.get("notes"):
         lines += ["## Notes", "", *[f"- {n}" for n in res["notes"]], ""]
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -296,8 +331,8 @@ def plot(res: dict, path: Path) -> None:
         series.setdefault(r["label"], []).append(r)
     budgets = sorted({r["budget"] for r in res["rows"] if r["budget"] is not None})
     xmax = max(budgets) + 0.4
-    for i, (label, pts) in enumerate(series.items()):
-        color, dash, width = styles[min(i, len(styles) - 1)]
+    for label, pts in series.items():  # the agent is the primary line; baselines are graphite references
+        color, dash, width = styles[{"agent": 0, "nsc_random": 1}.get(pts[0]["method"], 2)]
         if pts[0]["budget"] is None:
             ax.axhline(pts[0]["accuracy"], color=color, linestyle=(0, (2, 3)), linewidth=1.25, label=label)
             ax.text(xmax, pts[0]["accuracy"], f" {label}", va="center", fontsize=8, color=color)
@@ -403,7 +438,8 @@ async def main() -> int:
         res = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "models": {"scientist": args.model, "microscopist": args.model, "reviewer": args.reviewer_model,
                           "segmentation": manager.model_ids()["segmentation"]},
-               "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows}
+               "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows,
+               "analysis": analysis(used) if used else None}
         (EVAL / "results.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
         write_markdown(res, EVAL / "RESULTS.md")
         plot(res, EVAL / "accuracy_vs_budget.png")

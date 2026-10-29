@@ -1,0 +1,216 @@
+{
+ "generated_at": "2026-10-29T11:00:03+00:00",
+ "models": {
+  "scientist": "muse-spark-1.3-contributor",
+  "microscopist": "muse-spark-1.3-contributor",
+  "reviewer": "muse-wonder-1.0",
+  "segmentation": "classical (scikit-image)"
+ },
+ "n_compounds": 38,
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 80 deselected in 8.57s; offline re-scan of 114 eval run logs (events before unblinding): 0 hits",
+ "notes": [
+  "Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.",
+  "Budget 6, s_89c9462717: run failed (Blinding guard stopped the run: the result of describe_phenotype contained compound-identifying text.); counted as wrong.",
+  "Budget 6, s_3069b9414e: run failed (muse-spark-1.3-contributor used all 8000 tokens (incl. 7998 reasoning) without answering. Raise max_tokens for this call.); counted as wrong.",
+  "The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses treatment profiles (median over replicates), the published NSC protocol."
+ ],
+ "rows": [
+  {
+   "method": "nsc_all",
+   "label": "NSC baseline, all wells",
+   "budget": null,
+   "n": 38,
+   "accuracy": 0.7105,
+   "correct": 27
+  },
+  {
+   "method": "nsc_random",
+   "label": "NSC baseline, random wells",
+   "budget": 2,
+   "n": 38,
+   "accuracy": 0.5047,
+   "sd": 0.0619,
+   "mean_wells": 2.0
+  },
+  {
+   "method": "nsc_random",
+   "label": "NSC baseline, random wells",
+   "budget": 4,
+   "n": 38,
+   "accuracy": 0.5776,
+   "sd": 0.0584,
+   "mean_wells": 4.0
+  },
+  {
+   "method": "nsc_random",
+   "label": "NSC baseline, random wells",
+   "budget": 6,
+   "n": 38,
+   "accuracy": 0.6129,
+   "sd": 0.05,
+   "mean_wells": 6.0
+  },
+  {
+   "method": "agent",
+   "label": "MuseCell agent (muse-spark-1.3-contributor)",
+   "budget": 2,
+   "n": 38,
+   "accuracy": 0.4211,
+   "correct": 16,
+   "accuracy_before_review": 0.3684,
+   "mean_wells": 2.0,
+   "mean_cost_usd": 0.107,
+   "mean_latency_s": 203.2,
+   "citation_validity": 1.0,
+   "citations": "103/103",
+   "failed": 0,
+   "reviewer_requests": 15
+  },
+  {
+   "method": "agent",
+   "label": "MuseCell agent (muse-spark-1.3-contributor)",
+   "budget": 4,
+   "n": 38,
+   "accuracy": 0.3684,
+   "correct": 14,
+   "accuracy_before_review": 0.3684,
+   "mean_wells": 3.92,
+   "mean_cost_usd": 0.1352,
+   "mean_latency_s": 208.1,
+   "citation_validity": 1.0,
+   "citations": "109/109",
+   "failed": 0,
+   "reviewer_requests": 18
+  },
+  {
+   "method": "agent",
+   "label": "MuseCell agent (muse-spark-1.3-contributor)",
+   "budget": 6,
+   "n": 38,
+   "accuracy": 0.4211,
+   "correct": 16,
+   "accuracy_before_review": 0.4211,
+   "mean_wells": 5.61,
+   "mean_cost_usd": 0.1432,
+   "mean_latency_s": 239.4,
+   "citation_validity": 1.0,
+   "citations": "108/108",
+   "failed": 2,
+   "reviewer_requests": 13
+  }
+ ],
+ "analysis": {
+  "runs": 114,
+  "total_cost_usd": 14.6,
+  "calls_vs_truth": {
+   "Microtubule stabilizers": {
+    "called": 35,
+    "true": 9
+   },
+   "Aurora kinase inhibitors": {
+    "called": 15,
+    "true": 9
+   },
+   "Microtubule destabilizers": {
+    "called": 14,
+    "true": 12
+   },
+   "DNA replication": {
+    "called": 12,
+    "true": 12
+   },
+   "Protein synthesis": {
+    "called": 11,
+    "true": 9
+   },
+   "Actin disruptors": {
+    "called": 10,
+    "true": 9
+   },
+   "DNA damage": {
+    "called": 10,
+    "true": 12
+   },
+   "Eg5 inhibitors": {
+    "called": 4,
+    "true": 6
+   },
+   "(no conclusion)": {
+    "called": 2,
+    "true": 0
+   },
+   "Kinase inhibitors": {
+    "called": 1,
+    "true": 9
+   },
+   "Cholesterol-lowering": {
+    "called": 0,
+    "true": 6
+   },
+   "Epithelial": {
+    "called": 0,
+    "true": 9
+   },
+   "Protein degradation": {
+    "called": 0,
+    "true": 12
+   }
+  },
+  "per_class": {
+   "Actin disruptors": {
+    "correct": 0,
+    "runs": 9
+   },
+   "Aurora kinase inhibitors": {
+    "correct": 9,
+    "runs": 9
+   },
+   "Cholesterol-lowering": {
+    "correct": 0,
+    "runs": 6
+   },
+   "DNA damage": {
+    "correct": 6,
+    "runs": 12
+   },
+   "DNA replication": {
+    "correct": 6,
+    "runs": 12
+   },
+   "Eg5 inhibitors": {
+    "correct": 0,
+    "runs": 6
+   },
+   "Epithelial": {
+    "correct": 0,
+    "runs": 9
+   },
+   "Kinase inhibitors": {
+    "correct": 1,
+    "runs": 9
+   },
+   "Microtubule destabilizers": {
+    "correct": 12,
+    "runs": 12
+   },
+   "Microtubule stabilizers": {
+    "correct": 8,
+    "runs": 9
+   },
+   "Protein degradation": {
+    "correct": 0,
+    "runs": 12
+   },
+   "Protein synthesis": {
+    "correct": 4,
+    "runs": 9
+   }
+  },
+  "review": {
+   "request_experiment": 46,
+   "approve": 67,
+   "wrong_to_right": 3,
+   "right_to_wrong": 1
+  }
+ }
+}

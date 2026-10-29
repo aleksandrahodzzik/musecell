@@ -186,3 +186,41 @@ Also fixed: duplicate "(blinded)" + "Blinded" chip in the run header; chart end-
 ### Not done / known
 - Thinking notes in the three recorded runs are cut at 1,000 chars by the loop version that recorded them (current loop: 2,000); the UI shows them as recorded.
 - Recorded runs live in gitignored `runs/` for now; `demo/runs/` + thumbnails are Phase 6. In a fresh clone without DATA_DIR, masks/hover and channel images are unavailable (the UI says so).
+
+## Phase 6 — evaluation and demo recordings (2026-10-29)
+
+### Eval (`scripts/evaluate.py` → `eval/results.json`, `eval/RESULTS.md`, `eval/accuracy_vs_budget.png`)
+- All 38 annotated compounds × budgets 2/4/6 = 114 full agent runs (blinded loop, PI review, unblinding, literature, reflection). Scientist/Microscopist/reflection on **`muse-spark-1.3-contributor`** (user's choice after the cost estimate; public data; labelled in every output), reviewer `muse-wonder-1.0`. Estimate printed first: ~$12 (≤ $16); actual **$14.60** for the 114 logged runs.
+- Baselines (no API): (a) NSC on all wells = the published protocol already in `eval/baseline.json` (treatment profiles, compound majority vote); (b) NSC on k random wells of the specimen = 1-NN per well, majority vote, mean ± sd over 500 draws. (b) votes over single wells, so it is not identical to (a) at k = all; noted in the results.
+- Per-run records in `eval/agent_runs.jsonl` (committed, ~70 KB) so the tables can be rebuilt with `--aggregate-only`; run logs in gitignored `runs/eval/`.
+- Failed runs count as wrong and are listed: one stopped by the **runtime blinding guard** (the Microscopist's description of a taxol specimen matched an identifying term; the guard stopped it before any event carried the term), one where the contributor Scientist spent all 8,000 tokens on reasoning. Not re-run, not tuned (the 38 compounds are the eval set).
+- One more run (s_66b994c89e, budget 2) crashed on our own bug (below); its record was removed and the run repeated.
+- Blinding-leak test: pytest leak/blinding tests 13 passed; offline re-scan of all 114 eval logs (events before `unblinded`): 0 hits.
+
+### Result: the agent is below the baseline
+Agent 42.1 / 36.8 / 42.1 % at 2 / 4 / 6 wells vs NSC on the same number of random wells 50.5 / 57.8 / 61.3 % and NSC on all wells 71.0 %. More wells do not help the agent. Error analysis (in RESULTS.md, computed by the script):
+- **Over-calling one class:** "Microtubule stabilizers" is the agent's call in 35 of 114 runs (9 true). Strong cytoskeletal/mitotic phenotypes (stabilizers 8/9, destabilizers 12/12, Aurora 9/9) are nearly always right; subtle classes are never right (Actin disruptors, Cholesterol-lowering, Eg5, Epithelial, Protein degradation: 0 correct; Epithelial/Protein degradation/Cholesterol-lowering are never even called).
+- Our reading: the model's prior follows the most visible feature (tubulin texture/intensity z-scores, which are large for many treatments) more than the atlas vote, and it rarely calls classes whose phenotype is weak. The NSC baseline has no prior and simply follows the nearest profile. Same failure mode as the Phase-4 misses.
+- The PI review rarely changes the outcome: 46 requests, final call wrong→right in 3 runs, right→wrong in 1.
+- Citation validity 100 % (320/320 cited PMIDs were returned by `search_literature` in the run).
+- Caveat: the eval ran on the contributor tier; Phase 4's three full-price runs (1/3 correct) do not suggest a large difference, but full-price accuracy is not measured here.
+
+### Bug found: cost ledger torn by two processes
+Running the eval and the demo recorder at the same time made two processes append to `DATA_DIR/cache/costs/<day>.jsonl`; on Windows one line was overwritten mid-record and `DailyLedger.total_today()` raised `JSONDecodeError`, which crashed the eval. Fix: `add()` appends under a cross-process lock (`msvcrt.locking` / `fcntl.flock`), `total_today()` skips an unreadable line instead of crashing (the lost record was ≈ $0.001). Tests: torn line skipped (fails without the fix); 4 processes × 200 appends stay whole (passes on old code too — the race did not reproduce in the test, so it guards the lock but does not prove it).
+
+### Demo recordings (`scripts/record_demo_runs.py` → `demo/`)
+- Specimens ranked by phenotype strength (max norm of the robust-z treatment profile), one per MoA class, strongest first — chosen before seeing outcomes. Recorded on full-price `muse-spark-1.3` / `muse-wonder-1.0`, budget 5:
+  | Run | Class strength rank | Review | Verdict | Cost |
+  |---|---|---|---|---|
+  | run_78be77167c4d | 1 (stabilizer) | approve | correct | $0.198 |
+  | run_19b4ee810120 | 2 (Aurora) | request_experiment | correct | $0.372 |
+  | run_022fd8765474 | 3 (actin) | request_experiment | wrong | $0.491 |
+  | run_cae9422218ee | 4 (cholesterol) | request_experiment | wrong | $0.533 |
+- Leak re-scan of the four logs: 0 hits. Events, state, dossier copied to `demo/runs/` (0.8 MB).
+- Thumbnails: spec limit ≤ 40 PNGs / ≤ 15 MB, but the four runs reference 62 well/DMSO fields. Kept: the first field of every acquired well, then each well's same-plate DMSO field, then other fields, round-robin; composites downscaled to 512 px → 40 PNGs, 12.1 MB. Channel PNGs are not shipped (the microscope splits the composite, as before). Fields left out render as a labelled "not in demo" box (`FieldThumb`) instead of a broken image.
+
+### Fresh-clone check
+`git clone` into a scratch folder, `npm ci; npm run build`, uvicorn on **8797** (8787 was occupied by a running dev server on this machine) with `DATA_DIR` pointing to an empty folder and no `backend/.env`. `/api/health`: `live_runs false`, data and key errors as designed; `/api/recorded` lists the 4 demo runs; Playwright replayed each at 20× to `run_finished`: replay badge, verdict and dossier link shown, every served thumbnail loaded. The browser logs 404s by design — in replay-only mode: channel PNGs (3 per viewed field, fallback to composite), cell tables/label maps (masks/hover need DATA_DIR; the UI says so), composites beyond the 40-PNG cap. `scripts/screenshots.py` fails on any console error, so it should be run with data present.
+
+### Spend
+Phase 6: ≈ $16.2 (eval $14.60 + demo $1.59 + in-flight runs lost in the crash). Day total $17.28 of the $20 cap.
