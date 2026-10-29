@@ -32,32 +32,43 @@ function Beat({ at, children, className }: { at: number; children: ReactNode; cl
   );
 }
 
+/** The verdict lands like a stamp: a short press from slightly larger, part of the same orchestrated sequence. */
+function Stamp({ at, children }: { at: number; children: ReactNode }) {
+  const still = useReducedMotion();
+  return (
+    <motion.div initial={still ? false : { opacity: 0, scale: 1.12 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: at, duration: 0.22, ease: [0.3, 0, 0.2, 1] }}>
+      {children}
+    </motion.div>
+  );
+}
+
 export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict, report, probability }: Props) {
   const still = useReducedMotion();
 
   return (
-    <div className="h-full overflow-y-auto bg-sheet">
-      <div className="max-w-[780px] mx-auto px-6 py-3 flex flex-col gap-3">
+    <div className="h-full overflow-y-auto bg-night bg-[radial-gradient(70%_60%_at_30%_0%,rgba(255,255,255,0.07),transparent_70%)] text-haze">
+      <div className="max-w-[800px] mx-auto px-7 py-5 flex flex-col gap-4">
         <div>
-          <motion.p className="text-sm text-graphite" initial={still ? false : { opacity: 1 }} animate={{ opacity: 0.8 }}>
+          <motion.p className="text-sm text-mist" initial={still ? false : { opacity: 1 }} animate={{ opacity: 0.8 }}>
             {specimenLabel} was
           </motion.p>
           <motion.h2
-            className="font-serif text-[30px] leading-tight font-semibold"
-            initial={still ? false : { opacity: 0, filter: "blur(6px)" }}
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.35, ease }}
+            className="font-serif text-[48px] leading-[1.05] font-semibold tracking-[-0.015em] text-white"
+            initial={still ? false : { opacity: 0, filter: "blur(10px)", letterSpacing: "0.04em" }}
+            animate={{ opacity: 1, filter: "blur(0px)", letterSpacing: "-0.015em" }}
+            transition={{ duration: 0.45, ease }}
           >
             {u.compound}
           </motion.h2>
-          {u.identity_check && <p className="text-xs text-graphite mt-0.5">Identity check: {u.identity_check}</p>}
-          {!u.structure_url && <p className="text-xs text-graphite">No public structure to show for this compound.</p>}
+          {u.identity_check && <p className="text-xs text-mist mt-1">Identity check: {u.identity_check}</p>}
+          {!u.structure_url && <p className="text-xs text-mist">No public structure to show for this compound.</p>}
         </div>
 
-        <div className={`grid gap-5 items-start ${u.structure_url ? "grid-cols-[150px_1fr]" : "grid-cols-1"}`}>
+        <div className={`grid gap-5 items-start ${u.structure_url ? "grid-cols-[168px_1fr]" : "grid-cols-1"}`}>
           {u.structure_url && (
             <Beat at={0.3}>
-              <figure className="bg-white border border-rule rounded-panel p-1.5">
+              <figure className="bg-white rounded-panel p-2 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.9)]">
                 <img src={u.structure_url} alt={`2D structure of ${u.compound} from PubChem`} className="w-full aspect-square object-contain" />
                 <figcaption className="text-[11px] text-graphite mt-0.5">
                   PubChem CID{" "}
@@ -71,21 +82,21 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
 
           <div className="flex flex-col gap-4">
             <div>
-              <Beat at={0.6}><h3 className="text-sm font-medium">ChEMBL mechanism</h3></Beat>
+              <Beat at={0.6}><h3 className="text-sm font-medium text-white">ChEMBL mechanism</h3></Beat>
               {u.chembl_mechanisms.length ? (
                 <div className="mt-1 flex flex-col gap-0.5">
                   {u.chembl_mechanisms.map((m, i) => (
                     <Beat key={i} at={0.7 + i * 0.08}>
-                      <p className="text-sm">
+                      <p className="text-sm text-haze">
                         {m.mechanism_of_action}
-                        <span className="text-graphite">{m.target_name ? ` · target ${m.target_name}` : ""}{m.action_type ? ` · ${m.action_type.toLowerCase()}` : ""}</span>
+                        <span className="text-mist">{m.target_name ? ` · target ${m.target_name}` : ""}{m.action_type ? ` · ${m.action_type.toLowerCase()}` : ""}</span>
                       </p>
                     </Beat>
                   ))}
                 </div>
               ) : (
                 <Beat at={0.7}>
-                  <p className="text-sm text-graphite mt-1">
+                  <p className="text-sm text-mist mt-1">
                     No curated mechanism in ChEMBL{u.chembl_id ? ` (${u.chembl_id})` : ""}.
                   </p>
                 </Beat>
@@ -93,41 +104,41 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
             </div>
 
             {verdict && (
-              <Beat at={1.0}>
-                <div className={`rounded-panel border-2 p-3 ${verdict.correct ? "border-verdict-yes" : "border-verdict-no"}`}>
-                  <p className={`flex items-center gap-1.5 font-medium ${verdict.correct ? "text-verdict-yes" : "text-verdict-no"}`}>
+              <Stamp at={1.0}>
+                <div className={`-rotate-[0.8deg] rounded-panel border-2 p-4 bg-white/[0.03] ${verdict.correct ? "border-verdict-yes-on-night shadow-[0_0_40px_-12px_rgba(95,191,143,0.45)]" : "border-verdict-no-on-night shadow-[0_0_40px_-12px_rgba(224,112,104,0.45)]"}`}>
+                  <p className={`flex items-center gap-2 font-serif text-[22px] font-semibold ${verdict.correct ? "text-verdict-yes-on-night" : "text-verdict-no-on-night"}`}>
                     {verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
                     {verdict.correct ? "The agent's call matches" : "The agent's call does not match"}
                   </p>
                   <dl className="mt-1.5 grid grid-cols-[150px_1fr] gap-y-0.5 text-sm">
-                    <dt className="text-graphite">Agent's call</dt>
-                    <dd>{verdict.agent_moa}{probability != null && <span className="text-graphite"> · probability {probability.toFixed(2)}</span>}</dd>
-                    <dt className="text-graphite">Annotated mechanism</dt>
-                    <dd>{verdict.truth_moa} <span className="text-graphite">· BBBC021</span></dd>
+                    <dt className="text-mist">Agent's call</dt>
+                    <dd className="text-white">{verdict.agent_moa}{probability != null && <span className="text-mist"> · probability {probability.toFixed(2)} in its conclusion</span>}</dd>
+                    <dt className="text-mist">Annotated mechanism</dt>
+                    <dd className="text-white">{verdict.truth_moa} <span className="text-mist">· BBBC021</span></dd>
                   </dl>
-                  <p className="text-[11px] text-graphite mt-1.5">Compared by code, not judged by a model.</p>
+                  <p className="text-[11px] text-mist mt-2">Compared by code, not judged by a model.</p>
                 </div>
-              </Beat>
+              </Stamp>
             )}
           </div>
         </div>
 
         {report ? (
           <motion.section initial={still ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
-                          className="flex flex-col gap-2 border-t border-rule pt-3">
+                          className="flex flex-col gap-2 border-t border-line pt-4">
             <div className="flex items-center gap-3">
-              <h3 className="text-sm font-medium">Reflection</h3>
+              <h3 className="font-serif text-[20px] font-semibold text-white">Reflection</h3>
               <span className="label">{report.citations_label}</span>
               <a className="btn h-7 text-xs ml-auto" href={href({ name: "dossier", runId })}>
                 <FileText aria-hidden className="h-3.5 w-3.5" /> Open dossier
               </a>
             </div>
             {report.reflection.text.split(/\n\n+/).map((p, i) => (
-              <p key={i} className="font-serif text-[16px] leading-relaxed">{p}</p>
+              <p key={i} className="font-serif text-[16.5px] leading-[1.65] text-haze">{p}</p>
             ))}
           </motion.section>
         ) : (
-          <p className="text-sm text-graphite border-t border-rule pt-3">
+          <p className="text-sm text-mist border-t border-line pt-4">
             The agent is checking the literature and writing its reflection.
           </p>
         )}

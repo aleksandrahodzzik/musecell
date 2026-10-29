@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FileText, History, Loader2, Square } from "lucide-react";
+import { FileText, History, Loader2, Lock, Square, Unlock } from "lucide-react";
 import { useState } from "react";
 import { postJSON } from "../../lib/api";
 import { dateOnly, modelName, usd } from "../../lib/format";
@@ -15,6 +15,7 @@ const PHASE: Record<Phase, string> = {
   failed: "Stopped",
 };
 
+/** The run's instrument bar: specimen (or, after the unblinding, the compound), budget wells, cost, replay badge. */
 export default function RunHeader({ run, label }: { run: RunState; label: string }) {
   const still = useReducedMotion();
   const [stopping, setStopping] = useState(false);
@@ -22,6 +23,7 @@ export default function RunHeader({ run, label }: { run: RunState; label: string
   const { total, used } = run.budget;
   const done = !!run.finished;
   const replay = run.replay;
+  const sealed = !run.unblinded && run.started?.mode !== "open";
 
   const stop = async () => {
     setStopping(true);
@@ -35,56 +37,59 @@ export default function RunHeader({ run, label }: { run: RunState; label: string
   };
 
   return (
-    <div className="shrink-0 flex items-center gap-5 px-4 h-12 border-b border-rule bg-sheet">
-      <div className="flex items-baseline gap-2 min-w-0">
+    <div className="dark shrink-0 flex items-center gap-6 px-4 h-14 border-b border-line bg-night-2 text-haze">
+      <div className="flex items-center gap-3 min-w-0">
         <AnimatePresence mode="wait" initial={false}>
           {run.unblinded ? (
-            <motion.span key="name" className="font-serif text-[20px] font-semibold truncate"
+            <motion.span key="name" className="flex items-baseline gap-2 min-w-0"
                          initial={still ? false : { opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {run.unblinded.compound}
-              <span className="font-sans text-xs font-normal text-graphite ml-2">was {label}</span>
+              <span className="font-serif text-[22px] font-semibold text-white truncate">{run.unblinded.compound}</span>
+              <span className="text-xs text-mist whitespace-nowrap">was {label}</span>
             </motion.span>
           ) : (
-            <motion.span key="label" className="font-serif text-[20px] font-semibold" exit={still ? undefined : { opacity: 0, y: -4 }}
-                         transition={{ duration: 0.2 }}>
-              {label} <span className="font-sans text-sm font-normal text-graphite">({run.started?.mode === "open" ? "open" : "blinded"})</span>
+            <motion.span key="label" className="font-serif text-[22px] font-semibold text-white whitespace-nowrap"
+                         exit={still ? undefined : { opacity: 0, y: -4 }} transition={{ duration: 0.2 }}>
+              {label}
             </motion.span>
           )}
         </AnimatePresence>
-        {run.phase !== "blinded" && <span className="chip">{PHASE[run.phase]}</span>}
+        <span className="chip h-6 px-2">
+          {sealed ? <Lock aria-hidden className="h-3 w-3" /> : <Unlock aria-hidden className="h-3 w-3" />}
+          {run.phase === "blinded" || run.phase === "connecting" ? (run.started?.mode === "open" ? "Open" : "Blinded") : PHASE[run.phase]}
+        </span>
       </div>
 
       {total > 0 && (
-        <div className="flex items-center gap-2 text-sm" aria-label={`Budget: ${used} of ${total} wells used`}>
-          <span className="text-graphite">Budget</span>
-          <span aria-hidden className="flex gap-1">
+        <div className="flex items-center gap-2.5 text-sm" aria-label={`Budget: ${used} of ${total} wells used`}>
+          <span aria-hidden className="flex gap-1.5">
             {Array.from({ length: total }, (_, i) => (
-              <span key={i} className={`h-2.5 w-2.5 rounded-full ${i < used ? "bg-ink" : "border border-ink/40"}`} />
+              <span key={i} className={`h-3 w-3 rounded-full transition-all duration-300 ${
+                i < used ? "bg-haze shadow-[0_0_8px_rgba(255,255,255,0.45)]" : "well"}`} />
             ))}
           </span>
-          <span>{used} of {total} wells</span>
+          <span className="text-white">{used} <span className="text-mist">of {total} wells</span></span>
         </div>
       )}
       <span className="text-sm" title={`${run.cost.calls} model calls`}>
-        <span className="text-graphite">Cost </span>{usd(run.cost.usd)}
+        <span className="text-mist">Cost </span><span className="text-white">{usd(run.cost.usd)}</span>
       </span>
 
       {replay && (
-        <span className="chip h-7 px-2 border-ink/50 bg-white" role="note">
-          <History aria-hidden className="h-3.5 w-3.5" />
+        <span className="chip h-7 px-2.5 border-white/25 text-haze truncate" role="note">
+          <History aria-hidden className="h-3.5 w-3.5 shrink-0" />
           Replay of a live run · {dateOnly(replay.recorded_at)} · {[replay.model_ids.scientist, replay.model_ids.reviewer].filter(Boolean).map(modelName).join(", ")}
         </span>
       )}
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2 shrink-0">
         {(run.connection === "reconnecting") && (
-          <span className="flex items-center gap-1 text-xs text-graphite" role="status">
+          <span className="flex items-center gap-1 text-xs text-mist" role="status">
             <Loader2 aria-hidden className="h-3 w-3 animate-spin" /> Reconnecting
           </span>
         )}
-        {stopError && <span className="text-xs text-ink" role="alert">{stopError}</span>}
+        {stopError && <span className="text-xs text-white" role="alert">{stopError}</span>}
         {run.report && (
-          <a className="btn" href={href({ name: "dossier", runId: run.runId })}>
+          <a className="btn-primary h-8" href={href({ name: "dossier", runId: run.runId })}>
             <FileText aria-hidden className="h-3.5 w-3.5" /> Dossier
           </a>
         )}

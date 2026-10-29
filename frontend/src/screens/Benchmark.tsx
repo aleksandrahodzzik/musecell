@@ -41,17 +41,19 @@ export default function Benchmark() {
   const baseline = useFetch<Baseline>("/api/eval/baseline");
 
   return (
-    <div className="mx-auto max-w-[1040px] px-6 py-7 flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-serif text-[28px] leading-tight font-semibold">Benchmark</h1>
-        <p className="font-serif text-[16px] text-graphite max-w-[72ch] leading-snug">
+    <div className="mx-auto max-w-[1040px] px-6 py-8 flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <h1 className="font-serif text-[40px] leading-tight font-semibold tracking-[-0.01em]">Benchmark</h1>
+        <p className="font-serif text-[16.5px] text-graphite max-w-[72ch] leading-relaxed">
           Mechanism-of-action accuracy on the 38 annotated BBBC021 compounds, each held out from the reference atlas
           (leave-one-compound-out). Every number on this page is read from the files the evaluation scripts write.
         </p>
       </div>
 
-      <section className="panel p-4 flex flex-col gap-3" aria-labelledby="agent-h">
-        <h2 id="agent-h" className="text-sm font-medium">Agent against baselines, by budget</h2>
+      {results.data && <Finding rows={results.data.rows} />}
+
+      <section className="panel p-5 flex flex-col gap-3" aria-labelledby="agent-h">
+        <h2 id="agent-h" className="font-serif text-[20px] font-semibold">Agent against baselines, by budget</h2>
         {results.loading && <Loading label="Loading eval/results.json…" />}
         {results.error?.status === 404 && (
           <EmptyState title="No benchmark results yet.">
@@ -63,8 +65,8 @@ export default function Benchmark() {
         {results.data && <ResultsView r={results.data} />}
       </section>
 
-      <section className="panel p-4 flex flex-col gap-3" aria-labelledby="baseline-h">
-        <h2 id="baseline-h" className="text-sm font-medium">Classical baseline: nearest reference compound</h2>
+      <section className="panel p-5 flex flex-col gap-3" aria-labelledby="baseline-h">
+        <h2 id="baseline-h" className="font-serif text-[20px] font-semibold">Classical baseline: nearest reference compound</h2>
         {baseline.loading && <Loading label="Loading eval/baseline.json…" />}
         {baseline.error && <ErrorNote title="Could not read eval/baseline.json.">{baseline.error.message} Run python scripts/baseline_nsc.py to create it.</ErrorNote>}
         {baseline.data && <BaselineView b={baseline.data} />}
@@ -81,11 +83,11 @@ function BaselineView({ b }: { b: Baseline }) {
       <p className="text-sm text-graphite">{b.method} · {dateOnly(b.date)}</p>
       <div className="flex gap-8">
         <div>
-          <p className="text-[28px] font-medium leading-none">{pct(c.compound_accuracy)}</p>
+          <p className="font-serif text-[34px] font-semibold leading-none">{pct(c.compound_accuracy)}</p>
           <p className="label mt-1">compound level · {Math.round(c.compound_accuracy * c.n_compounds)} of {c.n_compounds}</p>
         </div>
         <div>
-          <p className="text-[28px] font-medium leading-none">{pct(c.treatment_accuracy)}</p>
+          <p className="font-serif text-[34px] font-semibold leading-none">{pct(c.treatment_accuracy)}</p>
           <p className="label mt-1">treatment level · {Math.round(c.treatment_accuracy * c.n_treatments)} of {c.n_treatments}</p>
         </div>
       </div>
@@ -147,10 +149,47 @@ function ResultsView({ r }: { r: Results }) {
 }
 
 const DASH = ["", "5 4", "1.5 3", "8 3 2 3"];
+const isAgent = (pts: ResultRow[]) => pts.some((p) => p.method === "agent");
+
+/** The headline: the agent and both baselines at the largest budget the eval ran, read from the rows. */
+function Finding({ rows }: { rows: ResultRow[] }) {
+  const agent = rows.filter((x) => x.method === "agent" && x.budget != null);
+  if (!agent.length) return null;
+  const b = Math.max(...agent.map((x) => x.budget!));
+  const a = agent.find((x) => x.budget === b)!;
+  const rand = rows.find((x) => x.method === "nsc_random" && x.budget === b);
+  const all = rows.find((x) => x.method === "nsc_all");
+  const below = rand && a.accuracy < rand.accuracy;
+  const tiles: [string, ResultRow | undefined, string][] = [
+    ["MuseCell agent", a, `${b} wells per compound`],
+    ["Nearest-neighbour baseline", rand, `the same ${b} wells, drawn at random`],
+    ["Nearest-neighbour baseline", all, "all wells of the compound"],
+  ];
+  return (
+    <section aria-label="Headline result" className="dark instrument rounded-panel border border-line p-6 flex flex-col gap-5 text-haze">
+      {rand && (
+        <p className="font-serif text-[22px] leading-snug text-white max-w-[52ch]">
+          At {b} wells the agent is {below ? "below" : "at or above"} the nearest-neighbour baseline on the same number of wells.
+        </p>
+      )}
+      <div className="grid grid-cols-3 gap-6">
+        {tiles.map(([name, row, sub], i) => row && (
+          <div key={i} className={`flex flex-col gap-1 ${i ? "border-l border-line pl-6" : ""}`}>
+            <span className="text-sm text-mist">{name}</span>
+            <span className={`font-serif text-[52px] leading-none font-semibold tracking-tight ${i === 0 ? "text-white" : "text-haze"}`}>
+              {pct(row.accuracy)}
+            </span>
+            <span className="text-xs text-mist">{sub}{row.correct != null && row.n != null ? ` · ${row.correct} of ${row.n} correct` : ""}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /** Accuracy against wells per compound. Methods with a budget are lines; "all wells" methods are reference lines. */
 function AccuracyChart({ rows }: { rows: ResultRow[] }) {
-  const W = 640, H = 240, L = 44, R = 170, T = 12, B = 30;
+  const W = 720, H = 250, L = 44, R = 210, T = 12, B = 30;
   const series = new Map<string, ResultRow[]>();
   rows.forEach((x) => series.set(x.label, [...(series.get(x.label) ?? []), x]));
   const budgets = rows.map((x) => x.budget).filter((b): b is number => b != null);
@@ -163,7 +202,7 @@ function AccuracyChart({ rows }: { rows: ResultRow[] }) {
   const labels = [...series.entries()].map(([label, pts], i) => {
     const withBudget = pts.filter((p) => p.budget != null).sort((a, b) => a.budget! - b.budget!);
     const end = withBudget[withBudget.length - 1];
-    return { label, i, x: end ? sx(end.budget!) + 8 : W - R + 6, y: sy(end ? end.accuracy : pts[0].accuracy) + 4 };
+    return { label, i, lead: isAgent(pts), x: end ? sx(end.budget!) + 10 : W - R + 6, y: sy(end ? end.accuracy : pts[0].accuracy) + 4 };
   }).sort((a, b) => a.y - b.y);
   labels.forEach((l, k) => {
     if (k > 0 && l.y - labels[k - 1].y < 13) l.y = labels[k - 1].y + 13;
@@ -180,8 +219,9 @@ function AccuracyChart({ rows }: { rows: ResultRow[] }) {
         {ticks.map((b) => <text key={b} x={sx(b)} y={H - B + 14} textAnchor="middle" fontSize={11} fill="#5B6672">{b}</text>)}
         <text x={(L + W - R) / 2} y={H - 2} textAnchor="middle" fontSize={11} fill="#5B6672">wells per compound</text>
         {[...series.entries()].map(([label, pts], i) => {
-          const color = i === 0 ? "#17202A" : "#5B6672";
-          const dash = DASH[i % DASH.length];
+          const lead = isAgent(pts);
+          const color = lead ? "#17202A" : "#5B6672";
+          const dash = lead ? "" : DASH[1 + (i % (DASH.length - 1))];
           const flat = pts.every((p) => p.budget == null);
           if (flat) {
             const y = sy(pts[0].accuracy);
@@ -195,12 +235,20 @@ function AccuracyChart({ rows }: { rows: ResultRow[] }) {
           const d = sorted.map((p, j) => `${j ? "L" : "M"}${sx(p.budget!)},${sy(p.accuracy)}`).join(" ");
           return (
             <g key={label}>
-              <path d={d} fill="none" stroke={color} strokeWidth={i === 0 ? 2 : 1.5} strokeDasharray={dash} />
-              {sorted.map((p) => <circle key={p.budget} cx={sx(p.budget!)} cy={sy(p.accuracy)} r={3} fill={color} />)}
+              <path d={d} fill="none" stroke={color} strokeWidth={lead ? 2.5 : 1.25} strokeDasharray={dash} />
+              {sorted.map((p) => <circle key={p.budget} cx={sx(p.budget!)} cy={sy(p.accuracy)} r={lead ? 4 : 2.5} fill={lead ? "#17202A" : "#F6F8F9"} stroke={color} strokeWidth={1.5} />)}
             </g>
           );
         })}
-        {labels.map((l) => <text key={l.label} x={l.x} y={l.y} fontSize={11} fill={l.i === 0 ? "#17202A" : "#5B6672"}>{l.label}</text>)}
+        {labels.map((l) => {
+          const [name, model] = l.label.split(/ (?=\()/);
+          return (
+            <text key={l.label} x={l.x} y={l.y} fontSize={11.5} fontWeight={l.lead ? 600 : 400} fill={l.lead ? "#17202A" : "#5B6672"}>
+              {name}
+              {model && <tspan x={l.x} dy={13} fontSize={10.5} fontWeight={400} fill="#5B6672">{model}</tspan>}
+            </text>
+          );
+        })}
       </svg>
     </figure>
   );

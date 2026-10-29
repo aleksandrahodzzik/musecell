@@ -158,6 +158,12 @@ async def recorded(request: Request) -> list[dict]:
     return list_recorded([(DEMO_RUNS_DIR, "demo"), (m.runs_dir, "local")], labels)
 
 
+@app.get("/api/gallery")
+async def gallery() -> list[str]:
+    """Composite image ids shipped in demo/thumbnails (real BBBC021 fields; opaque ids, no compound or dose)."""
+    return sorted(p.name.removesuffix(".png") for p in DEMO_THUMBS.glob("f_*.composite.png"))
+
+
 @app.get("/api/fields/{field_id}/cells")
 async def field_cells(field_id: str, request: Request) -> dict:
     m = mgr(request)

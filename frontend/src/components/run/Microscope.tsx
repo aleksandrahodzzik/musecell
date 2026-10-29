@@ -36,7 +36,7 @@ export default function Microscope({ well }: { well?: AcquiredWell }) {
 
   if (!well) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col on-dark">
         <Toolbar disabled enabled={enabled} setEnabled={setEnabled} masks={masks} setMasks={setMasks}
                  compare={compare} setCompare={setCompare} setView={setView} caps={caps} />
         <div className="flex-1 bg-darkfield flex items-center justify-center p-6">
@@ -52,23 +52,23 @@ export default function Microscope({ well }: { well?: AcquiredWell }) {
   const dmso = well.dmso_field_ids.length ? well.dmso_field_ids[fieldIdx % well.dmso_field_ids.length] : undefined;
 
   return (
-    <div className="h-full flex flex-col min-h-0">
+    <div className="h-full flex flex-col min-h-0 on-dark">
       <Toolbar enabled={enabled} setEnabled={setEnabled} masks={masks} setMasks={setMasks} compare={compare}
                setCompare={setCompare} setView={setView} caps={caps} hasDmso={!!dmso} />
-      <div className="flex items-center gap-2 px-3 h-8 border-b border-rule text-xs bg-sheet">
-        <span className="font-medium text-ink">Well {well.order}</span>
-        <span className="text-graphite">dose {well.concentration_index + 1} · {uM(well.concentration_uM)} · replicate {well.replicate}</span>
-        <span className="ml-auto text-graphite">Field</span>
+      <div className="flex items-center gap-2 px-3 h-8 border-b border-line text-xs bg-night-2">
+        <span className="font-medium text-white">Well {well.order}</span>
+        <span className="text-mist">dose {well.concentration_index + 1} · {uM(well.concentration_uM)} · replicate {well.replicate}</span>
+        <span className="ml-auto text-mist">Field</span>
         <div role="group" aria-label="Field" className="flex gap-1">
           {well.field_ids.map((f, i) => (
             <button key={f} aria-pressed={i === fieldIdx} onClick={() => setFieldIdx(i)}
-                    className={`h-6 w-6 rounded-control text-xs border ${i === fieldIdx ? "bg-ink text-sheet border-ink" : "border-rule bg-white hover:border-ink/40"}`}>
+                    className={`h-6 w-6 rounded-control text-xs border ${i === fieldIdx ? "bg-haze text-night border-haze" : "border-line bg-night-3 text-haze hover:border-white/30"}`}>
               {i + 1}
             </button>
           ))}
         </div>
       </div>
-      <div className={`flex-1 min-h-0 grid gap-px bg-ink ${compare && dmso ? "grid-cols-2" : "grid-cols-1"}`}>
+      <div className={`flex-1 min-h-0 grid gap-px bg-night-3 ${compare && dmso ? "grid-cols-2" : "grid-cols-1"}`}>
         <Pane fieldId={fid} title={`Treated · field ${fieldIdx + 1} of ${well.field_ids.length}`} enabled={enabled}
               masks={masks} view={view} setView={setView} onCaps={setCaps} />
         {compare && dmso && (
@@ -76,7 +76,7 @@ export default function Microscope({ well }: { well?: AcquiredWell }) {
         )}
       </div>
       {(!caps.seg || !caps.channels) && (
-        <p className="px-3 py-1 text-[11px] text-graphite bg-sheet border-t border-rule">
+        <p className="px-3 py-1 text-[11px] text-mist bg-night-2 border-t border-line">
           {!caps.channels && "Channels are split from the 8-bit composite for this field (per-channel images are not on this server). "}
           {!caps.seg && "Masks and per-cell measurements need the BBBC021 segmentation cache on this machine."}
         </p>
@@ -99,12 +99,12 @@ function Toolbar(props: {
 }) {
   const { enabled, setEnabled, masks, setMasks, compare, setCompare, setView, caps, disabled } = props;
   const toggle = "h-7 px-2 rounded-control text-xs border inline-flex items-center gap-1.5 transition-colors disabled:opacity-40";
-  const on = "bg-ink text-sheet border-ink";
-  const off = "bg-white text-ink border-rule hover:border-ink/40";
+  const on = "bg-haze text-night border-haze";
+  const off = "bg-night-3 text-haze border-line hover:border-white/30";
   const zoomBy = (k: number) => setView((v) => clampView({ s: v.s * k, tx: v.tx * k, ty: v.ty * k }));
   return (
-    <div className="flex items-center gap-1.5 px-3 h-10 border-b border-rule bg-sheet">
-      <h2 className="text-sm font-medium mr-2">Microscope</h2>
+    <div className="flex items-center gap-1.5 px-3 h-10 border-b border-line bg-night-2">
+      <h2 className="text-sm font-medium mr-2 text-white">Microscope</h2>
       <div role="group" aria-label="Channels" className="flex gap-1">
         {CHANNELS.map((ch) => (
           <button key={ch} className={`${toggle} ${enabled[ch] ? on : off}`} aria-pressed={enabled[ch]}

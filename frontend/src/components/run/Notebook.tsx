@@ -47,7 +47,7 @@ export default function Notebook({ run, focusEvidence, onSelectWell }: Props) {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center gap-2 px-4 h-9 border-b border-rule shrink-0">
+      <div className="flex items-center gap-2 px-4 h-9 border-b border-rule shrink-0 bg-sheet">
         <h2 className="text-sm font-medium">Notebook</h2>
         <span className="label">{run.entries.filter((e) => e.kind === "tool").length} steps · turn {run.turn} of {run.started?.max_turns ?? 20}</span>
       </div>
@@ -88,7 +88,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "note":
       return (
         <div className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Scientist</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Scientist</span>
           <p className="font-serif text-[15px] leading-snug whitespace-pre-line">{e.text}</p>
         </div>
       );
@@ -97,7 +97,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "conclusion":
       return (
         <div className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Conclusion</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Conclusion</span>
           <div className="flex flex-col gap-1">
             <p className="text-sm">
               <span className="font-medium">{e.conclusion.top_moa}</span>
@@ -116,14 +116,14 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
       );
     case "review":
       return (
-        <div className="flex gap-3 rounded-panel bg-white/60 border border-rule -mx-2 px-2 py-2">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5 flex gap-1"><MessageSquareQuote aria-hidden className="h-3.5 w-3.5" />Reviewer</span>
+        <div className="flex gap-3 rounded-r-panel bg-white border border-rule border-l-[3px] border-l-ink -mx-2 px-2 py-2.5 shadow-[0_6px_18px_-12px_rgba(23,32,42,0.5)]">
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5 flex gap-1"><MessageSquareQuote aria-hidden className="h-3.5 w-3.5" />Reviewer</span>
           <div className="flex flex-col gap-1">
             <p className="text-sm">
               <span className="font-medium">{e.review.verdict === "approve" ? "Approved the conclusion" : "Asked for one more experiment"}</span>
               <span className="text-graphite"> · {modelName(e.review.model ?? run.started?.model_ids.reviewer)}</span>
             </p>
-            <p className="font-serif text-[15px] leading-snug">{e.review.critique}</p>
+            <p className="font-serif italic text-[15.5px] leading-snug">“{e.review.critique}”</p>
             {e.review.requested_experiment && (
               <p className="text-xs text-graphite">Requested: <span className="text-ink">{e.review.requested_experiment}</span></p>
             )}
@@ -133,7 +133,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "unblinded":
       return (
         <div className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Unblinded</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Unblinded</span>
           <p className="text-sm">
             The specimen is <span className="font-medium">{e.unblinded.compound}</span>
             {e.unblinded.identity_check && <span className="text-graphite"> · {e.unblinded.identity_check}</span>}
@@ -143,7 +143,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "verdict":
       return (
         <div className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Verdict</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Verdict</span>
           <p className={`text-sm flex items-center gap-1.5 ${e.verdict.correct ? "text-verdict-yes" : "text-verdict-no"}`}>
             {e.verdict.correct ? <Check aria-hidden className="h-4 w-4" /> : <X aria-hidden className="h-4 w-4" />}
             {e.verdict.correct
@@ -156,7 +156,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "report":
       return (
         <div className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Dossier</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Dossier</span>
           <p className="text-sm flex items-center gap-3">
             <span>Reflection and dossier written · {e.report.citations_label}</span>
             <a className="btn h-7 text-xs" href={href({ name: "dossier", runId: run.runId })}>
@@ -168,7 +168,7 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
     case "error":
       return (
         <div role="alert" className="flex gap-3">
-          <span className="w-[68px] shrink-0 text-xs text-ink pt-0.5 flex gap-1"><AlertTriangle aria-hidden className="h-3.5 w-3.5" />{e.fatal ? "Stopped" : "Error"}</span>
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-ink pt-0.5 flex gap-1"><AlertTriangle aria-hidden className="h-3.5 w-3.5" />{e.fatal ? "Stopped" : "Error"}</span>
           <p className="text-sm font-medium">{e.message}</p>
         </div>
       );
@@ -210,12 +210,12 @@ function ToolEntry({ call, result, step, onSelectWell }: { call: ToolCallData; r
   const hasMore = result?.ok && ["acquire_well", "describe_phenotype", "compare_to_reference_atlas", "search_literature"].includes(result.name);
   return (
     <div id={result?.evidence_id ? `ev-${result.evidence_id}` : undefined} tabIndex={-1} className="flex gap-3 scroll-mt-4">
-      <span className="w-[68px] shrink-0 text-xs text-graphite pt-0.5">Step {step}</span>
+      <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Step {step}</span>
       <div className="flex flex-col gap-1 min-w-0 flex-1">
         <p className="text-sm">
-          <span className="font-medium">{toolName(call.name)}</span>
+          <span className="font-semibold">{toolName(call.name)}</span>
           {argLine(call) && <span className="text-graphite"> · {argLine(call)}</span>}
-          {result?.evidence_id && <span className="text-graphite"> · {result.evidence_id}</span>}
+          {result?.evidence_id && <span className="text-graphite"> · <span className="ids">{result.evidence_id}</span></span>}
         </p>
         {call.rationale && (
           <p className="font-serif text-[15px] leading-snug"><span className="font-sans text-xs text-graphite mr-1.5">Why</span>{call.rationale}</p>

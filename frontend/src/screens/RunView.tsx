@@ -32,7 +32,7 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
 
   if (run.connection === "not_found") {
     return (
-      <div className="max-w-[640px] mx-auto p-8">
+      <div className="dark max-w-[640px] mx-auto p-8">
         <ErrorNote title="This run is not on the server."
                    action={<a className="btn" href={href({ name: "home" })}>Back to specimens</a>}>
           Live runs are kept in memory until the server restarts. Start a new run, or replay a recorded one.
@@ -42,12 +42,12 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
   }
   if (!run.started) {
     return run.connection === "lost" ? (
-      <div className="max-w-[640px] mx-auto p-8">
+      <div className="dark max-w-[640px] mx-auto p-8">
         <ErrorNote title="Lost the connection to the server." action={<button className="btn" onClick={run.retry}>Try again</button>}>
           Check that the backend is still running on port 8787.
         </ErrorNote>
       </div>
-    ) : <Loading label="Connecting to the run…" />;
+    ) : <div className="dark"><Loading label="Connecting to the run…" /></div>;
   }
 
   const label = labels[run.started.specimen_id] ?? `Specimen ${shortId(run.started.specimen_id)}`;
@@ -78,16 +78,16 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
           </ErrorNote>
         </div>
       )}
-      <div className={`shrink-0 ${tab === "unblinding" ? "h-[66%]" : "h-[56%]"} min-h-[320px] grid grid-cols-[214px_minmax(0,1fr)_268px] border-b border-rule`}>
-        <section aria-label="Plate map" className="bg-sheet border-r border-rule min-h-0">
+      <div className={`shrink-0 ${tab === "unblinding" ? "h-[66%]" : "h-[56%]"} min-h-[320px] grid grid-cols-[220px_minmax(0,1fr)_280px] border-b border-rule`}>
+        <section aria-label="Plate map" className="dark instrument border-r border-line min-h-0">
           <PlateMap doses={run.doses} nDoses={run.started.doses} wells={run.wells} selected={selectedId} onSelect={onSelectWell} />
         </section>
-        <section aria-label={tab === "microscope" ? "Microscope" : "Unblinding"} className="flex flex-col min-h-0 min-w-0">
+        <section aria-label={tab === "microscope" ? "Microscope" : "Unblinding"} className="dark flex flex-col min-h-0 min-w-0 bg-night">
           {run.unblinded && (
-            <div role="tablist" aria-label="Centre view" className="flex gap-1 px-3 pt-1.5 bg-sheet border-b border-rule">
+            <div role="tablist" aria-label="Centre view" className="flex gap-1 px-3 pt-1.5 bg-night-2 border-b border-line">
               {(["unblinding", "microscope"] as const).map((t) => (
                 <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}
-                        className={`px-2.5 h-7 text-xs rounded-t-control border-b-2 ${tab === t ? "border-ink text-ink font-medium" : "border-transparent text-graphite hover:text-ink"}`}>
+                        className={`px-2.5 h-7 text-xs rounded-t-control border-b-2 ${tab === t ? "border-white text-white font-medium" : "border-transparent text-mist hover:text-white"}`}>
                   {t === "unblinding" ? "Unblinding" : "Microscope"}
                 </button>
               ))}
@@ -102,11 +102,11 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
             )}
           </div>
         </section>
-        <section aria-label="Hypotheses" className="bg-sheet border-l border-rule min-h-0">
+        <section aria-label="Hypotheses" className="ruled border-l border-rule min-h-0">
           <HypothesisBoard hypotheses={run.hypotheses} conclusion={finalConclusion} verdict={run.verdict} onEvidence={onEvidence} />
         </section>
       </div>
-      <section aria-label="Notebook" className="flex-1 min-h-0 bg-sheet">
+      <section aria-label="Notebook" className="flex-1 min-h-0 ruled">
         <Notebook run={run} focusEvidence={focus} onSelectWell={onSelectWell} />
       </section>
     </div>

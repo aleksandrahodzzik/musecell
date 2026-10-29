@@ -20,7 +20,7 @@ export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvi
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center gap-2 px-3 h-10 border-b border-rule">
+      <div className="flex items-center gap-2 px-3 h-10 border-b border-rule bg-sheet">
         <h2 className="text-sm font-medium">Hypotheses</h2>
         {rows.length > 0 && <span className="label">agent's probabilities</span>}
       </div>
@@ -30,23 +30,30 @@ export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvi
             No hypotheses yet. The agent posts its first board after it has looked at some wells.
           </p>
         )}
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-0.5">
           {rows.map((h, i) => {
             const isCall = verdict ? h.moa === verdict.agent_moa : conclusion?.top_moa === h.moa;
             const isTruth = verdict?.truth_moa === h.moa;
             const expanded = open === h.moa;
             return (
-              <li key={h.moa}>
+              <li key={h.moa} className={i === 0 ? "pb-2 mb-1 border-b border-rule" : ""}>
                 <button
-                  className="w-full text-left rounded-control px-1.5 py-1 hover:bg-white/70"
+                  className="w-full text-left rounded-control px-1.5 py-1.5 hover:bg-white/70"
                   aria-expanded={expanded}
                   onClick={() => setOpen(expanded ? null : h.moa)}
                 >
-                  <span className="flex items-baseline gap-2 text-[13px]">
-                    <span className={`flex-1 truncate ${i === 0 ? "font-medium" : ""}`}>{h.moa}</span>
-                    <span>{prob(h.probability)}</span>
-                  </span>
-                  <span className="mt-1 block h-1.5 rounded-full bg-ink/10 overflow-hidden">
+                  {i === 0 ? (
+                    <span className="flex items-end gap-2">
+                      <span className="flex-1 font-serif text-[17px] leading-tight font-semibold">{h.moa}</span>
+                      <span className="font-serif text-[34px] leading-none font-semibold tracking-tight">{prob(h.probability)}</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-baseline gap-2 text-[13px]">
+                      <span className="flex-1 truncate">{h.moa}</span>
+                      <span className="text-graphite">{prob(h.probability)}</span>
+                    </span>
+                  )}
+                  <span className={`block rounded-full bg-ink/10 overflow-hidden ${i === 0 ? "mt-2 h-2" : "mt-1 h-1"}`}>
                     <span
                       className={`block h-full rounded-full transition-[width] duration-500 ease-out ${i === 0 ? "bg-ink" : "bg-graphite/60"}`}
                       style={{ width: `${Math.max(1, h.probability * 100)}%` }}
@@ -54,7 +61,12 @@ export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvi
                   </span>
                   {(isCall || isTruth) && (
                     <span className="mt-1 flex flex-wrap gap-x-3 text-[11px]">
-                      {isCall && !verdict && conclusion && <span className="text-graphite">Submitted conclusion</span>}
+                      {isCall && conclusion && (!verdict || Math.abs(conclusion.probability - h.probability) >= 0.005) && (
+                        <span className="text-graphite">
+                          {verdict ? "Conclusion" : "Submitted conclusion"}
+                          {Math.abs(conclusion.probability - h.probability) >= 0.005 ? ` stated ${prob(conclusion.probability)}` : ""}
+                        </span>
+                      )}
                       {isCall && verdict && (
                         <span className={`flex items-center gap-1 ${verdict.correct ? "text-verdict-yes" : "text-verdict-no"}`}>
                           {verdict.correct ? <Check aria-hidden className="h-3 w-3" /> : <X aria-hidden className="h-3 w-3" />}

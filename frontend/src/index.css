@@ -3,22 +3,46 @@
 @tailwind utilities;
 
 @layer base {
-  html { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #17202A; background: #E8ECEF; }
+  html { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #17202A; background: #07090C; }
   body { margin: 0; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
   /* Visible keyboard focus everywhere (spec §8 quality floor). */
   :focus { outline: none; }
   :focus-visible { outline: 2px solid #17202A; outline-offset: 2px; border-radius: 4px; }
-  .on-dark :focus-visible, .on-dark:focus-visible { outline-color: #FFFFFF; }
+  .dark :focus-visible, .on-dark :focus-visible, .on-dark:focus-visible { outline-color: #FFFFFF; }
   button:disabled { cursor: not-allowed; }
+  ::selection { background: rgb(23 32 42 / 0.15); }
+  .dark ::selection { background: rgb(255 255 255 / 0.2); }
 }
 
 @layer components {
-  .panel { @apply bg-sheet rounded-panel border border-rule; }
-  .btn { @apply inline-flex items-center gap-1.5 rounded-control px-3 h-8 text-sm font-medium border border-rule bg-sheet text-ink hover:bg-white transition-colors disabled:opacity-50 disabled:hover:bg-sheet; }
-  .btn-primary { @apply inline-flex items-center gap-1.5 rounded-control px-4 h-9 text-sm font-medium bg-ink text-sheet hover:bg-[#2a3542] transition-colors disabled:opacity-40 disabled:hover:bg-ink; }
-  .chip { @apply inline-flex items-center gap-1 rounded-control px-1.5 py-0.5 text-xs border border-rule bg-white/60 text-ink; }
-  .label { @apply text-xs text-graphite; }
+  .panel { @apply bg-sheet rounded-panel border border-rule dark:bg-night-2 dark:border-line; }
+  .btn { @apply inline-flex items-center gap-1.5 rounded-control px-3 h-8 text-sm font-medium border border-rule bg-sheet text-ink hover:bg-white transition-colors disabled:opacity-50 disabled:hover:bg-sheet
+                 dark:bg-night-3 dark:text-haze dark:border-line dark:hover:bg-[#1E242C] dark:hover:text-white dark:disabled:hover:bg-night-3; }
+  .btn-primary { @apply inline-flex items-center gap-1.5 rounded-control px-4 h-9 text-sm font-medium bg-ink text-sheet hover:bg-[#2a3542] transition-colors disabled:opacity-40 disabled:hover:bg-ink
+                         dark:bg-white dark:text-night dark:hover:bg-haze dark:disabled:hover:bg-white; }
+  .chip { @apply inline-flex items-center gap-1 rounded-control px-1.5 py-0.5 text-xs border border-rule bg-white/60 text-ink dark:bg-white/5 dark:border-line dark:text-haze; }
+  .label { @apply text-xs text-graphite dark:text-mist; }
   .serif { @apply font-serif; }
+  .ids { @apply font-mono text-[11px] tracking-tight; }
+
+  /* Lab-notebook ruling: a faint 24 px grid on the paper surfaces where the agent writes. */
+  .ruled {
+    background-color: #F6F8F9;
+    background-image:
+      linear-gradient(rgb(23 32 42 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(23 32 42 / 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  /* The instrument body: near-black with a soft light falling from the top. */
+  .instrument {
+    background-color: #07090C;
+    background-image: radial-gradient(120% 80% at 50% -20%, rgb(255 255 255 / 0.05), transparent 60%);
+  }
+
+  /* A plate well: recessed into the plate. */
+  .well { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.9), inset 0 0 0 1px rgb(255 255 255 / 0.07), 0 1px 0 rgb(255 255 255 / 0.04); background: #030405; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -29,8 +53,14 @@
   html, body { background: #FFFFFF !important; }
   .no-print { display: none !important; }
   .print-break { break-inside: avoid; }
+  .ruled { background: #FFFFFF !important; }
   a { color: inherit; text-decoration: none; }
 }
 
 /* Composite thumbnails re-tinted to the stain tokens (components/StainTint.tsx). */
 .stain-tint { filter: url(#stain-tint); }
+
+/* Thin scrollbars on the instrument. */
+.dark ::-webkit-scrollbar, .on-dark ::-webkit-scrollbar { height: 8px; width: 8px; }
+.dark ::-webkit-scrollbar-thumb, .on-dark ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.12); border-radius: 8px; }
+.dark ::-webkit-scrollbar-track, .on-dark ::-webkit-scrollbar-track { background: transparent; }

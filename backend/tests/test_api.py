@@ -208,3 +208,10 @@ def test_field_segmentation_endpoints(client, tmp_path):
     raw = r.content if len(r.content) == 2 * 2 * w * h else gzip.decompress(r.content)
     assert (w, h) == (5, 4) and np.frombuffer(raw, "<u2").reshape(2, h, w)[0, 1, 1] == 1
     assert c.get("/api/fields/..%2Fx/cells").status_code == 404
+
+
+def test_gallery_lists_servable_demo_composites(client):
+    c, _ = client
+    ids = c.get("/api/gallery").json()
+    assert ids and all(main.IMAGE_ID.match(i) and i.endswith(".composite") for i in ids)
+    assert c.get(f"/api/images/{ids[0]}").headers["content-type"] == "image/png"

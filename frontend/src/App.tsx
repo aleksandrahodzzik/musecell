@@ -27,9 +27,9 @@ export default function App() {
   const liveNote = health.data ? (health.data.live_runs ? "Live runs available" : "Replays only on this server") : undefined;
 
   return (
-    <div className="h-screen flex flex-col bg-paper text-ink">
+    <div className="h-screen flex flex-col bg-night text-ink">
       <StainTintFilter />
-      <Nav route={route} liveNote={liveNote} />
+      <Nav route={route} liveNote={liveNote} live={health.data?.live_runs} />
       {health.error && (
         <div className="px-4 pt-3">
           <ErrorNote title="The MuseCell server is not reachable." action={<button className="btn" onClick={health.reload}>Try again</button>}>
@@ -40,7 +40,7 @@ export default function App() {
       {route.name === "run" ? (
         <main className="flex-1 min-h-0"><RunView key={route.runId} runId={route.runId} labels={labels} /></main>
       ) : (
-        <Page>
+        <Page dark={route.name === "home"}>
           {route.name === "home" && <ChooseSpecimen health={health.data} />}
           {route.name === "dossier" && <Dossier runId={route.runId} labels={labels} />}
           {route.name === "benchmark" && <Benchmark />}
