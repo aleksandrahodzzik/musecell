@@ -34,6 +34,32 @@ export default function Microscope({ well }: { well?: AcquiredWell }) {
     setView(FIT);
   }, [well?.well_id]);
 
+  // Keyboard: 1/2/3 stains, M masks, D same-plate DMSO, F fit, +/- zoom, ←/→ fields. Ignored while typing or when a
+  // control that uses those keys (radio groups, sliders, tabs) has focus.
+  const nFields = well?.field_ids.length ?? 0;
+  useEffect(() => {
+    if (!nFields) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement;
+      if (t.closest("input, select, textarea, [role=radio], [role=slider], [role=tab]")) return;
+      const ch = ({ "1": "dna", "2": "tubulin", "3": "actin" } as Record<string, Channel>)[e.key];
+      const k = e.key.toLowerCase();
+      if (ch) setEnabled((x) => ({ ...x, [ch]: !x[ch] }));
+      else if (k === "m" && caps.seg) setMasks((m) => !m);
+      else if (k === "d") setCompare((c) => !c);
+      else if (k === "f") setView(FIT);
+      else if (e.key === "+" || e.key === "=") setView((v) => clampView({ s: v.s * 1.5, tx: v.tx * 1.5, ty: v.ty * 1.5 }));
+      else if (e.key === "-") setView((v) => clampView({ s: v.s / 1.5, tx: v.tx / 1.5, ty: v.ty / 1.5 }));
+      else if (e.key === "ArrowRight") setFieldIdx((i) => (i + 1) % nFields);
+      else if (e.key === "ArrowLeft") setFieldIdx((i) => (i - 1 + nFields) % nFields);
+      else return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [nFields, caps.seg]);
+
   if (!well) {
     return (
       <div className="h-full flex flex-col on-dark">
@@ -58,7 +84,8 @@ export default function Microscope({ well }: { well?: AcquiredWell }) {
       <div className="flex items-center gap-2 px-3 h-8 border-b border-line text-xs bg-night-2">
         <span className="font-medium text-white">Well {well.order}</span>
         <span className="text-mist">dose {well.concentration_index + 1} · {uM(well.concentration_uM)} · replicate {well.replicate}</span>
-        <span className="ml-auto text-mist">Field</span>
+        <span className="ml-auto text-mist/80 hidden xl:inline" title="Keyboard: 1 2 3 stains · M masks · D same-plate DMSO · + − zoom · F fit · ← → fields"><kbd className="font-mono">1 2 3 M D ← →</kbd></span>
+        <span className="text-mist">Field</span>
         <div role="group" aria-label="Field" className="flex gap-1">
           {well.field_ids.map((f, i) => (
             <button key={f} aria-pressed={i === fieldIdx} onClick={() => setFieldIdx(i)}

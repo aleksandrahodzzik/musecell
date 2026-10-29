@@ -46,6 +46,7 @@ export interface RunState {
   verdict?: Verdict;
   report?: EventPayloads["report_ready"];
   cost: { usd: number; calls: number; last?: CallCost };
+  callLog: (CallCost & { seq: number })[]; // every metered model call, in order (cost_updated.last)
   finished?: EventPayloads["run_finished"];
   fatalError?: string;
 }
@@ -53,7 +54,7 @@ export interface RunState {
 export const initialRunState = (runId: string): RunState => ({
   runId, connection: "connecting", lastSeq: 0, phase: "connecting", turn: 0, working: false, entries: [],
   toolIndex: {}, evidence: {}, doses: [], wells: [], budget: { total: 0, used: 0 }, hypotheses: [], history: [],
-  conclusions: [], cost: { usd: 0, calls: 0 },
+  conclusions: [], cost: { usd: 0, calls: 0 }, callLog: [],
 });
 
 export type RunAction =
@@ -117,7 +118,10 @@ function applyEvent(s: RunState, e: RunEvent): RunState {
     case "report_ready":
       return { ...next, report: e.data, entries: [...s.entries, { ...base, kind: "report", report: e.data }] };
     case "cost_updated":
-      return { ...next, cost: { usd: e.data.cost_usd, calls: e.data.calls, last: e.data.last } };
+      return {
+        ...next, cost: { usd: e.data.cost_usd, calls: e.data.calls, last: e.data.last },
+        callLog: e.data.last ? [...s.callLog, { ...e.data.last, seq: e.seq }] : s.callLog,
+      };
     case "error":
       return {
         ...next, working: false, fatalError: e.data.fatal ? e.data.message : s.fatalError,

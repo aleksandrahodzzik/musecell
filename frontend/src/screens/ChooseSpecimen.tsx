@@ -3,10 +3,11 @@
 
 import { Lock, Play, RefreshCw, Shuffle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import type React from "react";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
-import { ApiError, imageUrl, postJSON } from "../lib/api";
+import { ApiError, postJSON } from "../lib/api";
 import { dateTime, modelName, usd } from "../lib/format";
-import { CHANNELS, CHANNEL_LABEL } from "../lib/fieldImage";
+import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
 import type { Health, ModelIds, RecordedRun, SpecimenCard } from "../lib/types";
 import { useFetch } from "../lib/useFetch";
@@ -251,48 +252,77 @@ function BudgetWells({ budget, setBudget }: { budget: number; setBudget: (n: num
   );
 }
 
-/** A real field from the recorded runs, seen through an eyepiece with a reticle. Click to look at another one. */
+/**
+ * A real field from the recorded runs, seen through an eyepiece with a reticle. Move the pointer to pan across the
+ * field, switch the three stains on and off, or click for another field.
+ */
 function Eyepiece() {
   const gallery = useFetch<string[]>("/api/gallery");
   const ids = gallery.data ?? [];
   const startAt = useMemo(() => Math.floor(Math.random() * 1000), []);
   const [k, setK] = useState(0);
-  const [loaded, setLoaded] = useState<string | null>(null);
+  const [enabled, setEnabled] = useState<Record<Channel, boolean>>({ dna: true, tubulin: true, actin: true });
+  const [px, setPx] = useState<FieldPixels | null>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const canvas = useRef<HTMLCanvasElement>(null);
   const id = ids.length ? ids[(startAt + k) % ids.length] : null;
+  const fieldId = id?.replace(".composite", "");
+
+  useEffect(() => {
+    if (!fieldId) return;
+    let live = true;
+    setPx(null);
+    loadPixels(fieldId).then((p) => live && setPx(p)).catch(() => live && setPx(null));
+    return () => { live = false; };
+  }, [fieldId]);
+
+  useEffect(() => {
+    const c = canvas.current;
+    if (!c || !px) return;
+    c.width = px.width;
+    c.height = px.height;
+    c.getContext("2d")!.putImageData(compose(px, enabled), 0, 0);
+  }, [px, enabled]);
+
+  const onMove = (e: React.PointerEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setPan({ x: ((e.clientX - r.left) / r.width - 0.5) * -2, y: ((e.clientY - r.top) / r.height - 0.5) * -2 });
+  };
 
   return (
     <figure className="flex flex-col items-center gap-3">
       <button
         onClick={() => setK((x) => x + 1)}
+        onPointerMove={onMove}
+        onPointerLeave={() => setPan({ x: 0, y: 0 })}
         disabled={ids.length < 2}
         aria-label="Look at another field"
         className="group relative h-[360px] w-[360px] rounded-full bg-darkfield shadow-[0_0_0_1px_rgba(255,255,255,0.14),0_0_0_10px_#0E1217,0_0_0_11px_rgba(255,255,255,0.08),0_40px_80px_-20px_rgba(0,0,0,0.9)] overflow-hidden"
       >
-        {id && (
-          <img
-            key={id}
-            src={imageUrl(id)}
-            alt="A field of MCF-7 cells from BBBC021: DNA, tubulin and actin stains"
-            onLoad={() => setLoaded(id)}
-            className={`stain-tint absolute inset-0 h-full w-full object-cover scale-[1.18] transition-opacity duration-700 ${loaded === id ? "opacity-100" : "opacity-0"}`}
-          />
-        )}
+        <span aria-hidden={!px} className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-500 ease-out ${px ? "opacity-100" : "opacity-0"}`}
+              style={{ transform: `translate(${pan.x * 12}%, ${pan.y * 12}%) scale(1.4)` }}>
+          <canvas ref={canvas} role="img" aria-label="A field of MCF-7 cells from BBBC021 with the selected stains"
+                  className="h-full w-auto max-w-none" />
+        </span>
         <Reticle />
         <span aria-hidden className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,transparent_58%,rgba(0,0,0,0.55)_80%,#000_100%)]" />
         <span className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] text-haze opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
           <RefreshCw aria-hidden className="h-3 w-3" /> Another field
         </span>
       </button>
-      <figcaption className="flex flex-col items-center gap-1.5 text-center">
-        <span className="flex items-center gap-3 text-[12px] text-haze">
+      <figcaption className="flex flex-col items-center gap-2 text-center">
+        <span role="group" aria-label="Stains" className="flex items-center gap-1.5">
           {CHANNELS.map((c) => (
-            <span key={c} className="flex items-center gap-1.5">
-              <span aria-hidden className={`h-2 w-2 rounded-full ${SWATCH[c]}`} /> {CHANNEL_LABEL[c]}
-            </span>
+            <button key={c} aria-pressed={enabled[c]} onClick={() => setEnabled((e) => ({ ...e, [c]: !e[c] }))}
+                    className={`flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[12px] transition-colors ${
+                      enabled[c] ? "border-white/30 text-white bg-white/[0.06]" : "border-line text-mist hover:text-haze"}`}>
+              <span aria-hidden className={`h-2 w-2 rounded-full ${SWATCH[c]} ${enabled[c] ? "shadow-[0_0_8px_currentColor]" : "opacity-30"}`} />
+              {CHANNEL_LABEL[c]}
+            </button>
           ))}
         </span>
         <span className="text-[11px] text-mist">
-          A real BBBC021 field from a recorded run{id ? <> · <span className="ids">{id.replace(".composite", "")}</span></> : null}
+          A real BBBC021 field from a recorded run{fieldId ? <> · <span className="ids">{fieldId}</span></> : null}
         </span>
       </figcaption>
     </figure>

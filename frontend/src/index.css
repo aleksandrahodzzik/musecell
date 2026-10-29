@@ -64,3 +64,6 @@
 .dark ::-webkit-scrollbar, .on-dark ::-webkit-scrollbar { height: 8px; width: 8px; }
 .dark ::-webkit-scrollbar-thumb, .on-dark ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.12); border-radius: 8px; }
 .dark ::-webkit-scrollbar-track, .on-dark ::-webkit-scrollbar-track { background: transparent; }
+
+/* Signal travelling along a wire of the agent circuit (AgentCircuit.tsx). */
+@keyframes wire { from { transform: translateX(0); } to { transform: translateX(22px); } }

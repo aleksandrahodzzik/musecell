@@ -2,19 +2,21 @@
 // After the unblinding the verdict (computed by code) marks the agent's call and the annotated mechanism.
 
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { useState, type PointerEvent } from "react";
 import { prob } from "../../lib/format";
 import type { Conclusion, Hypothesis, Verdict } from "../../lib/types";
 
 interface Props {
   hypotheses: Hypothesis[];
+  history: { step: number; hypotheses: Hypothesis[] }[];
   conclusion?: Conclusion;
   verdict?: Verdict;
   onEvidence: (evidenceId: string) => void;
 }
 
-export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvidence }: Props) {
+export default function HypothesisBoard({ hypotheses, history, conclusion, verdict, onEvidence }: Props) {
   const [open, setOpen] = useState<string | null>(null);
+  const [view, setView] = useState<"now" | "time">("now");
   const rows = [...hypotheses].sort((a, b) => b.probability - a.probability);
   const truthMissing = verdict && !rows.some((h) => h.moa === verdict.truth_moa);
 
@@ -22,8 +24,19 @@ export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvi
     <div className="flex flex-col h-full min-h-0">
       <div className="flex items-center gap-2 px-3 h-10 border-b border-rule bg-sheet">
         <h2 className="text-sm font-medium">Hypotheses</h2>
-        {rows.length > 0 && <span className="label">agent's probabilities</span>}
+        {rows.length > 0 && history.length < 2 && <span className="label">agent's probabilities</span>}
+        {history.length >= 2 && (
+          <div role="tablist" aria-label="Board view" className="ml-auto flex rounded-control border border-rule p-0.5 text-[11px]">
+            {(["now", "time"] as const).map((v) => (
+              <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}
+                      className={`px-2 h-5 rounded-[4px] ${view === v ? "bg-ink text-sheet" : "text-graphite hover:text-ink"}`}>
+                {v === "now" ? "Now" : "Over time"}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+      {view === "time" && history.length >= 2 ? <Trajectory history={history} lead={verdict?.agent_moa ?? conclusion?.top_moa ?? rows[0]?.moa} truth={verdict?.truth_moa} /> : (
       <div className="flex-1 min-h-0 overflow-y-auto px-3 py-2">
         {rows.length === 0 && (
           <p className="text-xs text-graphite pt-1">
@@ -97,6 +110,71 @@ export default function HypothesisBoard({ hypotheses, conclusion, verdict, onEvi
           </p>
         )}
       </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The board over time: one line per mechanism across the agent's board updates. Move the pointer (or use the
+ * arrow keys) to read the board as it stood after any update.
+ */
+function Trajectory({ history, lead, truth }: { history: { step: number; hypotheses: Hypothesis[] }[]; lead?: string; truth?: string }) {
+  const [at, setAt] = useState(history.length - 1);
+  const W = 256, H = 150, L = 26, R = 8, T = 8, B = 20;
+  const n = history.length;
+  const sx = (i: number) => L + (i / Math.max(1, n - 1)) * (W - L - R);
+  const sy = (p: number) => T + (1 - p) * (H - T - B);
+  const classes = Array.from(new Set(history.flatMap((h) => h.hypotheses.map((x) => x.moa))));
+  const value = (i: number, moa: string) => history[i].hypotheses.find((x) => x.moa === moa)?.probability ?? 0;
+  const peak = (moa: string) => Math.max(...history.map((_, i) => value(i, moa)));
+  const shown = classes.filter((m) => m === lead || m === truth || peak(m) >= 0.1);
+  const i = Math.min(at, n - 1);
+  const board = [...history[i].hypotheses].sort((a, b) => b.probability - a.probability).slice(0, 5);
+
+  const onMove = (e: PointerEvent<SVGSVGElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * W;
+    setAt(Math.max(0, Math.min(n - 1, Math.round(((x - L) / (W - L - R)) * (n - 1)))));
+  };
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto px-3 py-2 flex flex-col gap-2">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full touch-none cursor-crosshair outline-none" onPointerMove={onMove}
+           tabIndex={0} role="slider" aria-label="Board update" aria-valuemin={1} aria-valuemax={n} aria-valuenow={i + 1}
+           aria-valuetext={`Update ${i + 1} of ${n}, after step ${history[i].step}`}
+           onKeyDown={(e) => {
+             const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+             if (d) { e.preventDefault(); setAt(Math.max(0, Math.min(n - 1, i + d))); }
+           }}>
+        {[0, 0.5, 1].map((p) => (
+          <g key={p}>
+            <line x1={L} x2={W - R} y1={sy(p)} y2={sy(p)} stroke="#17202A" strokeOpacity={0.08} />
+            <text x={L - 4} y={sy(p) + 3} textAnchor="end" fontSize={9} fill="#5B6672">{p.toFixed(1)}</text>
+          </g>
+        ))}
+        <text x={L} y={H - 4} fontSize={9} fill="#5B6672">update 1</text>
+        <text x={W - R} y={H - 4} fontSize={9} fill="#5B6672" textAnchor="end">{n}</text>
+        {shown.map((m) => {
+          const isLead = m === lead;
+          const d = history.map((_, k) => `${k ? "L" : "M"}${sx(k)},${sy(value(k, m))}`).join(" ");
+          return <path key={m} d={d} fill="none" stroke={isLead ? "#17202A" : "#5B6672"} strokeOpacity={isLead ? 1 : 0.55}
+                       strokeWidth={isLead ? 2.25 : 1.1} strokeDasharray={m === truth && !isLead ? "3 2" : undefined} />;
+        })}
+        <line x1={sx(i)} x2={sx(i)} y1={T} y2={H - B} stroke="#17202A" strokeOpacity={0.35} />
+        {shown.map((m) => <circle key={m} cx={sx(i)} cy={sy(value(i, m))} r={m === lead ? 3.5 : 2.2} fill={m === lead ? "#17202A" : "#5B6672"} />)}
+      </svg>
+      <p className="text-[11px] text-graphite">
+        Board after step {history[i].step} · update {i + 1} of {n}
+        {truth && truth !== lead && <> · dashed: annotated mechanism</>}
+      </p>
+      <ul className="flex flex-col gap-1 text-[12.5px]">
+        {board.map((h) => (
+          <li key={h.moa} className="flex items-baseline gap-2">
+            <span className={`flex-1 truncate ${h.moa === lead ? "font-semibold" : ""}`}>{h.moa}</span>
+            <span className="text-graphite font-mono text-[11.5px]">{prob(h.probability)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

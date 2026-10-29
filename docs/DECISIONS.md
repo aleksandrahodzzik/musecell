@@ -253,3 +253,12 @@ The owner asked for a much more memorable UI. Spec §8's concept (lab notebook +
 - **Board vs conclusion probability**: the board shows the last `update_hypotheses`; the conclusion carries its own probability (e.g. 0.93 vs 0.85 in run_19b4ee810120). Both are now labelled ("Conclusion stated 0.85", "probability 0.85 in its conclusion") instead of looking like a contradiction.
 - **Benchmark** opens with a dark headline band: agent vs both NSC baselines at the largest eval budget, and one sentence ("below" / "at or above") derived from the rows, not hard-coded. The agent is the emphasised line in the chart; the cut-off series label is fixed.
 - Screenshots (`scripts/screenshots.py`, 0 console errors) and `docs/hero.gif` (now 880 px / 8 fps, 7.46 MB) re-recorded. pytest 93 passed, 1 skipped.
+
+## Interaction pass (2026-10-29)
+
+Owner asked for more interactivity. Everything added reads the run's own events; nothing is simulated.
+- **Agent circuit** (`AgentCircuit.tsx`), a band under the run header: Scientist (Muse Spark 1.3) · Microscope · Microscopist (Muse Spark 1.3 vision) · Atlas · PI reviewer (Muse Wonder 1.0) · PubChem/ChEMBL/PubMed. The node working now glows (pending tool call → its node; conclusion awaiting review → reviewer; model turn → scientist). Each node shows its calls and cost; clicking opens the per-call ledger (tokens in/out/reasoning, seconds, $) from `cost_updated.last`, now kept in `RunState.callLog`. The databases node shows a lock until the unblinding, so the blinding is visible. Ambient motion (ping on the active node, a signal on the wire) is a deliberate exception to "one orchestrated animation"; it stops under prefers-reduced-motion.
+- **Hypothesis board "Over time"**: one line per mechanism across the agent's board updates; pointer or ←/→ scrubs to read the board after any update; the annotated mechanism is dashed after the unblinding.
+- **Eyepiece**: DNA / tubulin / actin toggle on the start screen (canvas composite from `fieldImage.compose`, the same code as the microscope); the field pans with the pointer.
+- **Microscope keys**: 1/2/3 stains, M masks, D same-plate DMSO, +/− zoom, F fit, ←/→ fields; ignored while typing or when radio groups, sliders or tabs have focus.
+- Screenshots (0 console errors) and `docs/hero.gif` (7.81 MB) re-recorded.

@@ -2,6 +2,7 @@
 // Live runs and replays use exactly this screen; a replay only adds its permanent badge in the header.
 
 import { useEffect, useRef, useState } from "react";
+import AgentCircuit from "../components/run/AgentCircuit";
 import HypothesisBoard from "../components/run/HypothesisBoard";
 import Microscope from "../components/run/Microscope";
 import Notebook from "../components/run/Notebook";
@@ -71,6 +72,7 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
   return (
     <div className="h-full flex flex-col min-h-0">
       <RunHeader run={run} label={label} />
+      <AgentCircuit run={run} />
       {run.connection === "lost" && (
         <div className="px-4 pt-2">
           <ErrorNote title="Lost the connection to the server." action={<button className="btn" onClick={run.retry}>Reconnect</button>}>
@@ -103,7 +105,7 @@ export default function RunView({ runId, labels }: { runId: string; labels: Reco
           </div>
         </section>
         <section aria-label="Hypotheses" className="ruled border-l border-rule min-h-0">
-          <HypothesisBoard hypotheses={run.hypotheses} conclusion={finalConclusion} verdict={run.verdict} onEvidence={onEvidence} />
+          <HypothesisBoard hypotheses={run.hypotheses} history={run.history} conclusion={finalConclusion} verdict={run.verdict} onEvidence={onEvidence} />
         </section>
       </div>
       <section aria-label="Notebook" className="flex-1 min-h-0 ruled">
