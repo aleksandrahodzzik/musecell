@@ -25,3 +25,28 @@ Client: `openai.OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MO
   - Usage on `response.completed`: all token counts 0, `usage.images_processed=1` → cost by image ($2.50 / 1000).
   - **Surprise — prompt wording matters a lot.** On a 256² image with 3 soft Gaussian blobs: `"circle"` → 0 objects (completed, empty output); `"bright spot"` → 0; `"blob"` → 3/3 correct boxes, confidence ≈ 0.51–0.52. On hard-edged white discs, `"circle"` and `"white circle"` also → 0. An empty result is a normal `completed` outcome, not an error. → For cells, the Phase-0 bake-off must try several noun phrases (`cell`, `nucleus`, `nuclei`, `blob`…) per channel and log per-prompt counts; the segmenter must treat "0 objects" as a result to handle, and confidences are around 0.5 even on easy objects, so don't threshold at e.g. 0.8.
 - **Cost of Phase-0 probing**: ≈ $0.04 total (first run $0.0138, 4 extra SAM prompt trials $0.01, final run $0.0162).
+
+## Phase 1 — BBBC021 data (2026-10-28)
+
+### Metadata (real columns, verified)
+- `BBBC021_v1_image.csv` (13,200 fields): `TableNumber, ImageNumber, Image_FileName_{DAPI,Tubulin,Actin}, Image_PathName_{DAPI,Tubulin,Actin}, Image_Metadata_Plate_DAPI, Image_Metadata_Well_DAPI, Replicate, Image_Metadata_Compound, Image_Metadata_Concentration`. The field (site) number exists only in the file name (`<well>_s<N>_w…`). All 3 channels of a field share one folder.
+- `BBBC021_v1_compound.csv`: `compound, smiles` (113 rows). `BBBC021_v1_moa.csv`: `compound, concentration, moa` — 104 rows = 103 compound-concentrations of 38 compounds, 12 MoA classes, plus one `DMSO` row. Matches spec.
+- Zips: `BBBC021_v1_images_<plate>.zip`, members `<plate>/<file>.tif`, deflate, TIFF ≈ 2.6 MB raw / ≈ 1.1 MB compressed, uint16 1024×1280. Server sends `accept-ranges: bytes`; `remotezip` works.
+
+### Subset ("G") — deviation from spec §2, approved by the human
+- Spec plan (38 compounds × all 8 concentrations × 4 fields + same-plate DMSO) needs all 55 plates and **21.05 GB** of ranged reads — over the 12 GB hard cap.
+- Taxol 0.3 µM is a positive control on every plate (6 wells/plate, 333 wells): dropped except on the 3 plates that carry taxol's own dose series (Week1_22123/22141/22161). Rule is generic: a compound's wells on plates where it has no other concentration are dropped.
+- MoA-labelled compound-concentrations (103): all 4 fields. Unlabelled concentrations (201): fields 1–2. DMSO: all 6 wells per plate, fields 1–2 (12 DMSO fields/plate).
+- Result: 55 plates, 1,228 wells, 3,096 fields, 9,288 TIFFs, **10.83 GB** ranged. Every compound keeps all 8 doses (the agent's dose choice needs them); eval/atlas on labelled doses is unaffected.
+
+### Paths and ids
+- `DATA_DIR` default changed from `../musecell-data` (resolves onto the OneDrive Desktop or into the repo) to `~/musecell-data`. `scripts/data_paths.py` refuses a DATA_DIR inside OneDrive or the repo.
+- `data/index.parquet` stays in the repo's gitignored `data/`; all paths in it are relative to DATA_DIR. Outputs: `DATA_DIR/raw/<plate>/*.tif`, `DATA_DIR/processed/fields/<field_id>/{dna,tubulin,actin}.{npy,png}, composite.png`, `DATA_DIR/processed/contrast.json`.
+- `field_id = "f_" + sha256(salt/plate/well/site)[:12]`, salt random per machine in `DATA_DIR/field_id_salt` (never committed). An unsalted hash could be reversed by enumerating the public metadata. Consequence: ids differ between machines; committed demo runs must carry their own thumbnails.
+- `.npy` = (raw − p1) / (p99.8 − p1) of the plate's DMSO pixels, float32, **not clipped** (bright mitotic cells keep values > 1). PNGs are clipped to [0, 1]. Contrast values per plate/channel in `contrast.json`, so raw intensities are recoverable.
+- Added `tqdm` (progress bars) to requirements.
+
+### Result (2026-10-29)
+- Fetched 9,288 TIFFs (10.6 GB ranged, ~4 MB/s with 8–16 workers; Range never refused, so the full-zip fallback has not been exercised). The first fetch was interrupted overnight (laptop sleep, then the background process was killed); re-running resumed without re-downloading, and a final re-run reported 0 missing.
+- Index: 3,096 fields, 1,228 wells (898 treated, 330 DMSO), 55 plates, 38 compounds, 304 compound-concentrations (103 MoA-labelled), 12 MoA classes. Every plate has 12 DMSO fields.
+- Example composites (DMSO + 5 MoAs) in `docs/probe/example_*.jpg` (JPEG q90, ~0.9 MB total). With DMSO-based contrast, strongly affected cells saturate in the 8-bit PNGs; the .npy keeps the full range.
