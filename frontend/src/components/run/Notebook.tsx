@@ -3,7 +3,7 @@
 
 import { AlertTriangle, BookOpen, Check, ChevronDown, ChevronRight, ExternalLink, FileText, Loader2, MessageSquareQuote, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { imageUrl } from "../../lib/api";
+import FieldThumb from "../FieldThumb";
 import { CHANNEL_LABEL, type Channel } from "../../lib/fieldImage";
 import { featureName, modelName, prob, signed, toolName, uM } from "../../lib/format";
 import { href } from "../../lib/router";
@@ -273,8 +273,8 @@ function ToolDetail({ result: r, onSelectWell, open }: { result: ToolResultData;
             {(d.field_ids as string[]).map((f, i) => (
               <button key={f} onClick={() => onSelectWell(d.well_id)} className="bg-darkfield on-dark"
                       aria-label={`Show well field ${i + 1} in the microscope`}>
-                <img src={imageUrl(`${f}.composite`)} alt={`Field ${i + 1} of this well, composite of DNA, tubulin and actin`}
-                     loading="lazy" width={64} height={51} className="stain-tint block h-[51px] w-16 object-cover" />
+                <FieldThumb imageId={`${f}.composite`} alt={`Field ${i + 1} of this well, composite of DNA, tubulin and actin`}
+                            width={64} height={51} className="stain-tint block h-[51px] w-16 object-cover" />
               </button>
             ))}
           </div>

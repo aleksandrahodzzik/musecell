@@ -4,7 +4,7 @@
 import { ArrowLeft, Check, Download, Printer, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
-import { imageUrl } from "../lib/api";
+import FieldThumb from "../components/FieldThumb";
 import { dateTime, featureName, modelName, prob, signed, toolName, uM, usd } from "../lib/format";
 import { href } from "../lib/router";
 import type { Article, Conclusion, Deviation, Hypothesis, Reflection, Review, Unblinded, Verdict } from "../lib/types";
@@ -126,8 +126,8 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
                 <td className="py-1.5">{i + 1}<span className="block text-graphite text-xs">{x.evidence_id}</span></td>
                 <td className="py-1.5">
                   {x.image_ids[0] && (
-                    <img src={imageUrl(x.image_ids[0])} loading="lazy" width={72} height={58} className="stain-tint bg-darkfield w-[72px] h-[58px] object-cover"
-                         alt={`Well ${i + 1}, field 1: composite of DNA, tubulin and actin`} />
+                    <FieldThumb imageId={x.image_ids[0]} width={72} height={58} className="stain-tint bg-darkfield w-[72px] h-[58px] object-cover"
+                                alt={`Well ${i + 1}, field 1: composite of DNA, tubulin and actin`} />
                   )}
                 </td>
                 <td className="py-1.5 pr-4 text-right whitespace-nowrap">{uM(x.concentration_uM)}</td>

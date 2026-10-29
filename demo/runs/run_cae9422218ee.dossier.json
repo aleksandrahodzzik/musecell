@@ -1,0 +1,1402 @@
+{
+ "run_id": "run_cae9422218ee",
+ "mode": "blinded",
+ "specimen_id": "s_dace923f5f",
+ "status": "running",
+ "question": "Which mechanism-of-action class explains this compound's phenotype in MCF-7 cells?",
+ "budget": {
+  "total": 5,
+  "used": 5
+ },
+ "experiments": [
+  {
+   "evidence_id": "e2",
+   "well_id": "w_960c8e8412",
+   "concentration_uM": 1.5,
+   "replicate": 1,
+   "cells_measured": 442,
+   "top_deviations": [
+    {
+     "feature": "act_glcm_contrast",
+     "z": 9.442,
+     "direction": "up",
+     "value": 0.002,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "act_std",
+     "z": 8.784,
+     "direction": "up",
+     "value": 0.122,
+     "dmso_median": 0.086
+    },
+    {
+     "feature": "frac_multinucleate_proxy",
+     "z": 6.708,
+     "direction": "up",
+     "value": 0.364,
+     "dmso_median": 0.198
+    },
+    {
+     "feature": "nuc_major_axis",
+     "z": -6.571,
+     "direction": "down",
+     "value": 32.902,
+     "dmso_median": 36.71
+    }
+   ],
+   "image_ids": [
+    "f_37c839966a48.composite",
+    "f_af4f4180ad4b.composite",
+    "f_ab3e1497cef2.composite",
+    "f_167331f81190.composite"
+   ]
+  },
+  {
+   "evidence_id": "e3",
+   "well_id": "w_7e02865f8b",
+   "concentration_uM": 15.0,
+   "replicate": 1,
+   "cells_measured": 69,
+   "top_deviations": [
+    {
+     "feature": "tub_glcm_contrast",
+     "z": 66.85,
+     "direction": "up",
+     "value": 0.012,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "act_glcm_contrast",
+     "z": 41.682,
+     "direction": "up",
+     "value": 0.005,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "act_std",
+     "z": 36.971,
+     "direction": "up",
+     "value": 0.235,
+     "dmso_median": 0.086
+    },
+    {
+     "feature": "tub_std",
+     "z": 30.722,
+     "direction": "up",
+     "value": 0.345,
+     "dmso_median": 0.13
+    }
+   ],
+   "image_ids": [
+    "f_ce9400223061.composite",
+    "f_434a93c4078a.composite",
+    "f_962298aa325f.composite",
+    "f_53e85790df0c.composite"
+   ]
+  },
+  {
+   "evidence_id": "e8",
+   "well_id": "w_573d79459b",
+   "concentration_uM": 0.5,
+   "replicate": 1,
+   "cells_measured": 234,
+   "top_deviations": [
+    {
+     "feature": "frac_large_nucleus",
+     "z": 4.241,
+     "direction": "up",
+     "value": 0.022,
+     "dmso_median": 0.005
+    },
+    {
+     "feature": "frac_multinucleate_proxy",
+     "z": 2.835,
+     "direction": "up",
+     "value": 0.268,
+     "dmso_median": 0.198
+    },
+    {
+     "feature": "nuc_major_axis",
+     "z": -2.03,
+     "direction": "down",
+     "value": 35.534,
+     "dmso_median": 36.71
+    },
+    {
+     "feature": "act_std",
+     "z": 1.563,
+     "direction": "up",
+     "value": 0.093,
+     "dmso_median": 0.086
+    }
+   ],
+   "image_ids": [
+    "f_01a8f3b71c93.composite",
+    "f_16fac954ca1c.composite"
+   ]
+  },
+  {
+   "evidence_id": "e9",
+   "well_id": "w_d49b17a696",
+   "concentration_uM": 5.0,
+   "replicate": 1,
+   "cells_measured": 288,
+   "top_deviations": [
+    {
+     "feature": "tub_glcm_contrast",
+     "z": 24.797,
+     "direction": "up",
+     "value": 0.005,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "act_glcm_contrast",
+     "z": 22.438,
+     "direction": "up",
+     "value": 0.003,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "act_std",
+     "z": 20.527,
+     "direction": "up",
+     "value": 0.169,
+     "dmso_median": 0.086
+    },
+    {
+     "feature": "tub_std",
+     "z": 17.73,
+     "direction": "up",
+     "value": 0.254,
+     "dmso_median": 0.13
+    }
+   ],
+   "image_ids": [
+    "f_1dbcaa471451.composite",
+    "f_9f2ab50f409a.composite",
+    "f_13b3d82aad0a.composite",
+    "f_b81b1cebb5ec.composite"
+   ]
+  },
+  {
+   "evidence_id": "e18",
+   "well_id": "w_6b6388bf53",
+   "concentration_uM": 5.0,
+   "replicate": 2,
+   "cells_measured": 331,
+   "top_deviations": [
+    {
+     "feature": "tub_glcm_contrast",
+     "z": 18.949,
+     "direction": "up",
+     "value": 0.004,
+     "dmso_median": 0.001
+    },
+    {
+     "feature": "tub_mean",
+     "z": 16.768,
+     "direction": "up",
+     "value": 0.416,
+     "dmso_median": 0.246
+    },
+    {
+     "feature": "nuc_solidity",
+     "z": -16.344,
+     "direction": "down",
+     "value": 0.967,
+     "dmso_median": 0.972
+    },
+    {
+     "feature": "act_glcm_contrast",
+     "z": 12.778,
+     "direction": "up",
+     "value": 0.003,
+     "dmso_median": 0.001
+    }
+   ],
+   "image_ids": [
+    "f_3407720e6efc.composite",
+    "f_aaf6bce9dcc6.composite",
+    "f_586bca1fa56d.composite",
+    "f_148ae90c8acc.composite"
+   ]
+  }
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "tool": "list_available_experiments",
+   "args": {
+    "rationale": "Need doses and replicates to plan discriminating wells."
+   },
+   "rationale": "Need doses and replicates to plan discriminating wells.",
+   "evidence_id": "e1",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:02:47.472558Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 2,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 4,
+    "rationale": "Mid dose 1.5uM likely shows on-target phenotype without toxicity.",
+    "replicate": 1
+   },
+   "rationale": "Mid dose 1.5uM likely shows on-target phenotype without toxicity.",
+   "evidence_id": "e2",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:02:49.448585Z",
+   "seconds": 0.023
+  },
+  {
+   "step": 3,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 6,
+    "rationale": "High dose 15uM reveals maximal effect to separate cytostatic vs cytotoxic MoAs.",
+    "replicate": 1
+   },
+   "rationale": "High dose 15uM reveals maximal effect to separate cytostatic vs cytotoxic MoAs.",
+   "evidence_id": "e3",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:02:49.467725Z",
+   "seconds": 0.018
+  },
+  {
+   "step": 4,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_37c839966a48",
+     "f_af4f4180ad4b",
+     "f_ab3e1497cef2",
+     "f_167331f81190"
+    ],
+    "rationale": "Visual check of mid-dose cytoskeletal vs nuclear changes."
+   },
+   "rationale": "Visual check of mid-dose cytoskeletal vs nuclear changes.",
+   "evidence_id": "e4",
+   "error": null,
+   "cost_usd": 0.026160250000000003,
+   "started_at": "2026-10-29T10:03:15.864093Z",
+   "seconds": 19.938
+  },
+  {
+   "step": 5,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_ce9400223061",
+     "f_434a93c4078a",
+     "f_962298aa325f",
+     "f_53e85790df0c"
+    ],
+    "rationale": "Visual check of high-dose strong texture and low cell count."
+   },
+   "rationale": "Visual check of high-dose strong texture and low cell count.",
+   "evidence_id": "e5",
+   "error": null,
+   "cost_usd": 0.026298250000000002,
+   "started_at": "2026-10-29T10:03:38.321251Z",
+   "seconds": 22.443
+  },
+  {
+   "step": 6,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Atlas neighbours will separate microtubule vs aurora vs actin MoAs.",
+    "well_ids": [
+     "w_960c8e8412",
+     "w_7e02865f8b"
+    ]
+   },
+   "rationale": "Atlas neighbours will separate microtubule vs aurora vs actin MoAs.",
+   "evidence_id": "e6",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:38.335932Z",
+   "seconds": 0.005
+  },
+  {
+   "step": 7,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e4"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.48,
+      "supporting_evidence_ids": [
+       "e3",
+       "e5",
+       "e6"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.38,
+      "supporting_evidence_ids": [
+       "e2",
+       "e4",
+       "e6"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e4"
+      ],
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.05,
+      "supporting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3"
+      ],
+      "moa": "Protein degradation",
+      "probability": 0.05,
+      "supporting_evidence_ids": [
+       "e6"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.04,
+      "supporting_evidence_ids": [
+       "e5"
+      ]
+     }
+    ],
+    "rationale": "Mid dose actin-like, high dose stabilizer-like; atlas split needs dose curve."
+   },
+   "rationale": "Mid dose actin-like, high dose stabilizer-like; atlas split needs dose curve.",
+   "evidence_id": "e7",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:44.088277Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 8,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 3,
+    "rationale": "Low-mid 0.5uM tests onset order of actin vs tubulin changes.",
+    "replicate": 1
+   },
+   "rationale": "Low-mid 0.5uM tests onset order of actin vs tubulin changes.",
+   "evidence_id": "e8",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:47.133625Z",
+   "seconds": 0.017
+  },
+  {
+   "step": 9,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 5,
+    "rationale": "5uM bridges mid and high to track transition in phenotype.",
+    "replicate": 1
+   },
+   "rationale": "5uM bridges mid and high to track transition in phenotype.",
+   "evidence_id": "e9",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:47.169047Z",
+   "seconds": 0.025
+  },
+  {
+   "step": 10,
+   "tool": "dose_response",
+   "args": {
+    "feature": "tub_mean",
+    "rationale": "Track tubulin intensity dose trend to test stabilizer hypothesis."
+   },
+   "rationale": "Track tubulin intensity dose trend to test stabilizer hypothesis.",
+   "evidence_id": "e10",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:54.611132Z",
+   "seconds": 0.006
+  },
+  {
+   "step": 11,
+   "tool": "dose_response",
+   "args": {
+    "feature": "act_mean",
+    "rationale": "Compare actin intensity trend vs tubulin to see which leads."
+   },
+   "rationale": "Compare actin intensity trend vs tubulin to see which leads.",
+   "evidence_id": "e11",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:54.620728Z",
+   "seconds": 0.005
+  },
+  {
+   "step": 12,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_mitotic_like",
+    "rationale": "Mitotic arrest would favor microtubule/Aurora over actin MoAs."
+   },
+   "rationale": "Mitotic arrest would favor microtubule/Aurora over actin MoAs.",
+   "evidence_id": "e12",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:54.632999Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 13,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_multinucleate_proxy",
+    "rationale": "Multinucleation dose trend informs cytokinesis vs mitotic slippage."
+   },
+   "rationale": "Multinucleation dose trend informs cytokinesis vs mitotic slippage.",
+   "evidence_id": "e13",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:54.637851Z",
+   "seconds": 0.005
+  },
+  {
+   "step": 14,
+   "tool": "dose_response",
+   "args": {
+    "feature": "cell_count",
+    "rationale": "Cell loss at high dose indicates cytotoxic vs cytostatic effect."
+   },
+   "rationale": "Cell loss at high dose indicates cytotoxic vs cytostatic effect.",
+   "evidence_id": "e14",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:03:54.646028Z",
+   "seconds": 0.005
+  },
+  {
+   "step": 15,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_1dbcaa471451",
+     "f_9f2ab50f409a",
+     "f_13b3d82aad0a",
+     "f_b81b1cebb5ec"
+    ],
+    "rationale": "Visualize 5uM transition where mitotic fraction spikes."
+   },
+   "rationale": "Visualize 5uM transition where mitotic fraction spikes.",
+   "evidence_id": "e15",
+   "error": null,
+   "cost_usd": 0.028725500000000015,
+   "started_at": "2026-10-29T10:04:29.594712Z",
+   "seconds": 28.344
+  },
+  {
+   "step": 16,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Neighbors of mid-dose alone to test actin hypothesis.",
+    "well_ids": [
+     "w_960c8e8412"
+    ]
+   },
+   "rationale": "Neighbors of mid-dose alone to test actin hypothesis.",
+   "evidence_id": "e16",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:04:29.608905Z",
+   "seconds": 0.003
+  },
+  {
+   "step": 17,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Neighbors of high-dose alone to test stabilizer hypothesis.",
+    "well_ids": [
+     "w_7e02865f8b"
+    ]
+   },
+   "rationale": "Neighbors of high-dose alone to test stabilizer hypothesis.",
+   "evidence_id": "e17",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:04:29.623530Z",
+   "seconds": 0.004
+  },
+  {
+   "step": 18,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 5,
+    "rationale": "Replicate 5uM mitotic spike to confirm stabilizer vs actin split.",
+    "replicate": 2
+   },
+   "rationale": "Replicate 5uM mitotic spike to confirm stabilizer vs actin split.",
+   "evidence_id": "e18",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:04:35.639917Z",
+   "seconds": 0.017
+  },
+  {
+   "step": 19,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e4",
+       "e16"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.68,
+      "supporting_evidence_ids": [
+       "e3",
+       "e5",
+       "e9",
+       "e15",
+       "e17",
+       "e18",
+       "e10"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5",
+       "e15",
+       "e17"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.22,
+      "supporting_evidence_ids": [
+       "e2",
+       "e4",
+       "e6",
+       "e16"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e10"
+      ],
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.04,
+      "supporting_evidence_ids": [
+       "e9",
+       "e12"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e10"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.03,
+      "supporting_evidence_ids": [
+       "e5",
+       "e12"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e9"
+      ],
+      "moa": "Protein degradation",
+      "probability": 0.03,
+      "supporting_evidence_ids": [
+       "e6",
+       "e17"
+      ]
+     }
+    ],
+    "rationale": "Replicate confirms tubulin dominance and mitotic rise; stabilizers lead, actin remains alternative."
+   },
+   "rationale": "Replicate confirms tubulin dominance and mitotic rise; stabilizers lead, actin remains alternative.",
+   "evidence_id": "e19",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:04:45.221332Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 20,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e3",
+     "e9",
+     "e15",
+     "e17",
+     "e18"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Anti-alpha-tubulin IF at 5uM vs DMSO for bundles/asters plus p-H3 mitotic index and washout regrowth to test stabilization and mitotic arrest versus actin mechanism.",
+    "probability": 0.68,
+    "rationale": "High doses show tubulin-dominant hyperintensity with mitotic rise and stabilizer atlas match; replicate confirms.",
+    "top_moa": "Microtubule stabilizers"
+   },
+   "rationale": "High doses show tubulin-dominant hyperintensity with mitotic rise and stabilizer atlas match; replicate confirms.",
+   "evidence_id": "e20",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:04:48.621984Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 21,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Requested check: atlas neighbours of replicated 5uM wells to test stabilizer vs actin.",
+    "well_ids": [
+     "w_d49b17a696",
+     "w_6b6388bf53"
+    ]
+   },
+   "rationale": "Requested check: atlas neighbours of replicated 5uM wells to test stabilizer vs actin.",
+   "evidence_id": "e21",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:22.698042Z",
+   "seconds": 0.005
+  },
+  {
+   "step": 22,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e5",
+       "e18"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.62,
+      "supporting_evidence_ids": [
+       "e2",
+       "e4",
+       "e16",
+       "e21"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e4",
+       "e16",
+       "e21"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.26,
+      "supporting_evidence_ids": [
+       "e3",
+       "e5",
+       "e15",
+       "e17"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e4"
+      ],
+      "moa": "Protein degradation",
+      "probability": 0.05,
+      "supporting_evidence_ids": [
+       "e17",
+       "e21"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e4"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.04,
+      "supporting_evidence_ids": [
+       "e12"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e2",
+       "e10"
+      ],
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.03,
+      "supporting_evidence_ids": [
+       "e12"
+      ]
+     }
+    ],
+    "rationale": "5uM replicate atlas top hits actin with higher similarity than stabilizers; mid dose also actin."
+   },
+   "rationale": "5uM replicate atlas top hits actin with higher similarity than stabilizers; mid dose also actin.",
+   "evidence_id": "e22",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:28.586603Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 23,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e2",
+     "e4",
+     "e16",
+     "e21"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Phalloidin actin imaging at 1.5 and 5uM vs cytochalasin control plus washout and cytokinesis live-imaging to confirm actin-dependent multinucleation versus tubulin bundling.",
+    "probability": 0.62,
+    "rationale": "Replicated 5uM atlas top hits actin over stabilizers; mid dose actin-dominant with multinucleation and low mitosis.",
+    "top_moa": "Actin disruptors"
+   },
+   "rationale": "Replicated 5uM atlas top hits actin over stabilizers; mid dose actin-dominant with multinucleation and low mitosis.",
+   "evidence_id": "e23",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:30.819659Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 24,
+   "tool": "lookup_compound",
+   "args": {
+    "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+    "name": "mevinolin/lovastatin"
+   },
+   "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+   "evidence_id": "e24",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:30.826201Z",
+   "seconds": 0.004
+  },
+  {
+   "step": 25,
+   "tool": "lookup_compound",
+   "args": {
+    "name": "lovastatin",
+    "rationale": "Verify unblinded identity and curated mechanisms for dossier."
+   },
+   "rationale": "Verify unblinded identity and curated mechanisms for dossier.",
+   "evidence_id": "e25",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:36.064760Z",
+   "seconds": 2.485
+  },
+  {
+   "step": 26,
+   "tool": "search_literature",
+   "args": {
+    "max_results": 5,
+    "query": "lovastatin mevinolin HMG-CoA reductase cholesterol lowering mechanism",
+    "rationale": "Need real papers on lovastatin annotated mechanism."
+   },
+   "rationale": "Need real papers on lovastatin annotated mechanism.",
+   "evidence_id": "e26",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:37.140930Z",
+   "seconds": 1.074
+  },
+  {
+   "step": 27,
+   "tool": "search_literature",
+   "args": {
+    "max_results": 5,
+    "query": "lovastatin statin actin cytoskeleton multinucleation morphology",
+    "rationale": "Need papers linking statins to actin-like phenotype we scored."
+   },
+   "rationale": "Need papers linking statins to actin-like phenotype we scored.",
+   "evidence_id": "e27",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T10:05:37.731075Z",
+   "seconds": 0.589
+  }
+ ],
+ "hypothesis_history": [
+  {
+   "step": 7,
+   "hypotheses": [
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.48,
+     "supporting_evidence_ids": [
+      "e3",
+      "e5",
+      "e6"
+     ],
+     "contradicting_evidence_ids": [
+      "e4"
+     ]
+    },
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.38,
+     "supporting_evidence_ids": [
+      "e2",
+      "e4",
+      "e6"
+     ],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.05,
+     "supporting_evidence_ids": [
+      "e5"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e4"
+     ]
+    },
+    {
+     "moa": "Protein degradation",
+     "probability": 0.05,
+     "supporting_evidence_ids": [
+      "e6"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e3"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.04,
+     "supporting_evidence_ids": [
+      "e5"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e3"
+     ]
+    }
+   ]
+  },
+  {
+   "step": 19,
+   "hypotheses": [
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.68,
+     "supporting_evidence_ids": [
+      "e3",
+      "e5",
+      "e9",
+      "e15",
+      "e17",
+      "e18",
+      "e10"
+     ],
+     "contradicting_evidence_ids": [
+      "e4",
+      "e16"
+     ]
+    },
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.22,
+     "supporting_evidence_ids": [
+      "e2",
+      "e4",
+      "e6",
+      "e16"
+     ],
+     "contradicting_evidence_ids": [
+      "e5",
+      "e15",
+      "e17"
+     ]
+    },
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.04,
+     "supporting_evidence_ids": [
+      "e9",
+      "e12"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e10"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.03,
+     "supporting_evidence_ids": [
+      "e5",
+      "e12"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e10"
+     ]
+    },
+    {
+     "moa": "Protein degradation",
+     "probability": 0.03,
+     "supporting_evidence_ids": [
+      "e6",
+      "e17"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e9"
+     ]
+    }
+   ]
+  },
+  {
+   "step": 22,
+   "hypotheses": [
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.62,
+     "supporting_evidence_ids": [
+      "e2",
+      "e4",
+      "e16",
+      "e21"
+     ],
+     "contradicting_evidence_ids": [
+      "e5",
+      "e18"
+     ]
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.26,
+     "supporting_evidence_ids": [
+      "e3",
+      "e5",
+      "e15",
+      "e17"
+     ],
+     "contradicting_evidence_ids": [
+      "e4",
+      "e16",
+      "e21"
+     ]
+    },
+    {
+     "moa": "Protein degradation",
+     "probability": 0.05,
+     "supporting_evidence_ids": [
+      "e17",
+      "e21"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e4"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.04,
+     "supporting_evidence_ids": [
+      "e12"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e4"
+     ]
+    },
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.03,
+     "supporting_evidence_ids": [
+      "e12"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e10"
+     ]
+    }
+   ]
+  }
+ ],
+ "conclusions": [
+  {
+   "top_moa": "Microtubule stabilizers",
+   "probability": 0.68,
+   "key_evidence_ids": [
+    "e3",
+    "e9",
+    "e15",
+    "e17",
+    "e18"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Anti-alpha-tubulin IF at 5uM vs DMSO for bundles/asters plus p-H3 mitotic index and washout regrowth to test stabilization and mitotic arrest versus actin mechanism.",
+   "rationale": "High doses show tubulin-dominant hyperintensity with mitotic rise and stabilizer atlas match; replicate confirms."
+  },
+  {
+   "top_moa": "Actin disruptors",
+   "probability": 0.62,
+   "key_evidence_ids": [
+    "e2",
+    "e4",
+    "e16",
+    "e21"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Phalloidin actin imaging at 1.5 and 5uM vs cytochalasin control plus washout and cytokinesis live-imaging to confirm actin-dependent multinucleation versus tubulin bundling.",
+   "rationale": "Replicated 5uM atlas top hits actin over stabilizers; mid dose actin-dominant with multinucleation and low mitosis."
+  }
+ ],
+ "review": {
+  "verdict": "request_experiment",
+  "critique": "**Do not approve yet \\u2014 request one free atlas analysis.** The dose series (0.5/1.5/5/15 \\u00b5M) and the 5 \\u00b5M replicate were well chosen, but the stabilizer call rests mainly on the single 15 \\u00b5M well (e3/e17): only 69 cells, saturated rounded cells, and actin hyperintensity nearly as extreme as tubulin (act_mean z=+17.2 vs tub_mean z=+15.0), so contraction/cytotoxicity could mimic tubulin bundling. The runner-up actin hypothesis explains the cleaner 1.5 \\u00b5M well better: actin-dominant texture, multinucleation z=+6.7 and *reduced* mitotic fraction z=-4.7 (e2/e4/e16), and even the high-dose atlas's top individual neighbours are actin/protein-degradation despite the 8/10 stabilizer count. Both tub_mean and act_mean rise with rho=+1.00 (e10/e11), so onset does not separate them. P=0.68 is therefore overstated. **Specific affordable step (budget=0): run `compare_to_reference_atlas` on the two already-acquired 5 \\u00b5M wells together \\u2014 dose index 5, rep 1 (w_d49b17a696) and rep 2 (w_6b6388bf53) \\u2014 the replicated, non-saturated transition dose where mitosis spikes.** If stabilizers dominate there, approve; if actin disruptors dominate, the conclusion must flip.",
+  "requested_experiment": "compare_to_reference_atlas on existing wells w_d49b17a696 (dose index 5, 5 \\u00b5M, rep 1) and w_6b6388bf53 (dose index 5, 5 \\u00b5M, rep 2) combined, to test whether the stabilizer atlas match persists at the replicated mid-high dose or was driven by the single low-cell-count 15 \\u00b5M well."
+ },
+ "unblinding": {
+  "compound": "mevinolin/lovastatin",
+  "pubchem_cid": 53232,
+  "structure_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/53232/PNG",
+  "chembl_mechanisms": [],
+  "identity_check": "name and BBBC021 structure agree"
+ },
+ "verdict": {
+  "correct": false,
+  "truth_moa": "Cholesterol-lowering",
+  "agent_moa": "Actin disruptors"
+ },
+ "reflection": {
+  "text": "The run chased a direct cytoskeleton dichotomy: 1.5 uM showed actin-dominant texture with multinucleation and microscopist actin call, while 15 uM showed extreme tubulin and actin texture with low cell count and stabilizer atlas matches, leading first to Microtubule stabilizers 0.68 then after the requested replicated 5 uM atlas to Actin disruptors 0.62. Unblinding as mevinolin/lovastatin with truth Cholesterol-lowering shows both calls mistook an indirect statin morphology for direct cytoskeletal binding.\n\nWhat misled was covariation without separation: tub_mean and act_mean both rose with rho=+1.00, mitotic and multinucleation dose trends were weak and non-significant, and the single 15 uM well had only 69 cells with saturated texture where actin was nearly as high as tubulin, inflating the stabilizer count. The decisive replicated 5 uM atlas was actually a tie with a true hint present — Actin 3/10, Stabilizers 3/10, Cholesterol-lowering 2/10 — but I read it as an actin win and discounted the metabolic signal.\n\nThe lesson is that strong actin/tubulin texture plus multinucleation at micromolar statin doses does not equal actin disruption, especially when cell loss indicates cytotoxicity/contractility confounds, and metabolic MoAs need explicit rescue controls rather than atlas majority vote.",
+  "what_was_right": [
+   "Flagged dose-dependent cell loss with rho=-1.00 and only 69 cells in the 15 uM well as a cytotoxicity/saturation confound for the extreme tub_glcm_contrast +66.8 and act_glcm_contrast +41.7 signal.",
+   "Correctly downweighted Aurora/Eg5 mitotic-arrest hypotheses because frac_mitotic_like dose trend was weak rho=+0.60 p=0.4 and frac_multinucleate_proxy rho=+0.40 p=0.6 despite multinucleation z=+6.7 at 1.5 uM.",
+   "Recognized that tub_mean and act_mean both rising with rho=+1.00 provided no onset separation between tubulin versus actin mechanisms."
+  ],
+  "what_was_wrong": [
+   "Misread mid-dose actin texture act_glcm_contrast z=+9.4, act_std z=+8.8 plus microscopist actin call as direct actin disruption without testing for actin filament loss versus compensatory bundling.",
+   "Overcalled Microtubule stabilizers from the single low-n 15 uM well and atlas counts 7/10 and 8/10 stabilizers while ignoring nearly equal actin hyperintensity and the cleaner mid-dose actin atlas.",
+   "Flipped to final Actin disruptors on ambiguous replicated 5 uM atlas 3 actin / 3 stabilizers / 2 cholesterol-lowering, treating the cholesterol-lowering neighbours as noise and never acquiring a very low dose or mevalonate-rescue comparison to test the true statin mechanism."
+  ],
+  "citations": [
+   {
+    "pmid": "3076125",
+    "claim": "Lovastatin/mevinolin acts as a cholesterol-lowering agent through inhibition of HMG-CoA reductase."
+   },
+   {
+    "pmid": "12539818",
+    "claim": "Lovastatin is classified among HMG-CoA reductase inhibitors compared for cholesterol-lowering activity."
+   },
+   {
+    "pmid": "34681729",
+    "claim": "Cholesterol-lowering activity can occur through statin-like HMG-CoA reductase regulation."
+   }
+  ],
+  "next_experiment": "Re-test lovastatin at 1.5 and 5 uM with and without mevalonate/mevalonolactone rescue plus a statin control and cholesterol readout, combined with phalloidin versus anti-tubulin imaging and cell viability, to test HMG-CoA reductase-dependent indirect cytoskeletal effects versus direct actin or microtubule binding.",
+  "citations_cited": [
+   "3076125",
+   "12539818",
+   "34681729"
+  ],
+  "citations_removed": []
+ },
+ "citations": [
+  {
+   "pmid": "3076125",
+   "title": "Mechanism of action and biological profile of HMG CoA reductase inhibitors. A new therapeutic alternative.",
+   "journal": "Drugs",
+   "year": 1988,
+   "authors": [
+    "Slater EE",
+    "MacDonald JS"
+   ],
+   "url": "https://pubmed.ncbi.nlm.nih.gov/3076125/"
+  },
+  {
+   "pmid": "12539818",
+   "title": "Comparing HMG-CoA reductase inhibitors.",
+   "journal": "Clin Cardiol",
+   "year": 2003,
+   "authors": [
+    "Jones PH"
+   ],
+   "url": "https://pubmed.ncbi.nlm.nih.gov/12539818/"
+  },
+  {
+   "pmid": "34681729",
+   "title": "IAF, QGF, and QDF Peptides Exhibit Cholesterol-Lowering Activity through a Statin-like HMG-CoA Reductase Regulation Mechanism: In Silico and In Vitro Approach.",
+   "journal": "Int J Mol Sci",
+   "year": 2021,
+   "authors": [
+    "Silva M",
+    "Philadelpho B",
+    "Santos J",
+    "Souza V",
+    "Souza C",
+    "Santiago V"
+   ],
+   "url": "https://pubmed.ncbi.nlm.nih.gov/34681729/"
+  }
+ ],
+ "citations_label": "Citations verified: 3/3",
+ "cost_usd": 0.5332,
+ "model_ids": {
+  "scientist": "muse-spark-1.3",
+  "microscopist": "muse-spark-1.3",
+  "reviewer": "muse-wonder-1.0",
+  "segmentation": "classical (scikit-image)"
+ },
+ "turns": 16,
+ "model_calls": [
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 1",
+   "input_tokens": 2787,
+   "output_tokens": 92,
+   "reasoning_tokens": 8,
+   "cost_usd": 0.0038747499999999997,
+   "seconds": 0.725,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 2",
+   "input_tokens": 3249,
+   "output_tokens": 375,
+   "reasoning_tokens": 148,
+   "cost_usd": 0.0056549999999999994,
+   "seconds": 1.914,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 3",
+   "input_tokens": 5431,
+   "output_tokens": 1668,
+   "reasoning_tokens": 1286,
+   "cost_usd": 0.01387775,
+   "seconds": 6.391,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "input_tokens": 11041,
+   "output_tokens": 2908,
+   "reasoning_tokens": 2201,
+   "cost_usd": 0.02616025,
+   "seconds": 16.436,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "input_tokens": 11029,
+   "output_tokens": 2944,
+   "reasoning_tokens": 2337,
+   "cost_usd": 0.026298250000000002,
+   "seconds": 17.753,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 4",
+   "input_tokens": 8163,
+   "output_tokens": 1140,
+   "reasoning_tokens": 780,
+   "cost_usd": 0.01504875,
+   "seconds": 5.685,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 5",
+   "input_tokens": 8844,
+   "output_tokens": 493,
+   "reasoning_tokens": 274,
+   "cost_usd": 0.01315025,
+   "seconds": 2.957,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 6",
+   "input_tokens": 10956,
+   "output_tokens": 1632,
+   "reasoning_tokens": 1204,
+   "cost_usd": 0.020631,
+   "seconds": 7.363,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 7",
+   "input_tokens": 12498,
+   "output_tokens": 1697,
+   "reasoning_tokens": 1334,
+   "cost_usd": 0.02283475,
+   "seconds": 6.514,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "input_tokens": 11060,
+   "output_tokens": 3506,
+   "reasoning_tokens": 2828,
+   "cost_usd": 0.0287255,
+   "seconds": 24.207,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 8",
+   "input_tokens": 15259,
+   "output_tokens": 1230,
+   "reasoning_tokens": 1091,
+   "cost_usd": 0.02430125,
+   "seconds": 5.884,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 9",
+   "input_tokens": 16380,
+   "output_tokens": 2137,
+   "reasoning_tokens": 1737,
+   "cost_usd": 0.02955725,
+   "seconds": 9.461,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 10",
+   "input_tokens": 17146,
+   "output_tokens": 726,
+   "reasoning_tokens": 520,
+   "cost_usd": 0.024518,
+   "seconds": 3.288,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-wonder-1.0",
+   "purpose": "reviewer",
+   "input_tokens": 15598,
+   "output_tokens": 3088,
+   "reasoning_tokens": 2615,
+   "cost_usd": 0.12415200000000001,
+   "seconds": 32.288,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 11",
+   "input_tokens": 18076,
+   "output_tokens": 166,
+   "reasoning_tokens": 16,
+   "cost_usd": 0.023300500000000002,
+   "seconds": 1.586,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 12",
+   "input_tokens": 19046,
+   "output_tokens": 1303,
+   "reasoning_tokens": 922,
+   "cost_usd": 0.02934525,
+   "seconds": 5.756,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 13",
+   "input_tokens": 19772,
+   "output_tokens": 438,
+   "reasoning_tokens": 229,
+   "cost_usd": 0.0265765,
+   "seconds": 2.109,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 14",
+   "input_tokens": 19086,
+   "output_tokens": 614,
+   "reasoning_tokens": 305,
+   "cost_usd": 0.026467,
+   "seconds": 2.742,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 15",
+   "input_tokens": 20547,
+   "output_tokens": 475,
+   "reasoning_tokens": 253,
+   "cost_usd": 0.0277025,
+   "seconds": 2.687,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "reflection",
+   "input_tokens": 5331,
+   "output_tokens": 3370,
+   "reasoning_tokens": 2510,
+   "cost_usd": 0.02098625,
+   "seconds": 13.961,
+   "attempts": 1,
+   "finish_reason": "stop"
+  }
+ ],
+ "disclaimer": "Research tool for cell-biology screening data. Not for clinical use."
+}

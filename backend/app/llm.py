@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import random
 import time
 from datetime import date, datetime, timezone
@@ -104,13 +105,42 @@ class DailyLedger:
         path = self._path()
         if not path.exists():
             return 0.0
-        return sum(json.loads(line)["cost_usd"] for line in path.read_text().splitlines() if line.strip())
+        total = 0.0
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                total += json.loads(line)["cost_usd"]
+            except (ValueError, KeyError, TypeError):  # a line torn by an older unlocked writer: skip, don't crash
+                continue
+        return total
 
     def add(self, run_id: str, record: CallRecord) -> None:
+        """Appends under a cross-process lock: the eval and the demo recorder share this file, and on Windows
+        unlocked appends from two processes can overwrite each other."""
         self.directory.mkdir(parents=True, exist_ok=True)
         line = {"ts": datetime.now(timezone.utc).isoformat(), "run_id": run_id, **record.model_dump()}
-        with self._path().open("a", encoding="utf-8") as f:
-            f.write(json.dumps(line) + "\n")
+        data = (json.dumps(line) + "\n").encode("utf-8")
+        fd = os.open(self._path(), os.O_WRONLY | os.O_APPEND | os.O_CREAT | getattr(os, "O_BINARY", 0))
+        try:
+            _lock(fd)
+            os.lseek(fd, 0, os.SEEK_END)
+            os.write(fd, data)
+        finally:
+            os.close(fd)  # closing releases the lock
+
+
+def _lock(fd: int) -> None:
+    """Blocking exclusive lock on an open file (msvcrt on Windows, fcntl elsewhere)."""
+    if os.name == "nt":
+        import msvcrt
+        os.lseek(fd, 0, os.SEEK_SET)
+        while True:
+            try:
+                msvcrt.locking(fd, msvcrt.LK_LOCK, 1)  # lock byte 0; LK_LOCK retries ~10 s, then raises
+                return
+            except OSError:
+                continue
+    import fcntl
+    fcntl.flock(fd, fcntl.LOCK_EX)
 
 
 def _retryable(exc: Exception) -> bool:

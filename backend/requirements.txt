@@ -15,4 +15,5 @@ pillow==13.0.0
 remotezip==0.12.6
 tqdm==4.70.1
 meta-sam-parser==0.1.0
+matplotlib==3.9.2
 pytest==9.2.0

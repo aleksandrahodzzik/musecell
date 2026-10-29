@@ -1,0 +1,2779 @@
+{
+ "run_id": "run_19b4ee810120",
+ "mode": "blinded",
+ "phase": "finished",
+ "specimen_id": "s_46227421e8",
+ "budget_total": 5,
+ "budget_used": 5,
+ "acquired_well_ids": [
+  "w_80f45bbd63",
+  "w_7d742a2ea2",
+  "w_b09894f4c4",
+  "w_3559cc7c5c",
+  "w_bb49de52e8"
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "tool": "list_available_experiments",
+   "args": {
+    "rationale": "Need dose range and replicates to plan discriminative well sampling."
+   },
+   "rationale": "Need dose range and replicates to plan discriminative well sampling.",
+   "evidence_id": "e1",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:57:41.984557Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 2,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 2,
+    "rationale": "Sample low dose to establish baseline onset vs DMSO.",
+    "replicate": 1
+   },
+   "rationale": "Sample low dose to establish baseline onset vs DMSO.",
+   "evidence_id": "e2",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:57:44.592993Z",
+   "seconds": 0.031
+  },
+  {
+   "step": 3,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 4,
+    "rationale": "Sample mid dose where MoA-specific phenotype should emerge.",
+    "replicate": 1
+   },
+   "rationale": "Sample mid dose where MoA-specific phenotype should emerge.",
+   "evidence_id": "e3",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:57:44.643905Z",
+   "seconds": 0.034
+  },
+  {
+   "step": 4,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 6,
+    "rationale": "Sample high dose to capture strong effect and test for toxicity.",
+    "replicate": 1
+   },
+   "rationale": "Sample high dose to capture strong effect and test for toxicity.",
+   "evidence_id": "e4",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:57:44.679745Z",
+   "seconds": 0.025
+  },
+  {
+   "step": 5,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_0388a47df642",
+     "f_7dd8f5cbadb2",
+     "f_27e25aa5a825",
+     "f_1ad97f1d11b7"
+    ],
+    "rationale": "Visual check for enlarged/monolobed nuclei vs mitotic arrest to separate Aurora from Eg5/MT."
+   },
+   "rationale": "Visual check for enlarged/monolobed nuclei vs mitotic arrest to separate Aurora from Eg5/MT.",
+   "evidence_id": "e5",
+   "error": null,
+   "cost_usd": 0.02756675,
+   "started_at": "2026-10-29T09:58:07.120835Z",
+   "seconds": 19.223
+  },
+  {
+   "step": 6,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Nearest reference MoAs will test if large-nucleus profile matches Aurora vs other classes.",
+    "well_ids": [
+     "w_80f45bbd63",
+     "w_7d742a2ea2",
+     "w_b09894f4c4"
+    ]
+   },
+   "rationale": "Nearest reference MoAs will test if large-nucleus profile matches Aurora vs other classes.",
+   "evidence_id": "e6",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:07.137614Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 7,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_large_nucleus",
+    "rationale": "Large-nucleus fraction is extreme; dose trend tests saturation vs toxicity drop."
+   },
+   "rationale": "Large-nucleus fraction is extreme; dose trend tests saturation vs toxicity drop.",
+   "evidence_id": "e7",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:12.392950Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 8,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_mitotic_like",
+    "rationale": "Low mitotic fraction argues against Eg5 arrest; checking dose trend."
+   },
+   "rationale": "Low mitotic fraction argues against Eg5 arrest; checking dose trend.",
+   "evidence_id": "e8",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:12.403866Z",
+   "seconds": 0.006
+  },
+  {
+   "step": 9,
+   "tool": "dose_response",
+   "args": {
+    "feature": "nuc_dna_integrated",
+    "rationale": "Integrated DNA rise supports polyploidy; dose trend confirms mechanism."
+   },
+   "rationale": "Integrated DNA rise supports polyploidy; dose trend confirms mechanism.",
+   "evidence_id": "e9",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:12.413762Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 10,
+   "tool": "dose_response",
+   "args": {
+    "feature": "cell_count",
+    "rationale": "Cell loss magnitude helps separate cytostatic polyploidy from cytotoxicity."
+   },
+   "rationale": "Cell loss magnitude helps separate cytostatic polyploidy from cytotoxicity.",
+   "evidence_id": "e10",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:12.422621Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 11,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.88,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e6",
+       "e8"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.02,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Microtubule destabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e6"
+      ],
+      "moa": "DNA damage",
+      "probability": 0.04,
+      "supporting_evidence_ids": [
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "DNA replication",
+      "probability": 0.02,
+      "supporting_evidence_ids": []
+     }
+    ],
+    "rationale": "Large irregular binucleate nuclei with high DNA, intact MT/actin, and 9/10 Aurora atlas matches dominate; need replicate to confirm."
+   },
+   "rationale": "Large irregular binucleate nuclei with high DNA, intact MT/actin, and 9/10 Aurora atlas matches dominate; need replicate to confirm.",
+   "evidence_id": "e11",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:16.600595Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 12,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 2,
+    "rationale": "Replicate low-dose strong polyploidy signal to test reproducibility vs well artifact.",
+    "replicate": 2
+   },
+   "rationale": "Replicate low-dose strong polyploidy signal to test reproducibility vs well artifact.",
+   "evidence_id": "e12",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:18.532086Z",
+   "seconds": 0.032
+  },
+  {
+   "step": 13,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.93,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e12"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e6"
+      ],
+      "moa": "DNA damage",
+      "probability": 0.03,
+      "supporting_evidence_ids": [
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e6",
+       "e8"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.01,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Microtubule destabilizers",
+      "probability": 0.01,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.01,
+      "supporting_evidence_ids": []
+     },
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "DNA replication",
+      "probability": 0.01,
+      "supporting_evidence_ids": []
+     }
+    ],
+    "rationale": "Replicate reproduces extreme large-nucleus polyploidy, raising Aurora confidence; no new contradicting data."
+   },
+   "rationale": "Replicate reproduces extreme large-nucleus polyploidy, raising Aurora confidence; no new contradicting data.",
+   "evidence_id": "e13",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:22.264054Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 14,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e12",
+     "e8"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 (Ser10) immunofluorescence plus live-cell imaging of mitosis to test Aurora-B inhibition and cytokinesis failure vs Eg5 monopolar arrest.",
+    "probability": 0.93,
+    "rationale": "Replicated extreme polyploid/binucleate phenotype with intact cytoskeleton and 9/10 Aurora atlas matches.",
+    "top_moa": "Aurora kinase inhibitors"
+   },
+   "rationale": "Replicated extreme polyploid/binucleate phenotype with intact cytoskeleton and 9/10 Aurora atlas matches.",
+   "evidence_id": "e14",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:24.208180Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 15,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 7,
+    "rationale": "Highest dose tests saturation/toxicity and extends neighborhood graph across full range.",
+    "replicate": 1
+   },
+   "rationale": "Highest dose tests saturation/toxicity and extends neighborhood graph across full range.",
+   "evidence_id": "e15",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:44.299991Z",
+   "seconds": 0.022
+  },
+  {
+   "step": 16,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Test if high-dose texture change shifts atlas neighbors away from Aurora class.",
+    "well_ids": [
+     "w_80f45bbd63",
+     "w_3559cc7c5c",
+     "w_7d742a2ea2",
+     "w_b09894f4c4",
+     "w_bb49de52e8"
+    ]
+   },
+   "rationale": "Test if high-dose texture change shifts atlas neighbors away from Aurora class.",
+   "evidence_id": "e16",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:58:48.099101Z",
+   "seconds": 0.012
+  },
+  {
+   "step": 17,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_52a5ba54a4cf",
+     "f_daa3056c4390"
+    ],
+    "rationale": "Visualize high-dose cytoskeletal texture to distinguish toxicity from MoA shift."
+   },
+   "rationale": "Visualize high-dose cytoskeletal texture to distinguish toxicity from MoA shift.",
+   "evidence_id": "e17",
+   "error": null,
+   "cost_usd": 0.0197725,
+   "started_at": "2026-10-29T09:59:02.576880Z",
+   "seconds": 14.469
+  },
+  {
+   "step": 18,
+   "tool": "dose_response",
+   "args": {
+    "feature": "tub_mean",
+    "rationale": "Tubulin brightening only at top dose; trend tests if secondary toxicity vs primary MoA."
+   },
+   "rationale": "Tubulin brightening only at top dose; trend tests if secondary toxicity vs primary MoA.",
+   "evidence_id": "e18",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:09.357510Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 19,
+   "tool": "dose_response",
+   "args": {
+    "feature": "nuc_area",
+    "rationale": "Nuclear enlargement peaks low then falls; trend clarifies biphasic response."
+   },
+   "rationale": "Nuclear enlargement peaks low then falls; trend clarifies biphasic response.",
+   "evidence_id": "e19",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:09.371625Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 20,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Isolate high-dose well to see if its neighbors diverge from Aurora consensus.",
+    "well_ids": [
+     "w_bb49de52e8"
+    ]
+   },
+   "rationale": "Isolate high-dose well to see if its neighbors diverge from Aurora consensus.",
+   "evidence_id": "e20",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:09.376878Z",
+   "seconds": 0.006
+  },
+  {
+   "step": 21,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e12",
+     "e20"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "In vitro Aurora kinase inhibition plus tubulin polymerization assay to confirm primary Aurora activity and test if 30uM bundling is direct MT stabilization or secondary toxicity.",
+    "probability": 0.85,
+    "rationale": "Replicated low-dose polyploid binucleate phenotype with intact MT and 9/10 Aurora neighbors at 0.93 similarity; uncertain: 30uM alone shifts to MT-stabilizer neighbors.",
+    "top_moa": "Aurora kinase inhibitors"
+   },
+   "rationale": "Replicated low-dose polyploid binucleate phenotype with intact MT and 9/10 Aurora neighbors at 0.93 similarity; uncertain: 30uM alone shifts to MT-stabilizer neighbors.",
+   "evidence_id": "e21",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:14.906300Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 22,
+   "tool": "lookup_compound",
+   "args": {
+    "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+    "name": "AZ258"
+   },
+   "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+   "evidence_id": "e22",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:14.921696Z",
+   "seconds": 0.013
+  },
+  {
+   "step": 23,
+   "tool": "search_literature",
+   "args": {},
+   "rationale": "",
+   "evidence_id": null,
+   "error": "Invalid arguments: rationale: Field required; query: Field required; max_results: Field required",
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:16.950899Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 24,
+   "tool": "search_literature",
+   "args": {},
+   "rationale": "",
+   "evidence_id": null,
+   "error": "Invalid arguments: rationale: Field required; query: Field required; max_results: Field required",
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:16.950899Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 25,
+   "tool": "search_literature",
+   "args": {
+    "max_results": 5,
+    "query": "Aurora kinase inhibitor polyploidy binucleate phenotype MCF-7",
+    "rationale": "Need papers linking Aurora inhibition to polyploid/binucleate morphology seen here."
+   },
+   "rationale": "Need papers linking Aurora inhibition to polyploid/binucleate morphology seen here.",
+   "evidence_id": "e23",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:18.549977Z",
+   "seconds": 0.339
+  },
+  {
+   "step": 26,
+   "tool": "search_literature",
+   "args": {
+    "max_results": 5,
+    "query": "AZ258 Aurora kinase inhibitor mechanism",
+    "rationale": "Need literature on AZ258 compound mechanism to confirm annotation."
+   },
+   "rationale": "Need literature on AZ258 compound mechanism to confirm annotation.",
+   "evidence_id": "e24",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-29T09:59:19.207629Z",
+   "seconds": 0.656
+  }
+ ],
+ "hypotheses": [
+  {
+   "moa": "Aurora kinase inhibitors",
+   "probability": 0.93,
+   "supporting_evidence_ids": [
+    "e2",
+    "e3",
+    "e5",
+    "e6",
+    "e12"
+   ],
+   "contradicting_evidence_ids": []
+  },
+  {
+   "moa": "DNA damage",
+   "probability": 0.03,
+   "supporting_evidence_ids": [
+    "e9"
+   ],
+   "contradicting_evidence_ids": [
+    "e6"
+   ]
+  },
+  {
+   "moa": "Eg5 inhibitors",
+   "probability": 0.01,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e6",
+    "e8"
+   ]
+  },
+  {
+   "moa": "Microtubule destabilizers",
+   "probability": 0.01,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e5"
+   ]
+  },
+  {
+   "moa": "Microtubule stabilizers",
+   "probability": 0.01,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e5"
+   ]
+  },
+  {
+   "moa": "DNA replication",
+   "probability": 0.01,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": []
+  }
+ ],
+ "hypothesis_history": [
+  {
+   "step": 11,
+   "hypotheses": [
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.88,
+     "supporting_evidence_ids": [
+      "e2",
+      "e3",
+      "e5",
+      "e6"
+     ],
+     "contradicting_evidence_ids": []
+    },
+    {
+     "moa": "DNA damage",
+     "probability": 0.04,
+     "supporting_evidence_ids": [
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e6"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.02,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e6",
+      "e8"
+     ]
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.02,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.02,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "DNA replication",
+     "probability": 0.02,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": []
+    }
+   ]
+  },
+  {
+   "step": 13,
+   "hypotheses": [
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.93,
+     "supporting_evidence_ids": [
+      "e2",
+      "e3",
+      "e5",
+      "e6",
+      "e12"
+     ],
+     "contradicting_evidence_ids": []
+    },
+    {
+     "moa": "DNA damage",
+     "probability": 0.03,
+     "supporting_evidence_ids": [
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e6"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.01,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e6",
+      "e8"
+     ]
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.01,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.01,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "DNA replication",
+     "probability": 0.01,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": []
+    }
+   ]
+  }
+ ],
+ "evidence": [
+  {
+   "evidence_id": "e1",
+   "kind": "experiments",
+   "tool": "list_available_experiments",
+   "summary": "8 doses (0.01-30 µM); 5 of 5 wells left",
+   "data": {
+    "specimen_id": "s_46227421e8",
+    "doses": [
+     {
+      "concentration_index": 0,
+      "concentration_uM": 0.01,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 1,
+      "concentration_uM": 0.03,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 2,
+      "concentration_uM": 0.1,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 3,
+      "concentration_uM": 0.3,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 4,
+      "concentration_uM": 1.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 5,
+      "concentration_uM": 3.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 6,
+      "concentration_uM": 10.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 7,
+      "concentration_uM": 30.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     }
+    ],
+    "budget_total": 5,
+    "budget_used": 0,
+    "budget_left": 5,
+    "acquired_wells": []
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:57:41.984557Z"
+  },
+  {
+   "evidence_id": "e2",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_80f45bbd63 (dose 2, 0.1 µM, rep 1): 442 cells measured; frac_large_nucleus z=+98.8, nuc_area z=+41.9, nuc_major_axis z=+28.2",
+   "data": {
+    "well_id": "w_80f45bbd63",
+    "concentration_index": 2,
+    "concentration_uM": 0.1,
+    "replicate": 1,
+    "field_ids": [
+     "f_0388a47df642",
+     "f_7dd8f5cbadb2",
+     "f_3ff8ffda1bca",
+     "f_5d033f9567d9"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 442,
+     "fields": [
+      {
+       "field_id": "f_0388a47df642",
+       "nuclei": 137,
+       "touching_border": 41
+      },
+      {
+       "field_id": "f_7dd8f5cbadb2",
+       "nuclei": 148,
+       "touching_border": 43
+      },
+      {
+       "field_id": "f_3ff8ffda1bca",
+       "nuclei": 171,
+       "touching_border": 42
+      },
+      {
+       "field_id": "f_5d033f9567d9",
+       "nuclei": 151,
+       "touching_border": 39
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 41.94,
+     "nuc_dna_integrated": 12.94,
+     "nuc_dna_mean": 6.03,
+     "nuc_eccentricity": 3.16,
+     "nuc_solidity": -15.22,
+     "nuc_form_factor": -13.46,
+     "nuc_major_axis": 28.22,
+     "cell_area": 11.05,
+     "cell_nuc_area_ratio": 4.37,
+     "cell_roundness": -3.98,
+     "cell_eccentricity": -2.79,
+     "cell_solidity": -1.41,
+     "cell_major_axis": 9.38,
+     "tub_mean": -1.68,
+     "tub_std": 1.06,
+     "tub_glcm_contrast": -4.46,
+     "act_mean": -3.92,
+     "act_std": -1.39,
+     "act_glcm_contrast": -5.54,
+     "act_tub_ratio": -1.08,
+     "cell_count": -5.11,
+     "frac_mitotic_like": -1.66,
+     "frac_large_nucleus": 98.8,
+     "frac_multinucleate_proxy": 2.29
+    },
+    "top_deviations": [
+     {
+      "feature": "frac_large_nucleus",
+      "z": 98.799,
+      "direction": "up",
+      "value": 0.302,
+      "dmso_median": 0.008
+     },
+     {
+      "feature": "nuc_area",
+      "z": 41.937,
+      "direction": "up",
+      "value": 1337.5,
+      "dmso_median": 809.0
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": 28.219,
+      "direction": "up",
+      "value": 47.781,
+      "dmso_median": 36.722
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -15.215,
+      "direction": "down",
+      "value": 0.967,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -13.463,
+      "direction": "down",
+      "value": 0.86,
+      "dmso_median": 0.917
+     },
+     {
+      "feature": "nuc_dna_integrated",
+      "z": 12.943,
+      "direction": "up",
+      "value": 727.67,
+      "dmso_median": 327.244
+     },
+     {
+      "feature": "cell_area",
+      "z": 11.053,
+      "direction": "up",
+      "value": 7175.0,
+      "dmso_median": 3406.0
+     },
+     {
+      "feature": "cell_major_axis",
+      "z": 9.384,
+      "direction": "up",
+      "value": 126.663,
+      "dmso_median": 87.654
+     }
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f",
+     "f_6a8c7914b9c7"
+    ],
+    "budget_left": 4
+   },
+   "image_ids": [
+    "f_0388a47df642.composite",
+    "f_7dd8f5cbadb2.composite",
+    "f_3ff8ffda1bca.composite",
+    "f_5d033f9567d9.composite"
+   ],
+   "created_at": "2026-10-29T09:57:44.592993Z"
+  },
+  {
+   "evidence_id": "e3",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_7d742a2ea2 (dose 4, 1 µM, rep 1): 350 cells measured; frac_large_nucleus z=+70.3, nuc_area z=+38.0, nuc_major_axis z=+22.7",
+   "data": {
+    "well_id": "w_7d742a2ea2",
+    "concentration_index": 4,
+    "concentration_uM": 1.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_27e25aa5a825",
+     "f_1ad97f1d11b7",
+     "f_39687df662ca",
+     "f_568a1455e800"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 350,
+     "fields": [
+      {
+       "field_id": "f_27e25aa5a825",
+       "nuclei": 85,
+       "touching_border": 27
+      },
+      {
+       "field_id": "f_1ad97f1d11b7",
+       "nuclei": 111,
+       "touching_border": 23
+      },
+      {
+       "field_id": "f_39687df662ca",
+       "nuclei": 109,
+       "touching_border": 22
+      },
+      {
+       "field_id": "f_568a1455e800",
+       "nuclei": 152,
+       "touching_border": 35
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 38.05,
+     "nuc_dna_integrated": 11.4,
+     "nuc_dna_mean": 3.92,
+     "nuc_eccentricity": 1.81,
+     "nuc_solidity": -12.92,
+     "nuc_form_factor": -10.55,
+     "nuc_major_axis": 22.75,
+     "cell_area": 9.54,
+     "cell_nuc_area_ratio": 5.39,
+     "cell_roundness": -0.96,
+     "cell_eccentricity": -2.19,
+     "cell_solidity": 0.6,
+     "cell_major_axis": 9.27,
+     "tub_mean": 2.23,
+     "tub_std": 6.19,
+     "tub_glcm_contrast": -1.6,
+     "act_mean": -4.21,
+     "act_std": -0.81,
+     "act_glcm_contrast": -5.48,
+     "act_tub_ratio": -2.83,
+     "cell_count": -6.27,
+     "frac_mitotic_like": -1.09,
+     "frac_large_nucleus": 70.32,
+     "frac_multinucleate_proxy": 3.24
+    },
+    "top_deviations": [
+     {
+      "feature": "frac_large_nucleus",
+      "z": 70.315,
+      "direction": "up",
+      "value": 0.217,
+      "dmso_median": 0.008
+     },
+     {
+      "feature": "nuc_area",
+      "z": 38.049,
+      "direction": "up",
+      "value": 1288.5,
+      "dmso_median": 809.0
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": 22.749,
+      "direction": "up",
+      "value": 45.637,
+      "dmso_median": 36.722
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -12.922,
+      "direction": "down",
+      "value": 0.967,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "nuc_dna_integrated",
+      "z": 11.397,
+      "direction": "up",
+      "value": 679.863,
+      "dmso_median": 327.244
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -10.553,
+      "direction": "down",
+      "value": 0.872,
+      "dmso_median": 0.917
+     },
+     {
+      "feature": "cell_area",
+      "z": 9.538,
+      "direction": "up",
+      "value": 6658.5,
+      "dmso_median": 3406.0
+     },
+     {
+      "feature": "cell_major_axis",
+      "z": 9.271,
+      "direction": "up",
+      "value": 126.192,
+      "dmso_median": 87.654
+     }
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f",
+     "f_6a8c7914b9c7"
+    ],
+    "budget_left": 3
+   },
+   "image_ids": [
+    "f_27e25aa5a825.composite",
+    "f_1ad97f1d11b7.composite",
+    "f_39687df662ca.composite",
+    "f_568a1455e800.composite"
+   ],
+   "created_at": "2026-10-29T09:57:44.643905Z"
+  },
+  {
+   "evidence_id": "e4",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_b09894f4c4 (dose 6, 10 µM, rep 1): 203 cells measured; nuc_area z=+25.2, nuc_major_axis z=+13.5, act_glcm_contrast z=+11.4",
+   "data": {
+    "well_id": "w_b09894f4c4",
+    "concentration_index": 6,
+    "concentration_uM": 10.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_f78b1dd684fb",
+     "f_447b9878cd6e"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 203,
+     "fields": [
+      {
+       "field_id": "f_f78b1dd684fb",
+       "nuclei": 119,
+       "touching_border": 30
+      },
+      {
+       "field_id": "f_447b9878cd6e",
+       "nuclei": 145,
+       "touching_border": 31
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 25.23,
+     "nuc_dna_integrated": 10.91,
+     "nuc_dna_mean": 4.89,
+     "nuc_eccentricity": 0.62,
+     "nuc_solidity": 0.38,
+     "nuc_form_factor": -2.32,
+     "nuc_major_axis": 13.48,
+     "cell_area": 9.64,
+     "cell_nuc_area_ratio": 7.07,
+     "cell_roundness": -4.76,
+     "cell_eccentricity": -9.16,
+     "cell_solidity": 1.96,
+     "cell_major_axis": 7.27,
+     "tub_mean": 2.17,
+     "tub_std": 7.72,
+     "tub_glcm_contrast": 4.8,
+     "act_mean": 2.44,
+     "act_std": 6.51,
+     "act_glcm_contrast": 11.4,
+     "act_tub_ratio": 0.64,
+     "cell_count": -5.72,
+     "frac_mitotic_like": -1.45,
+     "frac_large_nucleus": 2.71,
+     "frac_multinucleate_proxy": -2.05
+    },
+    "top_deviations": [
+     {
+      "feature": "nuc_area",
+      "z": 25.234,
+      "direction": "up",
+      "value": 1127.0,
+      "dmso_median": 809.0
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": 13.478,
+      "direction": "up",
+      "value": 42.004,
+      "dmso_median": 36.722
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 11.398,
+      "direction": "up",
+      "value": 0.002,
+      "dmso_median": 0.001
+     },
+     {
+      "feature": "nuc_dna_integrated",
+      "z": 10.909,
+      "direction": "up",
+      "value": 664.744,
+      "dmso_median": 327.244
+     },
+     {
+      "feature": "cell_area",
+      "z": 9.636,
+      "direction": "up",
+      "value": 6692.0,
+      "dmso_median": 3406.0
+     },
+     {
+      "feature": "cell_eccentricity",
+      "z": -9.156,
+      "direction": "down",
+      "value": 0.729,
+      "dmso_median": 0.772
+     },
+     {
+      "feature": "tub_std",
+      "z": 7.721,
+      "direction": "up",
+      "value": 0.169,
+      "dmso_median": 0.117
+     },
+     {
+      "feature": "cell_major_axis",
+      "z": 7.268,
+      "direction": "up",
+      "value": 117.865,
+      "dmso_median": 87.654
+     }
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f",
+     "f_6a8c7914b9c7"
+    ],
+    "budget_left": 2
+   },
+   "image_ids": [
+    "f_f78b1dd684fb.composite",
+    "f_447b9878cd6e.composite"
+   ],
+   "created_at": "2026-10-29T09:57:44.679745Z"
+  },
+  {
+   "evidence_id": "e5",
+   "kind": "phenotype",
+   "tool": "describe_phenotype",
+   "summary": "Microscopist on 4 field(s): density lower vs DMSO; 7 observations; candidates: Aurora kinase inhibitors",
+   "data": {
+    "field_ids": [
+     "f_0388a47df642",
+     "f_7dd8f5cbadb2",
+     "f_27e25aa5a825",
+     "f_1ad97f1d11b7"
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f"
+    ],
+    "model": "muse-spark-1.3",
+    "report": {
+     "candidate_mechanisms": [
+      {
+       "moa": "Aurora kinase inhibitors",
+       "why": "Enlarged irregular nuclei, frequent binucleate/paired nuclei, increased DNA content per nucleus and enlarged cells without microtubule loss or actin collapse, consistent with cytokinesis failure/polyploidy."
+      }
+     ],
+     "cell_density": "lower",
+     "notable_cells": [
+      {
+       "field_id": "f_0388a47df642",
+       "why": "large spread cell with two apposed round nuclei example of binucleation",
+       "x": 510,
+       "y": 330
+      },
+      {
+       "field_id": "f_7dd8f5cbadb2",
+       "why": "enlarged cell with single large irregular nucleus",
+       "x": 763,
+       "y": 223
+      },
+      {
+       "field_id": "f_1ad97f1d11b7",
+       "why": "cell with two distinct nuclei example of binucleation",
+       "x": 900,
+       "y": 350
+      },
+      {
+       "field_id": "f_27e25aa5a825",
+       "why": "enlarged multilobed nucleus",
+       "x": 421,
+       "y": 177
+      }
+     ],
+     "observations": [
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "Nuclei markedly larger than DMSO, many paired/binucleate or multilobed; agrees with frac_large_nucleus z 70-99, nuc_area z 38-42, nuc_major_axis z 22-28."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "Nuclei more irregular/less round than DMSO oval nuclei; agrees with nuc_solidity z -12 to -15 and nuc_form_factor z -10 to -13."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "DAPI brightness/integrated intensity per nucleus higher than DMSO; agrees with nuc_dna_integrated z 11-13."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "composite",
+       "finding": "Cells much larger and more spread with more cytoplasm than DMSO; agrees with cell_area z 9.5-11 and cell_major_axis z ~9.3."
+      },
+      {
+       "agrees_with_measurements": false,
+       "channel": "tubulin",
+       "finding": "Filamentous microtubule network preserved throughout cytoplasm, no obvious depolymerization or dense bundles; no tubulin measurement provided."
+      },
+      {
+       "agrees_with_measurements": false,
+       "channel": "actin",
+       "finding": "Cortical F-actin intact, no fragmentation or loss; no actin measurement provided."
+      },
+      {
+       "agrees_with_measurements": false,
+       "channel": "composite",
+       "finding": "Fields less confluent with empty gaps vs dense DMSO monolayer; no cell-count z-score provided."
+      }
+     ],
+     "uncertainty": "Polyploid/binucleate phenotype is clear but cannot alone distinguish Aurora inhibition from other cytokinesis-failure mechanisms; mitotic figures not resolved."
+    }
+   },
+   "image_ids": [
+    "f_0388a47df642.composite",
+    "f_7dd8f5cbadb2.composite",
+    "f_27e25aa5a825.composite",
+    "f_1ad97f1d11b7.composite",
+    "f_bd4169e2e78f.composite"
+   ],
+   "created_at": "2026-10-29T09:58:07.120835Z"
+  },
+  {
+   "evidence_id": "e6",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "Nearest references: Aurora kinase inhibitors (9/10), DNA damage (1/10)",
+   "data": {
+    "well_ids": [
+     "w_80f45bbd63",
+     "w_7d742a2ea2",
+     "w_b09894f4c4"
+    ],
+    "k": 10,
+    "similarity": "cosine on robust-z profiles",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "neighbors": [
+     {
+      "compound": "AZ841",
+      "concentration_uM": 0.3,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.96,
+      "image_id": "f_8b93542d8c89.composite"
+     },
+     {
+      "compound": "AZ841",
+      "concentration_uM": 0.1,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.952,
+      "image_id": "f_f5290300a0b7.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 1.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.939,
+      "image_id": "f_9b1232e520b6.composite"
+     },
+     {
+      "compound": "AZ841",
+      "concentration_uM": 1.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.931,
+      "image_id": "f_b5947047eed0.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 0.1,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.927,
+      "image_id": "f_01903e30b4c1.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 0.3,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.92,
+      "image_id": "f_0a642a8ce890.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 3.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.913,
+      "image_id": "f_1354f3c8e02d.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 30.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.912,
+      "image_id": "f_7ea188fa8262.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 10.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.902,
+      "image_id": "f_10c6bfbe2dcc.composite"
+     },
+     {
+      "compound": "etoposide",
+      "concentration_uM": 1.0,
+      "moa": "DNA damage",
+      "similarity": 0.819,
+      "image_id": "f_f243bab397ff.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Aurora kinase inhibitors",
+      "neighbors": 9,
+      "mean_similarity": 0.928
+     },
+     {
+      "moa": "DNA damage",
+      "neighbors": 1,
+      "mean_similarity": 0.819
+     }
+    ]
+   },
+   "image_ids": [
+    "f_8b93542d8c89.composite",
+    "f_f5290300a0b7.composite",
+    "f_9b1232e520b6.composite",
+    "f_b5947047eed0.composite",
+    "f_01903e30b4c1.composite",
+    "f_0a642a8ce890.composite",
+    "f_1354f3c8e02d.composite",
+    "f_7ea188fa8262.composite",
+    "f_10c6bfbe2dcc.composite",
+    "f_f243bab397ff.composite"
+   ],
+   "created_at": "2026-10-29T09:58:07.137614Z"
+  },
+  {
+   "evidence_id": "e7",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_large_nucleus over 3 wells, 3 doses: Spearman rho=-1.00 (p=0)",
+   "data": {
+    "feature": "frac_large_nucleus",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 98.7995,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 70.3155,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 2.7059,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -1.0,
+    "p_value": 0.0,
+    "n_wells": 3,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:12.392950Z"
+  },
+  {
+   "evidence_id": "e8",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_mitotic_like over 3 wells, 3 doses: Spearman rho=+0.50 (p=0.67)",
+   "data": {
+    "feature": "frac_mitotic_like",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": -1.6597,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -1.095,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": -1.453,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 0.5,
+    "p_value": 0.6667,
+    "n_wells": 3,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:12.403866Z"
+  },
+  {
+   "evidence_id": "e9",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of nuc_dna_integrated over 3 wells, 3 doses: Spearman rho=-1.00 (p=0)",
+   "data": {
+    "feature": "nuc_dna_integrated",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 12.9426,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 11.3974,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 10.9087,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -1.0,
+    "p_value": 0.0,
+    "n_wells": 3,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:12.413762Z"
+  },
+  {
+   "evidence_id": "e10",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of cell_count over 3 wells, 3 doses: Spearman rho=-0.50 (p=0.67)",
+   "data": {
+    "feature": "cell_count",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": -5.1091,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -6.272,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": -5.7215,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -0.5,
+    "p_value": 0.6667,
+    "n_wells": 3,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:12.422621Z"
+  },
+  {
+   "evidence_id": "e11",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Aurora kinase inhibitors 0.88, DNA damage 0.04, Eg5 inhibitors 0.02, Microtubule destabilizers 0.02",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.88,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "DNA damage",
+      "probability": 0.04,
+      "supporting_evidence_ids": [
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e6"
+      ]
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e6",
+       "e8"
+      ]
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "moa": "DNA replication",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": []
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:16.600595Z"
+  },
+  {
+   "evidence_id": "e12",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_3559cc7c5c (dose 2, 0.1 µM, rep 2): 462 cells measured; frac_large_nucleus z=+138.6, nuc_area z=+46.2, nuc_form_factor z=-46.1",
+   "data": {
+    "well_id": "w_3559cc7c5c",
+    "concentration_index": 2,
+    "concentration_uM": 0.1,
+    "replicate": 2,
+    "field_ids": [
+     "f_ad2198e74590",
+     "f_75ee11bdc07a",
+     "f_ee9f46995b49",
+     "f_b4b447e18765"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 462,
+     "fields": [
+      {
+       "field_id": "f_ad2198e74590",
+       "nuclei": 124,
+       "touching_border": 34
+      },
+      {
+       "field_id": "f_75ee11bdc07a",
+       "nuclei": 174,
+       "touching_border": 46
+      },
+      {
+       "field_id": "f_ee9f46995b49",
+       "nuclei": 139,
+       "touching_border": 41
+      },
+      {
+       "field_id": "f_b4b447e18765",
+       "nuclei": 198,
+       "touching_border": 52
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 46.24,
+     "nuc_dna_integrated": 8.51,
+     "nuc_dna_mean": 0.54,
+     "nuc_eccentricity": 4.33,
+     "nuc_solidity": -21.48,
+     "nuc_form_factor": -46.06,
+     "nuc_major_axis": 30.48,
+     "cell_area": 4.45,
+     "cell_nuc_area_ratio": 0.11,
+     "cell_roundness": -2.16,
+     "cell_eccentricity": -1.91,
+     "cell_solidity": 0.07,
+     "cell_major_axis": 4.49,
+     "tub_mean": -1.98,
+     "tub_std": -1.19,
+     "tub_glcm_contrast": -2.03,
+     "act_mean": -5.64,
+     "act_std": -2.82,
+     "act_glcm_contrast": -5.95,
+     "act_tub_ratio": -0.01,
+     "cell_count": -3.85,
+     "frac_mitotic_like": -2.27,
+     "frac_large_nucleus": 138.57,
+     "frac_multinucleate_proxy": 6.55
+    },
+    "top_deviations": [
+     {
+      "feature": "frac_large_nucleus",
+      "z": 138.571,
+      "direction": "up",
+      "value": 0.319,
+      "dmso_median": 0.005
+     },
+     {
+      "feature": "nuc_area",
+      "z": 46.238,
+      "direction": "up",
+      "value": 1333.5,
+      "dmso_median": 836.5
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -46.063,
+      "direction": "down",
+      "value": 0.848,
+      "dmso_median": 0.92
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": 30.475,
+      "direction": "up",
+      "value": 47.436,
+      "dmso_median": 37.225
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -21.484,
+      "direction": "down",
+      "value": 0.963,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "nuc_dna_integrated",
+      "z": 8.508,
+      "direction": "up",
+      "value": 610.612,
+      "dmso_median": 380.285
+     },
+     {
+      "feature": "frac_multinucleate_proxy",
+      "z": 6.555,
+      "direction": "up",
+      "value": 0.401,
+      "dmso_median": 0.203
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": -5.95,
+      "direction": "down",
+      "value": 0.001,
+      "dmso_median": 0.001
+     }
+    ],
+    "dmso_field_ids": [
+     "f_d60d2447f2a9",
+     "f_43d0b9102f21"
+    ],
+    "budget_left": 1
+   },
+   "image_ids": [
+    "f_ad2198e74590.composite",
+    "f_75ee11bdc07a.composite",
+    "f_ee9f46995b49.composite",
+    "f_b4b447e18765.composite"
+   ],
+   "created_at": "2026-10-29T09:58:18.532086Z"
+  },
+  {
+   "evidence_id": "e13",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Aurora kinase inhibitors 0.93, DNA damage 0.03, Eg5 inhibitors 0.01, Microtubule destabilizers 0.01",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.93,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e12"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "DNA damage",
+      "probability": 0.03,
+      "supporting_evidence_ids": [
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e6"
+      ]
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e6",
+       "e8"
+      ]
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "moa": "DNA replication",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": []
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:22.264054Z"
+  },
+  {
+   "evidence_id": "e14",
+   "kind": "conclusion",
+   "tool": "submit_conclusion",
+   "summary": "Conclusion: Aurora kinase inhibitors (p=0.93)",
+   "data": {
+    "top_moa": "Aurora kinase inhibitors",
+    "probability": 0.93,
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e12",
+     "e8"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 (Ser10) immunofluorescence plus live-cell imaging of mitosis to test Aurora-B inhibition and cytokinesis failure vs Eg5 monopolar arrest.",
+    "rationale": "Replicated extreme polyploid/binucleate phenotype with intact cytoskeleton and 9/10 Aurora atlas matches."
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:58:24.208180Z"
+  },
+  {
+   "evidence_id": "e15",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_bb49de52e8 (dose 7, 30 µM, rep 1): 165 cells measured; tub_glcm_contrast z=+28.9, act_glcm_contrast z=+22.6, tub_std z=+15.9",
+   "data": {
+    "well_id": "w_bb49de52e8",
+    "concentration_index": 7,
+    "concentration_uM": 30.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_52a5ba54a4cf",
+     "f_daa3056c4390"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 165,
+     "fields": [
+      {
+       "field_id": "f_52a5ba54a4cf",
+       "nuclei": 110,
+       "touching_border": 16
+      },
+      {
+       "field_id": "f_daa3056c4390",
+       "nuclei": 99,
+       "touching_border": 28
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 6.82,
+     "nuc_dna_integrated": 4.29,
+     "nuc_dna_mean": 1.44,
+     "nuc_eccentricity": 3.9,
+     "nuc_solidity": -2.77,
+     "nuc_form_factor": -3.1,
+     "nuc_major_axis": 6.39,
+     "cell_area": 2.7,
+     "cell_nuc_area_ratio": 3.5,
+     "cell_roundness": 4.0,
+     "cell_eccentricity": -6.1,
+     "cell_solidity": 0.15,
+     "cell_major_axis": 2.96,
+     "tub_mean": 13.77,
+     "tub_std": 15.95,
+     "tub_glcm_contrast": 28.87,
+     "act_mean": 3.37,
+     "act_std": 15.01,
+     "act_glcm_contrast": 22.63,
+     "act_tub_ratio": -2.48,
+     "cell_count": -6.57,
+     "frac_mitotic_like": -1.58,
+     "frac_large_nucleus": 6.92,
+     "frac_multinucleate_proxy": -3.24
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 28.865,
+      "direction": "up",
+      "value": 0.004,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 22.627,
+      "direction": "up",
+      "value": 0.002,
+      "dmso_median": 0.001
+     },
+     {
+      "feature": "tub_std",
+      "z": 15.947,
+      "direction": "up",
+      "value": 0.225,
+      "dmso_median": 0.117
+     },
+     {
+      "feature": "act_std",
+      "z": 15.014,
+      "direction": "up",
+      "value": 0.14,
+      "dmso_median": 0.075
+     },
+     {
+      "feature": "tub_mean",
+      "z": 13.767,
+      "direction": "up",
+      "value": 0.424,
+      "dmso_median": 0.284
+     },
+     {
+      "feature": "frac_large_nucleus",
+      "z": 6.917,
+      "direction": "up",
+      "value": 0.028,
+      "dmso_median": 0.008
+     },
+     {
+      "feature": "nuc_area",
+      "z": 6.824,
+      "direction": "up",
+      "value": 895.0,
+      "dmso_median": 809.0
+     },
+     {
+      "feature": "cell_count",
+      "z": -6.574,
+      "direction": "down",
+      "value": 104.5,
+      "dmso_median": 316.5
+     }
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f",
+     "f_6a8c7914b9c7"
+    ],
+    "budget_left": 0
+   },
+   "image_ids": [
+    "f_52a5ba54a4cf.composite",
+    "f_daa3056c4390.composite"
+   ],
+   "created_at": "2026-10-29T09:58:44.299991Z"
+  },
+  {
+   "evidence_id": "e16",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "Nearest references: Aurora kinase inhibitors (9/10), DNA damage (1/10)",
+   "data": {
+    "well_ids": [
+     "w_80f45bbd63",
+     "w_3559cc7c5c",
+     "w_7d742a2ea2",
+     "w_b09894f4c4",
+     "w_bb49de52e8"
+    ],
+    "k": 10,
+    "similarity": "cosine on robust-z profiles",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "neighbors": [
+     {
+      "compound": "AZ841",
+      "concentration_uM": 0.3,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.962,
+      "image_id": "f_8b93542d8c89.composite"
+     },
+     {
+      "compound": "AZ841",
+      "concentration_uM": 0.1,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.954,
+      "image_id": "f_f5290300a0b7.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 1.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.938,
+      "image_id": "f_9b1232e520b6.composite"
+     },
+     {
+      "compound": "AZ841",
+      "concentration_uM": 1.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.932,
+      "image_id": "f_b5947047eed0.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 0.1,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.925,
+      "image_id": "f_01903e30b4c1.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 0.3,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.92,
+      "image_id": "f_0a642a8ce890.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 3.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.911,
+      "image_id": "f_1354f3c8e02d.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 30.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.908,
+      "image_id": "f_7ea188fa8262.composite"
+     },
+     {
+      "compound": "AZ-A",
+      "concentration_uM": 10.0,
+      "moa": "Aurora kinase inhibitors",
+      "similarity": 0.899,
+      "image_id": "f_10c6bfbe2dcc.composite"
+     },
+     {
+      "compound": "etoposide",
+      "concentration_uM": 1.0,
+      "moa": "DNA damage",
+      "similarity": 0.815,
+      "image_id": "f_f243bab397ff.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Aurora kinase inhibitors",
+      "neighbors": 9,
+      "mean_similarity": 0.928
+     },
+     {
+      "moa": "DNA damage",
+      "neighbors": 1,
+      "mean_similarity": 0.815
+     }
+    ]
+   },
+   "image_ids": [
+    "f_8b93542d8c89.composite",
+    "f_f5290300a0b7.composite",
+    "f_9b1232e520b6.composite",
+    "f_b5947047eed0.composite",
+    "f_01903e30b4c1.composite",
+    "f_0a642a8ce890.composite",
+    "f_1354f3c8e02d.composite",
+    "f_7ea188fa8262.composite",
+    "f_10c6bfbe2dcc.composite",
+    "f_f243bab397ff.composite"
+   ],
+   "created_at": "2026-10-29T09:58:48.099101Z"
+  },
+  {
+   "evidence_id": "e17",
+   "kind": "phenotype",
+   "tool": "describe_phenotype",
+   "summary": "Microscopist on 2 field(s): density lower vs DMSO; 5 observations; candidates: Microtubule stabilizers",
+   "data": {
+    "field_ids": [
+     "f_52a5ba54a4cf",
+     "f_daa3056c4390"
+    ],
+    "dmso_field_ids": [
+     "f_bd4169e2e78f"
+    ],
+    "model": "muse-spark-1.3",
+    "report": {
+     "candidate_mechanisms": [
+      {
+       "moa": "Microtubule stabilizers",
+       "why": "tubulin is markedly brighter with thick bundles and high texture contrast vs diffuse DMSO network, plus cell spreading and low cell count, consistent with stabilization/bundling not depolymerization"
+      }
+     ],
+     "cell_density": "lower",
+     "notable_cells": [
+      {
+       "field_id": "f_52a5ba54a4cf",
+       "why": "very large spread cell with enlarged nucleus and intense perinuclear tubulin/actin",
+       "x": 960,
+       "y": 300
+      },
+      {
+       "field_id": "f_52a5ba54a4cf",
+       "why": "elongated cell with unusually long thin tubulin-positive process",
+       "x": 250,
+       "y": 520
+      },
+      {
+       "field_id": "f_daa3056c4390",
+       "why": "large flat cell with enlarged nucleus and bright bundled tubulin and peripheral actin ruffle",
+       "x": 255,
+       "y": 160
+      }
+     ],
+     "observations": [
+      {
+       "agrees_with_measurements": true,
+       "channel": "composite",
+       "finding": "treated fields sparse with isolated cells and large empty gaps vs confluent DMSO monolayer, consistent with reduced cell_count z=-6.57"
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "nuclei slightly larger and more variable with occasional large nuclei, consistent with increased nuc_area z=6.82 and frac_large_nucleus z=6.92"
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "tubulin",
+       "finding": "tubulin much brighter with thick bundles, strong cell-background contrast and heterogeneous intensity, consistent with increased tub_mean z=13.77, tub_std z=15.95, tub_glcm_contrast z=28.87"
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "actin",
+       "finding": "actin brighter and patchy with peripheral ruffles/spikes and high contrast, consistent with increased act_std z=15.01 and act_glcm_contrast z=22.63"
+      },
+      {
+       "agrees_with_measurements": false,
+       "channel": "composite",
+       "finding": "cells more spread/elongated with spiky protrusions and loss of cell-cell contacts vs compact polygonal DMSO; no spreading/shape measurement provided so no agreement assessment"
+      }
+     ],
+     "uncertainty": "Moderate: tubulin increase/bundling is clear, but actin brightening may be secondary to spreading and nuclear enlargement is modest without obvious mitotic arrest figures."
+    }
+   },
+   "image_ids": [
+    "f_52a5ba54a4cf.composite",
+    "f_daa3056c4390.composite",
+    "f_bd4169e2e78f.composite"
+   ],
+   "created_at": "2026-10-29T09:59:02.576880Z"
+  },
+  {
+   "evidence_id": "e18",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of tub_mean over 5 wells, 4 doses: Spearman rho=+0.87 (p=0.054)",
+   "data": {
+    "feature": "tub_mean",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": -1.8311,
+      "n_wells": 2
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 2.2277,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 2.1673,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 30.0,
+      "median": 13.7667,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 0.8721,
+    "p_value": 0.0539,
+    "n_wells": 5,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:09.357510Z"
+  },
+  {
+   "evidence_id": "e19",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of nuc_area over 5 wells, 4 doses: Spearman rho=-0.97 (p=0.0048)",
+   "data": {
+    "feature": "nuc_area",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 44.0875,
+      "n_wells": 2
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 38.0492,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 25.2339,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 30.0,
+      "median": 6.8243,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -0.9747,
+    "p_value": 0.0048,
+    "n_wells": 5,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:09.371625Z"
+  },
+  {
+   "evidence_id": "e20",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "Nearest references: Microtubule stabilizers (8/10), Actin disruptors (1/10), Eg5 inhibitors (1/10)",
+   "data": {
+    "well_ids": [
+     "w_bb49de52e8"
+    ],
+    "k": 10,
+    "similarity": "cosine on robust-z profiles",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "neighbors": [
+     {
+      "compound": "epothilone B",
+      "concentration_uM": 0.1,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.866,
+      "image_id": "f_1bfb6a4da63a.composite"
+     },
+     {
+      "compound": "epothilone B",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.831,
+      "image_id": "f_74075488e249.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.82,
+      "image_id": "f_9b59e1d37c99.composite"
+     },
+     {
+      "compound": "epothilone B",
+      "concentration_uM": 1.0,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.815,
+      "image_id": "f_225a1021d9a0.composite"
+     },
+     {
+      "compound": "docetaxel",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.81,
+      "image_id": "f_7f390bd32674.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 1.0,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.808,
+      "image_id": "f_491b6ae01668.composite"
+     },
+     {
+      "compound": "docetaxel",
+      "concentration_uM": 0.1,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.787,
+      "image_id": "f_6bb7cf105224.composite"
+     },
+     {
+      "compound": "cytochalasin B",
+      "concentration_uM": 30.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.783,
+      "image_id": "f_1538fc1b6382.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 3.0,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.779,
+      "image_id": "f_136d4ffe180f.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.003,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.775,
+      "image_id": "f_5ada1c0c556d.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Microtubule stabilizers",
+      "neighbors": 8,
+      "mean_similarity": 0.814
+     },
+     {
+      "moa": "Actin disruptors",
+      "neighbors": 1,
+      "mean_similarity": 0.783
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "neighbors": 1,
+      "mean_similarity": 0.775
+     }
+    ]
+   },
+   "image_ids": [
+    "f_1bfb6a4da63a.composite",
+    "f_74075488e249.composite",
+    "f_9b59e1d37c99.composite",
+    "f_225a1021d9a0.composite",
+    "f_7f390bd32674.composite",
+    "f_491b6ae01668.composite",
+    "f_6bb7cf105224.composite",
+    "f_1538fc1b6382.composite",
+    "f_136d4ffe180f.composite",
+    "f_5ada1c0c556d.composite"
+   ],
+   "created_at": "2026-10-29T09:59:09.376878Z"
+  },
+  {
+   "evidence_id": "e21",
+   "kind": "conclusion",
+   "tool": "submit_conclusion",
+   "summary": "Conclusion: Aurora kinase inhibitors (p=0.85)",
+   "data": {
+    "top_moa": "Aurora kinase inhibitors",
+    "probability": 0.85,
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e12",
+     "e20"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "In vitro Aurora kinase inhibition plus tubulin polymerization assay to confirm primary Aurora activity and test if 30uM bundling is direct MT stabilization or secondary toxicity.",
+    "rationale": "Replicated low-dose polyploid binucleate phenotype with intact MT and 9/10 Aurora neighbors at 0.93 similarity; uncertain: 30uM alone shifts to MT-stabilizer neighbors."
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:14.906300Z"
+  },
+  {
+   "evidence_id": "e22",
+   "kind": "compound",
+   "tool": "lookup_compound",
+   "summary": "AZ258: PubChem CID 59396138; ChEMBL none; mechanisms: none curated (from the BBBC021 structure (the name is not in PubChem))",
+   "data": {
+    "name": "AZ258",
+    "identity_check": "from the BBBC021 structure (the name is not in PubChem)",
+    "pubchem": {
+     "cid": 59396138,
+     "title": "N-(2,3-difluorophenyl)-2-[4-[[7-methoxy-5-[[(2R)-pyrrolidin-2-yl]methoxy]quinazolin-4-yl]amino]pyrazol-1-yl]acetamide",
+     "iupac_name": "N-(2,3-difluorophenyl)-2-[4-[[7-methoxy-5-[[(2R)-pyrrolidin-2-yl]methoxy]quinazolin-4-yl]amino]pyrazol-1-yl]acetamide",
+     "smiles": "COC1=CC2=C(C(=C1)OC[C@H]3CCCN3)C(=NC=N2)NC4=CN(N=C4)CC(=O)NC5=C(C(=CC=C5)F)F",
+     "inchikey": "NYAGHKBVQPLIEJ-OAHLLOKOSA-N",
+     "molecular_formula": "C25H25F2N7O3",
+     "molecular_weight": 509.5,
+     "structure_png_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/59396138/PNG",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/59396138",
+     "synonyms": [
+      "SCHEMBL3428927"
+     ]
+    },
+    "chembl": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:14.921696Z"
+  },
+  {
+   "evidence_id": "e23",
+   "kind": "literature",
+   "tool": "search_literature",
+   "summary": "PubMed 'Aurora kinase inhibitor polyploidy binucleate phenotype MCF-7': 0 hits, 0 returned",
+   "data": {
+    "query": "Aurora kinase inhibitor polyploidy binucleate phenotype MCF-7",
+    "total_count": 0,
+    "articles": []
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:18.549977Z"
+  },
+  {
+   "evidence_id": "e24",
+   "kind": "literature",
+   "tool": "search_literature",
+   "summary": "PubMed 'AZ258 Aurora kinase inhibitor mechanism': 1153 hits, 5 returned",
+   "data": {
+    "query": "AZ258 Aurora kinase inhibitor mechanism",
+    "total_count": 1153,
+    "articles": [
+     {
+      "pmid": "34171263",
+      "title": "The AML microenvironment catalyzes a stepwise evolution to gilteritinib resistance.",
+      "journal": "Cancer Cell",
+      "year": 2021,
+      "authors": [
+       "Joshi SK",
+       "Nechiporuk T",
+       "Bottomly D",
+       "Piehowski PD",
+       "Reisz JA",
+       "Pittsenbarger J"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34171263/"
+     },
+     {
+      "pmid": "41022821",
+      "title": "Cytoplasmic TRIM24 promotes colorectal cancer cell proliferation by activating Wnt/β-catenin signaling.",
+      "journal": "Nat Commun",
+      "year": 2025,
+      "authors": [
+       "Wang Y",
+       "Yao Y",
+       "Liu Z",
+       "Long S",
+       "Yi F",
+       "Fang Q"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41022821/"
+     },
+     {
+      "pmid": "40744724",
+      "title": "Targeting Aurora kinase B regulates cholesterol metabolism and enhances chemoimmunotherapy in cholangiocarcinoma.",
+      "journal": "Gut",
+      "year": 2026,
+      "authors": [
+       "Liu F",
+       "Chen W",
+       "Zhang Z",
+       "Zeng W",
+       "Hu H",
+       "Ning S"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40744724/"
+     },
+     {
+      "pmid": "41310329",
+      "title": "Aurora kinase B phosphorylates ZBP1 to drive PANoptosis following treatment with PARP and ATR inhibitors combination.",
+      "journal": "Nat Commun",
+      "year": 2025,
+      "authors": [
+       "Gong W",
+       "Liao Z",
+       "Xiong F",
+       "Wang L",
+       "Shi S",
+       "Luo M"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41310329/"
+     },
+     {
+      "pmid": "19369091",
+      "title": "Aurora kinase inhibitors.",
+      "journal": "Crit Rev Oncol Hematol",
+      "year": 2010,
+      "authors": [
+       "Kitzen JJ",
+       "de Jonge MJ",
+       "Verweij J"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/19369091/"
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-29T09:59:19.207629Z"
+  }
+ ],
+ "allowed_pmids": [
+  "34171263",
+  "41022821",
+  "40744724",
+  "41310329",
+  "19369091"
+ ],
+ "conclusion": {
+  "top_moa": "Aurora kinase inhibitors",
+  "probability": 0.85,
+  "key_evidence_ids": [
+   "e2",
+   "e5",
+   "e6",
+   "e12",
+   "e20"
+  ],
+  "next_experiment_if_this_were_a_real_lab": "In vitro Aurora kinase inhibition plus tubulin polymerization assay to confirm primary Aurora activity and test if 30uM bundling is direct MT stabilization or secondary toxicity.",
+  "rationale": "Replicated low-dose polyploid binucleate phenotype with intact MT and 9/10 Aurora neighbors at 0.93 similarity; uncertain: 30uM alone shifts to MT-stabilizer neighbors."
+ },
+ "conclusion_history": [
+  {
+   "top_moa": "Aurora kinase inhibitors",
+   "probability": 0.93,
+   "key_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e12",
+    "e8"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 (Ser10) immunofluorescence plus live-cell imaging of mitosis to test Aurora-B inhibition and cytokinesis failure vs Eg5 monopolar arrest.",
+   "rationale": "Replicated extreme polyploid/binucleate phenotype with intact cytoskeleton and 9/10 Aurora atlas matches."
+  },
+  {
+   "top_moa": "Aurora kinase inhibitors",
+   "probability": 0.85,
+   "key_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e12",
+    "e20"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "In vitro Aurora kinase inhibition plus tubulin polymerization assay to confirm primary Aurora activity and test if 30uM bundling is direct MT stabilization or secondary toxicity.",
+   "rationale": "Replicated low-dose polyploid binucleate phenotype with intact MT and 9/10 Aurora neighbors at 0.93 similarity; uncertain: 30uM alone shifts to MT-stabilizer neighbors."
+  }
+ ],
+ "review": {
+  "verdict": "request_experiment",
+  "critique": "Clean profile across 25 evaluated wells: 25 informative, 0 saturated, 0 empty. All 6 subclasses map to nearest-reference similarity in 0.5646–0.7595 and neighborhood purity in 0.42–0.74, while scores are dominated by in-class nearest references with matched metadata reported for each hit. None of the evaluable candidates are separated by cross-batch/fixed-vs-live metadata artifacts, and local-density/suspicion analyses show the local predictions are globally controlled, so no subclass-specific artifact rules are needed.",
+  "requested_experiment": "Calibrator-adjusted all-subclass neighborhood graph with subtype balancing in low-density neighborhoods and axis-aligned sparse-metric, annotator-adjusted GMM clustering with nested kernels."
+ },
+ "unblinding": {
+  "compound": "AZ258",
+  "pubchem_cid": 59396138,
+  "structure_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/59396138/PNG",
+  "chembl_mechanisms": [],
+  "identity_check": "from the BBBC021 structure (the name is not in PubChem)"
+ },
+ "verdict": {
+  "correct": true,
+  "truth_moa": "Aurora kinase inhibitors",
+  "agent_moa": "Aurora kinase inhibitors"
+ },
+ "reflection": {
+  "text": "Low-dose sampling got the call right. Wells w_80f45bbd63, w_7d742a2ea2 and replicate w_3559cc7c5c showed extreme frac_large_nucleus z=+70 to +138 with nuc_area z=+38 to +46 and low mitotic signal, plus microscopist binucleate/enlarged nuclei and 9/10 Aurora neighbors on compare_to_reference_atlas (PMID 19369091). Replicating the 0.1 uM phenotype was the decisive acquisition choice, lifting Aurora to 0.93 and correctly ruling out Eg5 and microtubule destabilizers.\n\nThe high-dose extension was misleading but did not flip the call. Well w_bb49de52e8 at 30 uM added tub_glcm_contrast z=+28.9 and act_glcm_contrast z=+22.6, a second describe_phenotype call of Microtubule stabilizers, and an isolated-well atlas of 8/10 Microtubule stabilizers, while nuc_area dose_response rho=-0.97 showed the large-nucleus signal falling at the top dose. I treated this as biphasic secondary toxicity rather than primary MoA, but it correctly forced confidence down to 0.85.\n\nLesson is dose-range weighting: primary MoA signal was low-dose polyploidy with intact cytoskeleton, while cytoskeletal texture only emerged at 30 uM. Future runs should pre-plan low-dose replication before spending on the top dose, and pair the top dose with a direct tubulin assay rather than atlas alone.",
+  "what_was_right": [
+   "Prioritized 0.1-1 uM wells where frac_large_nucleus z=+98.8 to +138.6 and nuc_area z=+38 to +46 defined polyploidy signal (e2, e3, e12).",
+   "Used describe_phenotype enlarged/binucleate calls with intact MT/actin to favor Aurora over Eg5/MT agents (e5).",
+   "Used 9/10 Aurora reference-atlas matches to anchor hypothesis at 0.88 then 0.93 (e6, e16).",
+   "Replicated 0.1 uM phenotype in rep 2 well w_3559cc7c5c to exclude well artifact (e12).",
+   "Used low frac_mitotic_like dose trend rho=+0.50 p=0.67 to argue against Eg5 mitotic arrest (e8)."
+  ],
+  "what_was_wrong": [
+   "Extended to 30 uM well w_bb49de52e8 where tubulin/actin texture z=+22 to +28 shifted isolated atlas to 8/10 Microtubule stabilizers (e15, e20), which I had not anticipated as secondary toxicity.",
+   "Second describe_phenotype at high dose suggesting Microtubule stabilizers (e17) contradicted first Aurora call (e5); I underweighted that visual shift in final rationale.",
+   "Early 3-well dose_response rho=-1.00 for frac_large_nucleus and nuc_dna_integrated (e7, e9) looked like simple saturation drop, missing the biphasic peak-low then fall clarified only by 5-well nuc_area rho=-0.97 (e19).",
+   "lookup_compound and literature searches added no discriminative value: AZ258 had no curated ChEMBL mechanisms (e22) and searches returned unrelated or zero hits for the polyploidy phenotype (e23)."
+  ],
+  "citations": [
+   {
+    "pmid": "19369091",
+    "claim": "This review covers Aurora kinase inhibitors as a drug class."
+   },
+   {
+    "pmid": "40744724",
+    "claim": "This study investigates targeting Aurora kinase B in cholangiocarcinoma."
+   },
+   {
+    "pmid": "41310329",
+    "claim": "This paper reports that Aurora kinase B phosphorylates ZBP1 to drive PANoptosis after PARP and ATR inhibitor treatment."
+   }
+  ],
+  "next_experiment": "Aurora B target-engagement titration by phospho-histone H3 Ser10 immunofluorescence plus time-lapse mitosis to confirm cytokinesis failure and polyploidy, paired with in vitro Aurora A/B kinase assay and tubulin-polymerization counter-assay across 0.1 to 30 uM to test whether the 30 uM microtubule-bundling signal is direct stabilization or secondary toxicity.",
+  "citations_cited": [
+   "19369091",
+   "40744724",
+   "41310329"
+  ],
+  "citations_removed": []
+ },
+ "status": "finished",
+ "error": null,
+ "turns": 15,
+ "model_calls": [
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 1",
+   "input_tokens": 2787,
+   "output_tokens": 91,
+   "reasoning_tokens": 6,
+   "cost_usd": 0.0038705,
+   "seconds": 0.733,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 2",
+   "input_tokens": 3250,
+   "output_tokens": 687,
+   "reasoning_tokens": 386,
+   "cost_usd": 0.006982250000000001,
+   "seconds": 2.55,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 3",
+   "input_tokens": 6445,
+   "output_tokens": 677,
+   "reasoning_tokens": 387,
+   "cost_usd": 0.010933499999999999,
+   "seconds": 3.15,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "input_tokens": 11493,
+   "output_tokens": 3106,
+   "reasoning_tokens": 2460,
+   "cost_usd": 0.02756675,
+   "seconds": 15.706,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 4",
+   "input_tokens": 8243,
+   "output_tokens": 1276,
+   "reasoning_tokens": 922,
+   "cost_usd": 0.01572675,
+   "seconds": 5.184,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 5",
+   "input_tokens": 9386,
+   "output_tokens": 994,
+   "reasoning_tokens": 618,
+   "cost_usd": 0.015957,
+   "seconds": 4.12,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 6",
+   "input_tokens": 10094,
+   "output_tokens": 280,
+   "reasoning_tokens": 161,
+   "cost_usd": 0.0138075,
+   "seconds": 1.852,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 7",
+   "input_tokens": 11204,
+   "output_tokens": 779,
+   "reasoning_tokens": 408,
+   "cost_usd": 0.01731575,
+   "seconds": 3.651,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 8",
+   "input_tokens": 11911,
+   "output_tokens": 342,
+   "reasoning_tokens": 139,
+   "cost_usd": 0.01634225,
+   "seconds": 1.853,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-wonder-1.0",
+   "purpose": "reviewer",
+   "input_tokens": 10011,
+   "output_tokens": 1833,
+   "reasoning_tokens": 1663,
+   "cost_usd": 0.076704,
+   "seconds": 18.047,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 9",
+   "input_tokens": 12496,
+   "output_tokens": 357,
+   "reasoning_tokens": 240,
+   "cost_usd": 0.01713725,
+   "seconds": 1.906,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 10",
+   "input_tokens": 13509,
+   "output_tokens": 600,
+   "reasoning_tokens": 326,
+   "cost_usd": 0.01943625,
+   "seconds": 3.7,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "input_tokens": 7046,
+   "output_tokens": 2580,
+   "reasoning_tokens": 2038,
+   "cost_usd": 0.0197725,
+   "seconds": 12.097,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 11",
+   "input_tokens": 15185,
+   "output_tokens": 1602,
+   "reasoning_tokens": 1303,
+   "cost_usd": 0.02578975,
+   "seconds": 6.67,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 12",
+   "input_tokens": 15532,
+   "output_tokens": 1174,
+   "reasoning_tokens": 957,
+   "cost_usd": 0.024404500000000003,
+   "seconds": 5.438,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 13",
+   "input_tokens": 16062,
+   "output_tokens": 465,
+   "reasoning_tokens": 240,
+   "cost_usd": 0.02205375,
+   "seconds": 2.019,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 14",
+   "input_tokens": 16250,
+   "output_tokens": 239,
+   "reasoning_tokens": 12,
+   "cost_usd": 0.02132825,
+   "seconds": 1.233,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "reflection",
+   "input_tokens": 4428,
+   "output_tokens": 2772,
+   "reasoning_tokens": 1803,
+   "cost_usd": 0.017315999999999998,
+   "seconds": 13.19,
+   "attempts": 1,
+   "finish_reason": "stop"
+  }
+ ],
+ "cost_usd": 0.3724445,
+ "model_ids": {
+  "scientist": "muse-spark-1.3",
+  "microscopist": "muse-spark-1.3",
+  "reviewer": "muse-wonder-1.0",
+  "segmentation": "classical (scikit-image)"
+ },
+ "started_at": "2026-10-29T09:57:41.181076Z"
+}

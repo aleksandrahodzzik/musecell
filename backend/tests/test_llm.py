@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import asyncio
 import json
+import multiprocessing
+from pathlib import Path
 
 import httpx
 import pytest
 from pydantic import SecretStr
 
 from app.config import Settings
-from app.llm import CostCapExceeded, CostMeter, DailyLedger, LLMClient, LLMError, ModelCheckError, cost_of
+from app.llm import CallRecord, CostCapExceeded, CostMeter, DailyLedger, LLMClient, LLMError, ModelCheckError, cost_of
 
 MODELS = ["muse-spark-1.3", "muse-wonder-1.0", "sam-3.1"]
 
@@ -158,6 +160,33 @@ def test_daily_cap_survives_restart(tmp_path):
     fresh, _ = make(tmp_path, Script(), daily_cost_cap_usd=1.0)  # new client reads the same ledger file
     with pytest.raises(CostCapExceeded, match="Daily cost cap"):
         chat(fresh, CostMeter(run_id="b", cap_usd=5))
+
+
+def _append_many(directory: str, n: int) -> None:
+    ledger = DailyLedger(Path(directory), 100.0)
+    for _ in range(n):
+        ledger.add("r", CallRecord(model="m", purpose="p" * 300, cost_usd=0.01))
+
+
+def test_ledger_appends_from_several_processes_stay_whole(tmp_path):
+    """Phase 6: the eval and the demo recorder appended at once; on Windows a line was overwritten."""
+    procs = [multiprocessing.Process(target=_append_many, args=(str(tmp_path), 200)) for _ in range(4)]
+    for p in procs:
+        p.start()
+    for p in procs:
+        p.join()
+    ledger = DailyLedger(tmp_path, 100.0)
+    lines = ledger._path().read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 800 and all(json.loads(line)["cost_usd"] == 0.01 for line in lines)
+    assert ledger.total_today() == pytest.approx(8.0)
+
+
+def test_ledger_skips_a_torn_line(tmp_path):
+    ledger = DailyLedger(tmp_path, 100.0)
+    ledger.add("r", CallRecord(model="m", purpose="p", cost_usd=0.5))
+    with ledger._path().open("a", encoding="utf-8") as f:
+        f.write('on": "tool_calls"}\n')
+    assert ledger.total_today() == pytest.approx(0.5)
 
 
 def test_contributor_model_needs_flag(tmp_path):
