@@ -1,0 +1,1109 @@
+{
+ "method": "NSC 1-NN (not-same-compound), leave-one-compound-out, cosine on robust-z profiles",
+ "date": "2026-10-29",
+ "segmentation": {
+  "nuclei": "classical",
+  "cells": "classical"
+ },
+ "n_features": 24,
+ "features": [
+  "nuc_area",
+  "nuc_dna_integrated",
+  "nuc_dna_mean",
+  "nuc_eccentricity",
+  "nuc_solidity",
+  "nuc_form_factor",
+  "nuc_major_axis",
+  "cell_area",
+  "cell_nuc_area_ratio",
+  "cell_roundness",
+  "cell_eccentricity",
+  "cell_solidity",
+  "cell_major_axis",
+  "tub_mean",
+  "tub_std",
+  "tub_glcm_contrast",
+  "act_mean",
+  "act_std",
+  "act_glcm_contrast",
+  "act_tub_ratio",
+  "cell_count",
+  "frac_mitotic_like",
+  "frac_large_nucleus",
+  "frac_multinucleate_proxy"
+ ],
+ "cosine": {
+  "treatment_accuracy": 0.7573,
+  "n_treatments": 103,
+  "compound_accuracy": 0.7105,
+  "n_compounds": 38
+ },
+ "cosine_dmso_whitened": {
+  "treatment_accuracy": 0.6019,
+  "n_treatments": 103,
+  "compound_accuracy": 0.5789,
+  "n_compounds": 38
+ },
+ "per_class": {
+  "Actin disruptors": {
+   "accuracy": 0.2,
+   "n": 5
+  },
+  "Aurora kinase inhibitors": {
+   "accuracy": 1.0,
+   "n": 12
+  },
+  "Cholesterol-lowering": {
+   "accuracy": 0.5,
+   "n": 6
+  },
+  "DNA damage": {
+   "accuracy": 0.8889,
+   "n": 9
+  },
+  "DNA replication": {
+   "accuracy": 0.625,
+   "n": 8
+  },
+  "Eg5 inhibitors": {
+   "accuracy": 1.0,
+   "n": 12
+  },
+  "Epithelial": {
+   "accuracy": 0.125,
+   "n": 8
+  },
+  "Kinase inhibitors": {
+   "accuracy": 1.0,
+   "n": 5
+  },
+  "Microtubule destabilizers": {
+   "accuracy": 0.8571,
+   "n": 14
+  },
+  "Microtubule stabilizers": {
+   "accuracy": 0.8889,
+   "n": 9
+  },
+  "Protein degradation": {
+   "accuracy": 0.4286,
+   "n": 7
+  },
+  "Protein synthesis": {
+   "accuracy": 1.0,
+   "n": 8
+  }
+ },
+ "confusion_matrix": {
+  "classes": [
+   "Actin disruptors",
+   "Aurora kinase inhibitors",
+   "Cholesterol-lowering",
+   "DNA damage",
+   "DNA replication",
+   "Eg5 inhibitors",
+   "Epithelial",
+   "Kinase inhibitors",
+   "Microtubule destabilizers",
+   "Microtubule stabilizers",
+   "Protein degradation",
+   "Protein synthesis"
+  ],
+  "rows_true_cols_predicted": [
+   [
+    1,
+    0,
+    3,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    12,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    2,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    1,
+    0,
+    8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    3,
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    12,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    4
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    12,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    0,
+    1
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    3,
+    3,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8
+   ]
+  ]
+ },
+ "predictions": [
+  {
+   "compound": "ALLN",
+   "concentration_uM": 3.0,
+   "moa": "Protein degradation",
+   "predicted": "DNA replication",
+   "neighbor": "camptothecin",
+   "similarity": 0.9237
+  },
+  {
+   "compound": "ALLN",
+   "concentration_uM": 100.0,
+   "moa": "Protein degradation",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9133
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 0.1,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9389
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 0.3,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9595
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 1.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9533
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 3.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.9068
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 10.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.8798
+  },
+  {
+   "compound": "AZ-A",
+   "concentration_uM": 30.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.8937
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.001,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9484
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.003,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9427
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.01,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9325
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.03,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.943
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.1,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9117
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 0.3,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9156
+  },
+  {
+   "compound": "AZ-C",
+   "concentration_uM": 1.0,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ138",
+   "similarity": 0.9369
+  },
+  {
+   "compound": "AZ-J",
+   "concentration_uM": 1.0,
+   "moa": "Epithelial",
+   "predicted": "Epithelial",
+   "neighbor": "PP-2",
+   "similarity": 0.8088
+  },
+  {
+   "compound": "AZ-J",
+   "concentration_uM": 3.0,
+   "moa": "Epithelial",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.8436
+  },
+  {
+   "compound": "AZ-J",
+   "concentration_uM": 10.0,
+   "moa": "Epithelial",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.8122
+  },
+  {
+   "compound": "AZ-U",
+   "concentration_uM": 1.0,
+   "moa": "Epithelial",
+   "predicted": "Actin disruptors",
+   "neighbor": "latrunculin B",
+   "similarity": 0.9478
+  },
+  {
+   "compound": "AZ-U",
+   "concentration_uM": 3.0,
+   "moa": "Epithelial",
+   "predicted": "Actin disruptors",
+   "neighbor": "latrunculin B",
+   "similarity": 0.9436
+  },
+  {
+   "compound": "AZ-U",
+   "concentration_uM": 10.0,
+   "moa": "Epithelial",
+   "predicted": "Actin disruptors",
+   "neighbor": "latrunculin B",
+   "similarity": 0.934
+  },
+  {
+   "compound": "AZ138",
+   "concentration_uM": 0.03,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9484
+  },
+  {
+   "compound": "AZ138",
+   "concentration_uM": 0.1,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9389
+  },
+  {
+   "compound": "AZ138",
+   "concentration_uM": 0.3,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9358
+  },
+  {
+   "compound": "AZ138",
+   "concentration_uM": 1.0,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9118
+  },
+  {
+   "compound": "AZ138",
+   "concentration_uM": 3.0,
+   "moa": "Eg5 inhibitors",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9369
+  },
+  {
+   "compound": "AZ258",
+   "concentration_uM": 0.1,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9816
+  },
+  {
+   "compound": "AZ258",
+   "concentration_uM": 0.3,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9823
+  },
+  {
+   "compound": "AZ258",
+   "concentration_uM": 1.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ841",
+   "similarity": 0.9811
+  },
+  {
+   "compound": "AZ841",
+   "concentration_uM": 0.1,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.978
+  },
+  {
+   "compound": "AZ841",
+   "concentration_uM": 0.3,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.9823
+  },
+  {
+   "compound": "AZ841",
+   "concentration_uM": 1.0,
+   "moa": "Aurora kinase inhibitors",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ258",
+   "similarity": 0.9579
+  },
+  {
+   "compound": "MG-132",
+   "concentration_uM": 0.1,
+   "moa": "Protein degradation",
+   "predicted": "Protein degradation",
+   "neighbor": "proteasome inhibitor I",
+   "similarity": 0.8172
+  },
+  {
+   "compound": "MG-132",
+   "concentration_uM": 3.0,
+   "moa": "Protein degradation",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "epothilone B",
+   "similarity": 0.8874
+  },
+  {
+   "compound": "PD-169316",
+   "concentration_uM": 3.0,
+   "moa": "Kinase inhibitors",
+   "predicted": "Kinase inhibitors",
+   "neighbor": "alsterpaullone",
+   "similarity": 0.9318
+  },
+  {
+   "compound": "PD-169316",
+   "concentration_uM": 10.0,
+   "moa": "Kinase inhibitors",
+   "predicted": "Kinase inhibitors",
+   "neighbor": "alsterpaullone",
+   "similarity": 0.916
+  },
+  {
+   "compound": "PP-2",
+   "concentration_uM": 3.0,
+   "moa": "Epithelial",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.8098
+  },
+  {
+   "compound": "PP-2",
+   "concentration_uM": 10.0,
+   "moa": "Epithelial",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.8536
+  },
+  {
+   "compound": "alsterpaullone",
+   "concentration_uM": 1.0,
+   "moa": "Kinase inhibitors",
+   "predicted": "Kinase inhibitors",
+   "neighbor": "PD-169316",
+   "similarity": 0.9318
+  },
+  {
+   "compound": "alsterpaullone",
+   "concentration_uM": 3.0,
+   "moa": "Kinase inhibitors",
+   "predicted": "Kinase inhibitors",
+   "neighbor": "PD-169316",
+   "similarity": 0.916
+  },
+  {
+   "compound": "anisomycin",
+   "concentration_uM": 0.3,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "cyclohexamide",
+   "similarity": 0.9636
+  },
+  {
+   "compound": "anisomycin",
+   "concentration_uM": 1.0,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "cyclohexamide",
+   "similarity": 0.971
+  },
+  {
+   "compound": "bryostatin",
+   "concentration_uM": 0.3,
+   "moa": "Kinase inhibitors",
+   "predicted": "Kinase inhibitors",
+   "neighbor": "PD-169316",
+   "similarity": 0.8063
+  },
+  {
+   "compound": "camptothecin",
+   "concentration_uM": 0.003,
+   "moa": "DNA replication",
+   "predicted": "DNA damage",
+   "neighbor": "etoposide",
+   "similarity": 0.9449
+  },
+  {
+   "compound": "camptothecin",
+   "concentration_uM": 0.01,
+   "moa": "DNA replication",
+   "predicted": "DNA damage",
+   "neighbor": "etoposide",
+   "similarity": 0.939
+  },
+  {
+   "compound": "camptothecin",
+   "concentration_uM": 0.03,
+   "moa": "DNA replication",
+   "predicted": "DNA damage",
+   "neighbor": "etoposide",
+   "similarity": 0.9331
+  },
+  {
+   "compound": "chlorambucil",
+   "concentration_uM": 10.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "mitomycin C",
+   "similarity": 0.968
+  },
+  {
+   "compound": "cisplatin",
+   "concentration_uM": 10.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "mitomycin C",
+   "similarity": 0.9152
+  },
+  {
+   "compound": "colchicine",
+   "concentration_uM": 0.03,
+   "moa": "Microtubule destabilizers",
+   "predicted": "DNA damage",
+   "neighbor": "cisplatin",
+   "similarity": 0.6508
+  },
+  {
+   "compound": "cyclohexamide",
+   "concentration_uM": 5.0,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.9636
+  },
+  {
+   "compound": "cyclohexamide",
+   "concentration_uM": 15.0,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.9616
+  },
+  {
+   "compound": "cyclohexamide",
+   "concentration_uM": 50.0,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "anisomycin",
+   "similarity": 0.971
+  },
+  {
+   "compound": "cytochalasin B",
+   "concentration_uM": 10.0,
+   "moa": "Actin disruptors",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8665
+  },
+  {
+   "compound": "cytochalasin B",
+   "concentration_uM": 30.0,
+   "moa": "Actin disruptors",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8979
+  },
+  {
+   "compound": "cytochalasin D",
+   "concentration_uM": 0.3,
+   "moa": "Actin disruptors",
+   "predicted": "Actin disruptors",
+   "neighbor": "cytochalasin B",
+   "similarity": 0.8745
+  },
+  {
+   "compound": "demecolcine",
+   "concentration_uM": 0.3,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "vincristine",
+   "similarity": 0.9465
+  },
+  {
+   "compound": "demecolcine",
+   "concentration_uM": 1.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "vincristine",
+   "similarity": 0.9411
+  },
+  {
+   "compound": "demecolcine",
+   "concentration_uM": 3.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "vincristine",
+   "similarity": 0.9757
+  },
+  {
+   "compound": "demecolcine",
+   "concentration_uM": 10.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "vincristine",
+   "similarity": 0.9567
+  },
+  {
+   "compound": "docetaxel",
+   "concentration_uM": 0.03,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Protein synthesis",
+   "neighbor": "emetine",
+   "similarity": 0.8949
+  },
+  {
+   "compound": "docetaxel",
+   "concentration_uM": 0.1,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9442
+  },
+  {
+   "compound": "docetaxel",
+   "concentration_uM": 0.3,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9547
+  },
+  {
+   "compound": "emetine",
+   "concentration_uM": 0.1,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "cyclohexamide",
+   "similarity": 0.937
+  },
+  {
+   "compound": "emetine",
+   "concentration_uM": 0.3,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "cyclohexamide",
+   "similarity": 0.9591
+  },
+  {
+   "compound": "emetine",
+   "concentration_uM": 1.0,
+   "moa": "Protein synthesis",
+   "predicted": "Protein synthesis",
+   "neighbor": "cyclohexamide",
+   "similarity": 0.9661
+  },
+  {
+   "compound": "epothilone B",
+   "concentration_uM": 0.1,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9317
+  },
+  {
+   "compound": "epothilone B",
+   "concentration_uM": 0.3,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9678
+  },
+  {
+   "compound": "epothilone B",
+   "concentration_uM": 1.0,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "taxol",
+   "similarity": 0.9628
+  },
+  {
+   "compound": "etoposide",
+   "concentration_uM": 1.0,
+   "moa": "DNA damage",
+   "predicted": "Aurora kinase inhibitors",
+   "neighbor": "AZ-A",
+   "similarity": 0.8906
+  },
+  {
+   "compound": "etoposide",
+   "concentration_uM": 3.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "mitomycin C",
+   "similarity": 0.9348
+  },
+  {
+   "compound": "etoposide",
+   "concentration_uM": 10.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "chlorambucil",
+   "similarity": 0.9451
+  },
+  {
+   "compound": "floxuridine",
+   "concentration_uM": 10.0,
+   "moa": "DNA replication",
+   "predicted": "DNA replication",
+   "neighbor": "mitoxantrone",
+   "similarity": 0.9118
+  },
+  {
+   "compound": "floxuridine",
+   "concentration_uM": 30.0,
+   "moa": "DNA replication",
+   "predicted": "DNA replication",
+   "neighbor": "mitoxantrone",
+   "similarity": 0.8704
+  },
+  {
+   "compound": "lactacystin",
+   "concentration_uM": 10.0,
+   "moa": "Protein degradation",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "epothilone B",
+   "similarity": 0.5699
+  },
+  {
+   "compound": "latrunculin B",
+   "concentration_uM": 1.0,
+   "moa": "Actin disruptors",
+   "predicted": "Epithelial",
+   "neighbor": "AZ-U",
+   "similarity": 0.9478
+  },
+  {
+   "compound": "latrunculin B",
+   "concentration_uM": 3.0,
+   "moa": "Actin disruptors",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8722
+  },
+  {
+   "compound": "methotrexate",
+   "concentration_uM": 10.0,
+   "moa": "DNA replication",
+   "predicted": "DNA replication",
+   "neighbor": "floxuridine",
+   "similarity": 0.8032
+  },
+  {
+   "compound": "mevinolin/lovastatin",
+   "concentration_uM": 1.5,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Actin disruptors",
+   "neighbor": "cytochalasin B",
+   "similarity": 0.8665
+  },
+  {
+   "compound": "mevinolin/lovastatin",
+   "concentration_uM": 5.0,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Actin disruptors",
+   "neighbor": "cytochalasin B",
+   "similarity": 0.8979
+  },
+  {
+   "compound": "mevinolin/lovastatin",
+   "concentration_uM": 15.0,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Protein degradation",
+   "neighbor": "ALLN",
+   "similarity": 0.9047
+  },
+  {
+   "compound": "mitomycin C",
+   "concentration_uM": 0.1,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "chlorambucil",
+   "similarity": 0.9501
+  },
+  {
+   "compound": "mitomycin C",
+   "concentration_uM": 0.3,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "chlorambucil",
+   "similarity": 0.968
+  },
+  {
+   "compound": "mitomycin C",
+   "concentration_uM": 1.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "etoposide",
+   "similarity": 0.9348
+  },
+  {
+   "compound": "mitomycin C",
+   "concentration_uM": 3.0,
+   "moa": "DNA damage",
+   "predicted": "DNA damage",
+   "neighbor": "etoposide",
+   "similarity": 0.919
+  },
+  {
+   "compound": "mitoxantrone",
+   "concentration_uM": 0.003,
+   "moa": "DNA replication",
+   "predicted": "DNA replication",
+   "neighbor": "floxuridine",
+   "similarity": 0.875
+  },
+  {
+   "compound": "mitoxantrone",
+   "concentration_uM": 0.01,
+   "moa": "DNA replication",
+   "predicted": "DNA replication",
+   "neighbor": "floxuridine",
+   "similarity": 0.9118
+  },
+  {
+   "compound": "nocodazole",
+   "concentration_uM": 1.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.8704
+  },
+  {
+   "compound": "nocodazole",
+   "concentration_uM": 3.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.7598
+  },
+  {
+   "compound": "proteasome inhibitor I",
+   "concentration_uM": 0.1,
+   "moa": "Protein degradation",
+   "predicted": "Protein degradation",
+   "neighbor": "MG-132",
+   "similarity": 0.8172
+  },
+  {
+   "compound": "proteasome inhibitor I",
+   "concentration_uM": 3.0,
+   "moa": "Protein degradation",
+   "predicted": "Protein degradation",
+   "neighbor": "MG-132",
+   "similarity": 0.6964
+  },
+  {
+   "compound": "simvastatin",
+   "concentration_uM": 2.0,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8117
+  },
+  {
+   "compound": "simvastatin",
+   "concentration_uM": 6.0,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8527
+  },
+  {
+   "compound": "simvastatin",
+   "concentration_uM": 20.0,
+   "moa": "Cholesterol-lowering",
+   "predicted": "Cholesterol-lowering",
+   "neighbor": "mevinolin/lovastatin",
+   "similarity": 0.8371
+  },
+  {
+   "compound": "taxol",
+   "concentration_uM": 0.3,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "epothilone B",
+   "similarity": 0.9678
+  },
+  {
+   "compound": "taxol",
+   "concentration_uM": 1.0,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "epothilone B",
+   "similarity": 0.9538
+  },
+  {
+   "compound": "taxol",
+   "concentration_uM": 3.0,
+   "moa": "Microtubule stabilizers",
+   "predicted": "Microtubule stabilizers",
+   "neighbor": "docetaxel",
+   "similarity": 0.9531
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 0.003,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.9358
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 0.01,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.9644
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 0.03,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.9757
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 0.1,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.92
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 0.3,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.9397
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 1.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Microtubule destabilizers",
+   "neighbor": "demecolcine",
+   "similarity": 0.8995
+  },
+  {
+   "compound": "vincristine",
+   "concentration_uM": 3.0,
+   "moa": "Microtubule destabilizers",
+   "predicted": "Eg5 inhibitors",
+   "neighbor": "AZ-C",
+   "similarity": 0.9352
+  }
+ ]
+}

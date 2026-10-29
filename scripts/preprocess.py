@@ -147,9 +147,8 @@ def build_index(fields: pd.DataFrame, salt: str) -> pd.DataFrame:
     return pd.concat([idx.reset_index(drop=True), paths], axis=1)
 
 
-def write_examples(root: Path, index: pd.DataFrame, n_moa: int = 5) -> list[Path]:
+def example_rows(index: pd.DataFrame, n_moa: int = 5) -> list[pd.Series]:
     """DMSO + n_moa different MoAs; highest MoA-labelled dose, field 1 of replicate 1."""
-    EXAMPLE_DIR.mkdir(parents=True, exist_ok=True)
     picks = [index[(index["role"] == "control") & (index["field"] == 1)].iloc[0]]
     labelled = index[index["moa_annotated_conc"] & (index["field"] == 1)]
     preferred = ["Microtubule stabilizers", "Microtubule destabilizers", "Actin disruptors", "Eg5 inhibitors",
@@ -157,10 +156,19 @@ def write_examples(root: Path, index: pd.DataFrame, n_moa: int = 5) -> list[Path
     for moa in [m for m in preferred if m in set(labelled["moa"])][:n_moa]:
         rows = labelled[labelled["moa"] == moa].sort_values(["concentration_uM", "replicate"], ascending=[False, True])
         picks.append(rows.iloc[0])
+    return picks
+
+
+def example_label(row: pd.Series) -> str:
+    label = "DMSO" if row["role"] == "control" else f"{row['moa']}_{row['compound']}_{row['concentration_uM']:g}uM"
+    return "".join(c if c.isalnum() or c in "-._" else "_" for c in label)
+
+
+def write_examples(root: Path, index: pd.DataFrame, n_moa: int = 5) -> list[Path]:
+    EXAMPLE_DIR.mkdir(parents=True, exist_ok=True)
     out = []
-    for row in picks:
-        label = "DMSO" if row["role"] == "control" else f"{row['moa']}_{row['compound']}_{row['concentration_uM']:g}uM"
-        dest = EXAMPLE_DIR / ("example_" + "".join(c if c.isalnum() or c in "-._" else "_" for c in label) + ".jpg")
+    for row in example_rows(index, n_moa):
+        dest = EXAMPLE_DIR / f"example_{example_label(row)}.jpg"
         Image.open(root / row["png_composite"]).convert("RGB").save(dest, quality=90)
         out.append(dest)
     return out

@@ -50,3 +50,27 @@ Client: `openai.OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MO
 - Fetched 9,288 TIFFs (10.6 GB ranged, ~4 MB/s with 8–16 workers; Range never refused, so the full-zip fallback has not been exercised). The first fetch was interrupted overnight (laptop sleep, then the background process was killed); re-running resumed without re-downloading, and a final re-run reported 0 missing.
 - Index: 3,096 fields, 1,228 wells (898 treated, 330 DMSO), 55 plates, 38 compounds, 304 compound-concentrations (103 MoA-labelled), 12 MoA classes. Every plate has 12 DMSO fields.
 - Example composites (DMSO + 5 MoAs) in `docs/probe/example_*.jpg` (JPEG q90, ~0.9 MB total). With DMSO-based contrast, strongly affected cells saturate in the 8-bit PNGs; the .npy keeps the full range.
+
+## Phase 2 — segmentation, features, atlas, baseline (2026-10-29)
+
+### Segmentation bake-off (`scripts/segmentation_bakeoff.py`, results `docs/probe/segmentation_bakeoff.json`, overlays `docs/probe/seg_*.jpg`)
+- 6 probe fields (DMSO + 5 MoAs). Classical nuclei per field: 359 / 87 / 82 / 118 / 75 / 137; visually correct at full resolution (cells by seeded watershed look plausible, incl. taxol/demecolcine/Eg5).
+- SAM 3.1 on the whole field (PNG, 1024 px side): **0 nuclei** with `nucleus`, `nuclei`, `blob` on the DNA PNG, also 0 on a contrast-stretched DNA image and on a 256-px DNA tile; `nucleus` on the composite → 0. `cell` on the composite → 2 / 43 / 39 / 58 / 18 / 103 objects (DMSO: 2 vs 359 nuclei), conf ≈ 0.5–0.7.
+- On a 256-px composite tile, `cell` → 20 cells at conf ≈ 0.9 (classical: 20 nuclei in that tile). SAM is limited by object count/size per image, not by the stain. Tiling a field needs ~20 calls ≈ $0.05/field ≈ $155 for the atlas — not justified.
+- **Winner: classical for nuclei and for cells.** SAM path stays selectable (`NUCLEI_SEGMENTER` / `CELL_SEGMENTER` = `classical|sam` in Settings, `backend/app/config.py`); SAM cells are paired to nuclei by centroid. Cache `DATA_DIR/cache/sam/<field_id>/<image>__<prompt>.npz`. Bake-off cost ≈ $0.10.
+- Possible later use: SAM `cell` on tiles of the few fields the agent actually acquires (display/second opinion), not for the atlas.
+
+### Features
+- 20 per-cell features (spec §3) + 4 per-field. GLCM contrast over in-cell pixel pairs only (outside pixels → reserved level 0, dropped). Border-touching cells count toward `cell_count` but are excluded from medians and fractions.
+- Phenotype fractions are relative to the pooled DMSO medians (`reference.json`: nucleus area 786 px, DNA mean 0.433): mitotic-like = area < 0.6×, DNA mean > 1.5×, solidity > 0.9; large nucleus = area > 2×.
+- **Multinucleation proxy (deviation):** a seeded watershed gives exactly one nucleus per cell, so true multinucleation can't be read off. Proxy = fraction of nuclei that share a connected DNA-positive component with another nucleus (touching / clumped nuclei).
+- Robust z vs same-plate DMSO wells (6 per plate). Per-plate MAD can be ~0, so the scale is floored at 0.5 × the median per-plate MAD of that feature.
+- Known bias (tested): smoothing + global Otsu moves bright nuclei edges out by ≤1.5 px (mean DNA diluted, integrated DNA preserved); cell areas ~8 % high because the cytoplasm threshold is 0.5 × Otsu.
+
+### Atlas build (`scripts/build_atlas.py`)
+- All 3,096 fields (not just annotated doses — the agent also acquires unannotated doses). 10 workers, 1,891 s wall; per field (one worker, under load) median 5.4 s, p90 10.1 s; unloaded ≈ 1 s segmentation + ~2 s features. Masks + cell tables cached per field in `DATA_DIR/processed/cells/classical-classical/`.
+- Output `DATA_DIR/processed/atlas/`: 1,228 wells (330 DMSO), 304 treatments (103 MoA-annotated, 38 compounds).
+
+### Baseline (`scripts/baseline_nsc.py` → `eval/baseline.json`)
+- NSC 1-NN, LOCO, cosine on robust-z profiles: **treatment-level 75.7 % (78/103), compound-level (majority vote) 71.1 % (27/38)**. Weak classes: Epithelial 1/8, Actin disruptors 1/5, Protein degradation 3/7.
+- DMSO PCA whitening: 60.2 % / 57.9 % — reported, not used. The default stays the spec's plain cosine; it was not chosen by comparing these numbers.

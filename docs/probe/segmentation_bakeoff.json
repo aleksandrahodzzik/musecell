@@ -1,0 +1,317 @@
+{
+ "fields": [
+  {
+   "field": "DMSO",
+   "field_id": "f_a07adf52fe25",
+   "classical": {
+    "nuclei": 359,
+    "cells": 359,
+    "seconds_nuclei": 0.5,
+    "seconds_total": 1.22
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.7,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.25,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.16,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 2,
+     "objects_size_filtered": 2,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.52,
+     "seconds": 5.1,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.8,
+     "cached": false
+    }
+   }
+  },
+  {
+   "field": "Microtubule_stabilizers_taxol_3uM",
+   "field_id": "f_136d4ffe180f",
+   "classical": {
+    "nuclei": 87,
+    "cells": 87,
+    "seconds_nuclei": 0.39,
+    "seconds_total": 0.7
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.34,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.57,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 1.86,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 43,
+     "objects_size_filtered": 43,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.675,
+     "seconds": 8.45,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 4.51,
+     "cached": false
+    }
+   }
+  },
+  {
+   "field": "Microtubule_destabilizers_demecolcine_10uM",
+   "field_id": "f_d79889052fd3",
+   "classical": {
+    "nuclei": 82,
+    "cells": 82,
+    "seconds_nuclei": 0.44,
+    "seconds_total": 0.81
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.46,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.05,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.5,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 39,
+     "objects_size_filtered": 39,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.688,
+     "seconds": 10.5,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.47,
+     "cached": false
+    }
+   }
+  },
+  {
+   "field": "Actin_disruptors_cytochalasin_B_30uM",
+   "field_id": "f_1538fc1b6382",
+   "classical": {
+    "nuclei": 118,
+    "cells": 118,
+    "seconds_nuclei": 0.49,
+    "seconds_total": 0.94
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.97,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.0,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.09,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 58,
+     "objects_size_filtered": 58,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.706,
+     "seconds": 7.69,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.33,
+     "cached": false
+    }
+   }
+  },
+  {
+   "field": "Eg5_inhibitors_AZ138_3uM",
+   "field_id": "f_373214fb2405",
+   "classical": {
+    "nuclei": 75,
+    "cells": 75,
+    "seconds_nuclei": 0.52,
+    "seconds_total": 0.9
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.42,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.39,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 3.18,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 18,
+     "objects_size_filtered": 18,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.574,
+     "seconds": 5.32,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.8,
+     "cached": false
+    }
+   }
+  },
+  {
+   "field": "DNA_damage_etoposide_10uM",
+   "field_id": "f_66b3ff222bbd",
+   "classical": {
+    "nuclei": 137,
+    "cells": 137,
+    "seconds_nuclei": 0.69,
+    "seconds_total": 1.52
+   },
+   "sam": {
+    "dna:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.53,
+     "cached": false
+    },
+    "dna:nuclei": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.01,
+     "cached": false
+    },
+    "dna:blob": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.28,
+     "cached": false
+    },
+    "composite:cell": {
+     "objects": 103,
+     "objects_size_filtered": 103,
+     "nucleus_f1_vs_classical": null,
+     "median_confidence": 0.636,
+     "seconds": 5.81,
+     "cached": false
+    },
+    "composite:nucleus": {
+     "objects": 0,
+     "objects_size_filtered": 0,
+     "nucleus_f1_vs_classical": 0.0,
+     "median_confidence": null,
+     "seconds": 2.9,
+     "cached": false
+    }
+   }
+  }
+ ],
+ "sam_cost_usd": 0.07500000000000002
+}
