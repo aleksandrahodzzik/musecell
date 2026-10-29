@@ -1,0 +1,961 @@
+{
+ "run": {
+  "run_id": "smoke_692e15c6",
+  "mode": "blinded",
+  "phase": "unblinded",
+  "specimen_id": "s_01943ff958",
+  "budget_total": 3,
+  "budget_used": 2,
+  "acquired_well_ids": [
+   "w_1288bb9f4e",
+   "w_cd67f183cb"
+  ],
+  "steps": [
+   {
+    "step": 1,
+    "tool": "list_available_experiments",
+    "args": {
+     "rationale": "I need to see available doses and budget before planning acquisitions."
+    },
+    "rationale": "I need to see available doses and budget before planning acquisitions.",
+    "evidence_id": "e1",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:18.983786Z",
+    "seconds": 0.0
+   },
+   {
+    "step": 2,
+    "tool": "acquire_well",
+    "args": {
+     "rationale": "smoke test of acquire_well",
+     "concentration_index": 3,
+     "replicate": 1
+    },
+    "rationale": "smoke test of acquire_well",
+    "evidence_id": "e2",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:18.998270Z",
+    "seconds": 0.016
+   },
+   {
+    "step": 3,
+    "tool": "acquire_well",
+    "args": {
+     "rationale": "smoke test of acquire_well",
+     "concentration_index": 7,
+     "replicate": 1
+    },
+    "rationale": "smoke test of acquire_well",
+    "evidence_id": "e3",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:19.012850Z",
+    "seconds": 0.013
+   },
+   {
+    "step": 4,
+    "tool": "describe_phenotype",
+    "args": {
+     "rationale": "smoke test of describe_phenotype",
+     "field_ids": [
+      "f_26ef3536d60e",
+      "f_9f930ec467b3"
+     ]
+    },
+    "rationale": "smoke test of describe_phenotype",
+    "evidence_id": "e4",
+    "error": null,
+    "cost_usd": 0.02219575,
+    "started_at": "2026-10-29T08:17:33.767133Z",
+    "seconds": 14.754
+   },
+   {
+    "step": 5,
+    "tool": "compare_to_reference_atlas",
+    "args": {
+     "rationale": "smoke test of compare_to_reference_atlas",
+     "well_ids": [
+      "w_1288bb9f4e",
+      "w_cd67f183cb"
+     ],
+     "k": 5
+    },
+    "rationale": "smoke test of compare_to_reference_atlas",
+    "evidence_id": "e5",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.771188Z",
+    "seconds": 0.005
+   },
+   {
+    "step": 6,
+    "tool": "dose_response",
+    "args": {
+     "rationale": "smoke test of dose_response",
+     "feature": "frac_mitotic_like"
+    },
+    "rationale": "smoke test of dose_response",
+    "evidence_id": "e6",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.774269Z",
+    "seconds": 0.004
+   },
+   {
+    "step": 7,
+    "tool": "update_hypotheses",
+    "args": {
+     "rationale": "smoke test of update_hypotheses",
+     "hypotheses": [
+      {
+       "moa": "Kinase inhibitors",
+       "probability": 2,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      },
+      {
+       "moa": "DNA damage",
+       "probability": 2,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      },
+      {
+       "moa": "DNA replication",
+       "probability": 1,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      }
+     ]
+    },
+    "rationale": "smoke test of update_hypotheses",
+    "evidence_id": "e7",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.774269Z",
+    "seconds": 0.0
+   },
+   {
+    "step": 8,
+    "tool": "submit_conclusion",
+    "args": {
+     "rationale": "smoke test of submit_conclusion",
+     "top_moa": "Kinase inhibitors",
+     "probability": 0.4,
+     "key_evidence_ids": [
+      "e5"
+     ],
+     "next_experiment_if_this_were_a_real_lab": "smoke test"
+    },
+    "rationale": "smoke test of submit_conclusion",
+    "evidence_id": "e8",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.774269Z",
+    "seconds": 0.0
+   },
+   {
+    "step": 9,
+    "tool": "lookup_compound",
+    "args": {
+     "rationale": "smoke test of lookup_compound",
+     "name": "PD-169316"
+    },
+    "rationale": "smoke test of lookup_compound",
+    "evidence_id": "e9",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.848421Z",
+    "seconds": 0.014
+   },
+   {
+    "step": 10,
+    "tool": "search_literature",
+    "args": {
+     "rationale": "smoke test of search_literature",
+     "query": "PD-169316 mechanism of action",
+     "max_results": 3
+    },
+    "rationale": "smoke test of search_literature",
+    "evidence_id": "e10",
+    "error": null,
+    "cost_usd": 0.0,
+    "started_at": "2026-10-29T08:17:33.873821Z",
+    "seconds": 0.025
+   }
+  ],
+  "hypotheses": [
+   {
+    "moa": "Kinase inhibitors",
+    "probability": 0.4,
+    "supporting_evidence_ids": [
+     "e5"
+    ],
+    "contradicting_evidence_ids": []
+   },
+   {
+    "moa": "DNA damage",
+    "probability": 0.4,
+    "supporting_evidence_ids": [
+     "e5"
+    ],
+    "contradicting_evidence_ids": []
+   },
+   {
+    "moa": "DNA replication",
+    "probability": 0.2,
+    "supporting_evidence_ids": [
+     "e5"
+    ],
+    "contradicting_evidence_ids": []
+   }
+  ],
+  "hypothesis_history": [
+   {
+    "step": 7,
+    "hypotheses": [
+     {
+      "moa": "Kinase inhibitors",
+      "probability": 0.4,
+      "supporting_evidence_ids": [
+       "e5"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "DNA damage",
+      "probability": 0.4,
+      "supporting_evidence_ids": [
+       "e5"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "DNA replication",
+      "probability": 0.2,
+      "supporting_evidence_ids": [
+       "e5"
+      ],
+      "contradicting_evidence_ids": []
+     }
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "evidence_id": "e1",
+    "kind": "experiments",
+    "tool": "list_available_experiments",
+    "summary": "8 doses (0.01-30 \u00b5M); 3 of 3 wells left",
+    "data": {
+     "specimen_id": "s_01943ff958",
+     "doses": [
+      {
+       "concentration_index": 0,
+       "concentration_uM": 0.01,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 1,
+       "concentration_uM": 0.03,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 2,
+       "concentration_uM": 0.1,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 3,
+       "concentration_uM": 0.3,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 4,
+       "concentration_uM": 1.0,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 5,
+       "concentration_uM": 3.0,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 6,
+       "concentration_uM": 10.0,
+       "replicates": 2,
+       "acquired_replicates": []
+      },
+      {
+       "concentration_index": 7,
+       "concentration_uM": 30.0,
+       "replicates": 2,
+       "acquired_replicates": []
+      }
+     ],
+     "budget_total": 3,
+     "budget_used": 0,
+     "budget_left": 3,
+     "acquired_wells": []
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:18.983786Z"
+   },
+   {
+    "evidence_id": "e2",
+    "kind": "well",
+    "tool": "acquire_well",
+    "summary": "Well w_1288bb9f4e (dose 3, 0.3 \u00b5M, rep 1): 755 cells measured; nuc_major_axis z=+5.1, nuc_dna_mean z=-2.8, nuc_solidity z=+2.7",
+    "data": {
+     "well_id": "w_1288bb9f4e",
+     "concentration_index": 3,
+     "concentration_uM": 0.3,
+     "replicate": 1,
+     "field_ids": [
+      "f_18df85058fc8",
+      "f_99b9f74b7ae5"
+     ],
+     "segmentation": {
+      "nuclei_method": "classical",
+      "cells_method": "classical",
+      "cells_measured": 755,
+      "fields": [
+       {
+        "field_id": "f_18df85058fc8",
+        "nuclei": 364,
+        "touching_border": 61
+       },
+       {
+        "field_id": "f_99b9f74b7ae5",
+        "nuclei": 534,
+        "touching_border": 82
+       }
+      ]
+     },
+     "profile_z": {
+      "nuc_area": 1.7,
+      "nuc_dna_integrated": -0.16,
+      "nuc_dna_mean": -2.83,
+      "nuc_eccentricity": 0.71,
+      "nuc_solidity": 2.66,
+      "nuc_form_factor": 1.1,
+      "nuc_major_axis": 5.14,
+      "cell_area": 1.46,
+      "cell_nuc_area_ratio": 0.7,
+      "cell_roundness": -0.76,
+      "cell_eccentricity": 0.56,
+      "cell_solidity": -0.69,
+      "cell_major_axis": 1.34,
+      "tub_mean": -0.73,
+      "tub_std": -0.45,
+      "tub_glcm_contrast": -0.58,
+      "act_mean": -0.51,
+      "act_std": -0.64,
+      "act_glcm_contrast": -0.65,
+      "act_tub_ratio": 1.15,
+      "cell_count": -0.76,
+      "frac_mitotic_like": 0.19,
+      "frac_large_nucleus": -0.33,
+      "frac_multinucleate_proxy": -2.03
+     },
+     "top_deviations": [
+      {
+       "feature": "nuc_major_axis",
+       "z": 5.143,
+       "direction": "up",
+       "value": 37.147,
+       "dmso_median": 34.919
+      },
+      {
+       "feature": "nuc_dna_mean",
+       "z": -2.826,
+       "direction": "down",
+       "value": 0.321,
+       "dmso_median": 0.356
+      },
+      {
+       "feature": "nuc_solidity",
+       "z": 2.664,
+       "direction": "up",
+       "value": 0.971,
+       "dmso_median": 0.968
+      },
+      {
+       "feature": "frac_multinucleate_proxy",
+       "z": -2.03,
+       "direction": "down",
+       "value": 0.338,
+       "dmso_median": 0.471
+      },
+      {
+       "feature": "nuc_area",
+       "z": 1.702,
+       "direction": "up",
+       "value": 782.0,
+       "dmso_median": 686.75
+      },
+      {
+       "feature": "cell_area",
+       "z": 1.464,
+       "direction": "up",
+       "value": 2308.0,
+       "dmso_median": 1800.5
+      },
+      {
+       "feature": "cell_major_axis",
+       "z": 1.341,
+       "direction": "up",
+       "value": 73.209,
+       "dmso_median": 64.783
+      },
+      {
+       "feature": "act_tub_ratio",
+       "z": 1.147,
+       "direction": "up",
+       "value": 1.327,
+       "dmso_median": 1.148
+      }
+     ],
+     "dmso_field_ids": [
+      "f_b7ce3f874263",
+      "f_eeda7e52c464"
+     ],
+     "budget_left": 2
+    },
+    "image_ids": [
+     "f_18df85058fc8.composite",
+     "f_99b9f74b7ae5.composite"
+    ],
+    "created_at": "2026-10-29T08:17:18.998270Z"
+   },
+   {
+    "evidence_id": "e3",
+    "kind": "well",
+    "tool": "acquire_well",
+    "summary": "Well w_cd67f183cb (dose 7, 30 \u00b5M, rep 1): 567 cells measured; nuc_major_axis z=+10.3, nuc_dna_mean z=-6.1, nuc_solidity z=+4.7",
+    "data": {
+     "well_id": "w_cd67f183cb",
+     "concentration_index": 7,
+     "concentration_uM": 30.0,
+     "replicate": 1,
+     "field_ids": [
+      "f_26ef3536d60e",
+      "f_9f930ec467b3"
+     ],
+     "segmentation": {
+      "nuclei_method": "classical",
+      "cells_method": "classical",
+      "cells_measured": 567,
+      "fields": [
+       {
+        "field_id": "f_26ef3536d60e",
+        "nuclei": 328,
+        "touching_border": 71
+       },
+       {
+        "field_id": "f_9f930ec467b3",
+        "nuclei": 371,
+        "touching_border": 61
+       }
+      ]
+     },
+     "profile_z": {
+      "nuc_area": 4.22,
+      "nuc_dna_integrated": 1.17,
+      "nuc_dna_mean": -6.08,
+      "nuc_eccentricity": -1.26,
+      "nuc_solidity": 4.68,
+      "nuc_form_factor": 1.37,
+      "nuc_major_axis": 10.27,
+      "cell_area": 3.4,
+      "cell_nuc_area_ratio": 2.19,
+      "cell_roundness": -2.31,
+      "cell_eccentricity": 2.65,
+      "cell_solidity": -1.14,
+      "cell_major_axis": 2.93,
+      "tub_mean": -0.66,
+      "tub_std": -0.15,
+      "tub_glcm_contrast": -0.51,
+      "act_mean": -0.96,
+      "act_std": -2.07,
+      "act_glcm_contrast": -2.23,
+      "act_tub_ratio": 0.35,
+      "cell_count": -1.44,
+      "frac_mitotic_like": -0.48,
+      "frac_large_nucleus": 1.21,
+      "frac_multinucleate_proxy": -2.86
+     },
+     "top_deviations": [
+      {
+       "feature": "nuc_major_axis",
+       "z": 10.271,
+       "direction": "up",
+       "value": 39.369,
+       "dmso_median": 34.919
+      },
+      {
+       "feature": "nuc_dna_mean",
+       "z": -6.076,
+       "direction": "down",
+       "value": 0.28,
+       "dmso_median": 0.356
+      },
+      {
+       "feature": "nuc_solidity",
+       "z": 4.682,
+       "direction": "up",
+       "value": 0.973,
+       "dmso_median": 0.968
+      },
+      {
+       "feature": "nuc_area",
+       "z": 4.221,
+       "direction": "up",
+       "value": 923.0,
+       "dmso_median": 686.75
+      },
+      {
+       "feature": "cell_area",
+       "z": 3.398,
+       "direction": "up",
+       "value": 2978.0,
+       "dmso_median": 1800.5
+      },
+      {
+       "feature": "cell_major_axis",
+       "z": 2.933,
+       "direction": "up",
+       "value": 83.212,
+       "dmso_median": 64.783
+      },
+      {
+       "feature": "frac_multinucleate_proxy",
+       "z": -2.861,
+       "direction": "down",
+       "value": 0.284,
+       "dmso_median": 0.471
+      },
+      {
+       "feature": "cell_eccentricity",
+       "z": 2.654,
+       "direction": "up",
+       "value": 0.765,
+       "dmso_median": 0.752
+      }
+     ],
+     "dmso_field_ids": [
+      "f_b7ce3f874263",
+      "f_eeda7e52c464"
+     ],
+     "budget_left": 1
+    },
+    "image_ids": [
+     "f_26ef3536d60e.composite",
+     "f_9f930ec467b3.composite"
+    ],
+    "created_at": "2026-10-29T08:17:19.012850Z"
+   },
+   {
+    "evidence_id": "e4",
+    "kind": "phenotype",
+    "tool": "describe_phenotype",
+    "summary": "Microscopist on 2 field(s): density lower vs DMSO; 7 observations; candidates: unknown",
+    "data": {
+     "field_ids": [
+      "f_26ef3536d60e",
+      "f_9f930ec467b3"
+     ],
+     "dmso_field_ids": [
+      "f_b7ce3f874263"
+     ],
+     "model": "muse-spark-1.3",
+     "report": {
+      "candidate_mechanisms": [
+       {
+        "moa": "unknown",
+        "why": "Enlarged pale nuclei and larger spread cells without actin collapse, microtubule loss/bundling, or increased multinucleation/mitotic arrest; no listed class is specifically supported."
+       }
+      ],
+      "cell_density": "lower",
+      "notable_cells": [
+       {
+        "field_id": "f_26ef3536d60e",
+        "why": "Unusually large flat cell with large dim oval nucleus, example of increased cell/nuclear area.",
+        "x": 135,
+        "y": 395
+       },
+       {
+        "field_id": "f_9f930ec467b3",
+        "why": "Large spread cell with large dim oval nucleus, example of increased cell/nuclear area.",
+        "x": 200,
+        "y": 270
+       }
+      ],
+      "observations": [
+       {
+        "agrees_with_measurements": true,
+        "channel": "dna",
+        "finding": "Nuclei larger in area and long axis vs DMSO, agrees with nuc_area z=4.22 and nuc_major_axis z=10.27."
+       },
+       {
+        "agrees_with_measurements": true,
+        "channel": "dna",
+        "finding": "Mean DAPI intensity paler/dimmer vs DMSO, agrees with nuc_dna_mean z=-6.08."
+       },
+       {
+        "agrees_with_measurements": true,
+        "channel": "dna",
+        "finding": "Nuclei smooth oval with high solidity vs DMSO, agrees with nuc_solidity z=4.68."
+       },
+       {
+        "agrees_with_measurements": true,
+        "channel": "composite",
+        "finding": "Cytoplasm more spread with larger cell area and long axis vs DMSO, agrees with cell_area z=3.40 and cell_major_axis z=2.93."
+       },
+       {
+        "agrees_with_measurements": false,
+        "channel": "tubulin",
+        "finding": "Microtubule network remains filamentous with no obvious loss or bundling; no tubulin-intensity measurement provided to compare."
+       },
+       {
+        "agrees_with_measurements": false,
+        "channel": "actin",
+        "finding": "Cortical actin meshwork intact with no collapse or fragmentation; no actin measurement provided to compare."
+       },
+       {
+        "agrees_with_measurements": false,
+        "channel": "composite",
+        "finding": "Few bright rounded mitotic figures vs DMSO; no direct mitotic-count measurement provided to compare."
+       }
+      ],
+      "uncertainty": "Nonspecific hypertrophy with pale nuclei only; single time/concentration, modest density difference could partly reflect plating; no specific cytoskeletal or mitotic hallmark to assign class."
+     }
+    },
+    "image_ids": [
+     "f_26ef3536d60e.composite",
+     "f_9f930ec467b3.composite",
+     "f_b7ce3f874263.composite"
+    ],
+    "created_at": "2026-10-29T08:17:33.766120Z"
+   },
+   {
+    "evidence_id": "e5",
+    "kind": "atlas",
+    "tool": "compare_to_reference_atlas",
+    "summary": "Nearest references: Kinase inhibitors (2/5), DNA damage (2/5), DNA replication (1/5)",
+    "data": {
+     "well_ids": [
+      "w_1288bb9f4e",
+      "w_cd67f183cb"
+     ],
+     "k": 5,
+     "similarity": "cosine on robust-z profiles",
+     "excluded": "the specimen's own compound (leave-one-compound-out)",
+     "neighbors": [
+      {
+       "compound": "alsterpaullone",
+       "concentration_uM": 3.0,
+       "moa": "Kinase inhibitors",
+       "similarity": 0.816,
+       "image_id": "f_19adee5305fa.composite"
+      },
+      {
+       "compound": "etoposide",
+       "concentration_uM": 10.0,
+       "moa": "DNA damage",
+       "similarity": 0.778,
+       "image_id": "f_66b3ff222bbd.composite"
+      },
+      {
+       "compound": "alsterpaullone",
+       "concentration_uM": 1.0,
+       "moa": "Kinase inhibitors",
+       "similarity": 0.776,
+       "image_id": "f_b8a0bcf339cd.composite"
+      },
+      {
+       "compound": "etoposide",
+       "concentration_uM": 3.0,
+       "moa": "DNA damage",
+       "similarity": 0.733,
+       "image_id": "f_d773afdff777.composite"
+      },
+      {
+       "compound": "camptothecin",
+       "concentration_uM": 0.003,
+       "moa": "DNA replication",
+       "similarity": 0.721,
+       "image_id": "f_6003222ba01a.composite"
+      }
+     ],
+     "moa_summary": [
+      {
+       "moa": "Kinase inhibitors",
+       "neighbors": 2,
+       "mean_similarity": 0.796
+      },
+      {
+       "moa": "DNA damage",
+       "neighbors": 2,
+       "mean_similarity": 0.755
+      },
+      {
+       "moa": "DNA replication",
+       "neighbors": 1,
+       "mean_similarity": 0.721
+      }
+     ]
+    },
+    "image_ids": [
+     "f_19adee5305fa.composite",
+     "f_66b3ff222bbd.composite",
+     "f_b8a0bcf339cd.composite",
+     "f_d773afdff777.composite",
+     "f_6003222ba01a.composite"
+    ],
+    "created_at": "2026-10-29T08:17:33.771188Z"
+   },
+   {
+    "evidence_id": "e6",
+    "kind": "dose_response",
+    "tool": "dose_response",
+    "summary": "Dose response of frac_mitotic_like over 2 wells, 2 doses: Need at least 3 wells over 2 concentrations for a dose trend.",
+    "data": {
+     "feature": "frac_mitotic_like",
+     "points": [
+      {
+       "concentration_uM": 0.3,
+       "median": 0.1945,
+       "n_wells": 1
+      },
+      {
+       "concentration_uM": 30.0,
+       "median": -0.4798,
+       "n_wells": 1
+      }
+     ],
+     "spearman_rho": null,
+     "p_value": null,
+     "n_wells": 2,
+     "note": "Need at least 3 wells over 2 concentrations for a dose trend."
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:33.774269Z"
+   },
+   {
+    "evidence_id": "e7",
+    "kind": "hypotheses",
+    "tool": "update_hypotheses",
+    "summary": "Hypotheses: Kinase inhibitors 0.40, DNA damage 0.40, DNA replication 0.20",
+    "data": {
+     "hypotheses": [
+      {
+       "moa": "Kinase inhibitors",
+       "probability": 0.4,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      },
+      {
+       "moa": "DNA damage",
+       "probability": 0.4,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      },
+      {
+       "moa": "DNA replication",
+       "probability": 0.2,
+       "supporting_evidence_ids": [
+        "e5"
+       ],
+       "contradicting_evidence_ids": []
+      }
+     ]
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:33.774269Z"
+   },
+   {
+    "evidence_id": "e8",
+    "kind": "conclusion",
+    "tool": "submit_conclusion",
+    "summary": "Conclusion: Kinase inhibitors (p=0.40)",
+    "data": {
+     "top_moa": "Kinase inhibitors",
+     "probability": 0.4,
+     "key_evidence_ids": [
+      "e5"
+     ],
+     "next_experiment_if_this_were_a_real_lab": "smoke test",
+     "rationale": "smoke test of submit_conclusion"
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:33.774269Z"
+   },
+   {
+    "evidence_id": "e9",
+    "kind": "compound",
+    "tool": "lookup_compound",
+    "summary": "PD-169316: PubChem CID 4712; ChEMBL CHEMBL17331; mechanisms: none curated (name and BBBC021 structure agree)",
+    "data": {
+     "name": "PD-169316",
+     "identity_check": "name and BBBC021 structure agree",
+     "pubchem": {
+      "cid": 4712,
+      "title": "PD-169316",
+      "iupac_name": "4-[4-(4-fluorophenyl)-2-(4-nitrophenyl)-1H-imidazol-5-yl]pyridine",
+      "smiles": "C1=CC(=CC=C1C2=NC(=C(N2)C3=CC=NC=C3)C4=CC=C(C=C4)F)[N+](=O)[O-]",
+      "inchikey": "BGIYKDUASORTBB-UHFFFAOYSA-N",
+      "molecular_formula": "C20H13FN4O2",
+      "molecular_weight": 360.3,
+      "structure_png_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/4712/PNG",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/4712",
+      "synonyms": [
+       "152121-53-4",
+       "PD 169316",
+       "PD-169316",
+       "PD169316",
+       "4-(4-(4-fluorophenyl)-2-(4-nitrophenyl)-1H-imidazol-5-yl)pyridine",
+       "4-[4-(4-fluorophenyl)-2-(4-nitrophenyl)-1H-imidazol-5-yl]pyridine",
+       "GX3Y2V80CV",
+       "J1.342.800J",
+       "2-(4-Nitrophenyl)-4-(4-fluorophenyl)-5-(4-pyridinyl)-1H-imidazole",
+       "PD168316"
+      ]
+     },
+     "chembl": {
+      "molecule_chembl_id": "CHEMBL17331",
+      "pref_name": "PD-169316",
+      "matched_by": "pref_name",
+      "max_phase": null,
+      "mechanisms": [],
+      "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL17331"
+     }
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:33.848421Z"
+   },
+   {
+    "evidence_id": "e10",
+    "kind": "literature",
+    "tool": "search_literature",
+    "summary": "PubMed 'PD-169316 mechanism of action': 113 hits, 3 returned",
+    "data": {
+     "query": "PD-169316 mechanism of action",
+     "total_count": 113,
+     "articles": [
+      {
+       "pmid": "37075613",
+       "title": "Targeting tumour-associated macrophages in hodgkin lymphoma using engineered extracellular matrix-mimicking cryogels.",
+       "journal": "Biomaterials",
+       "year": 2023,
+       "authors": [
+        "Bahlmann LC",
+        "Xue C",
+        "Chin AA",
+        "Skirzynska A",
+        "Lu J",
+        "Th\u00e9riault B"
+       ],
+       "url": "https://pubmed.ncbi.nlm.nih.gov/37075613/"
+      },
+      {
+       "pmid": "22069054",
+       "title": "p38 Mitogen-activated protein kinase modulates exocrine secretion in rabbit lacrimal gland.",
+       "journal": "Cell Mol Biol Lett",
+       "year": 2012,
+       "authors": [
+        "Carlsson SK",
+        "Gierow JP"
+       ],
+       "url": "https://pubmed.ncbi.nlm.nih.gov/22069054/"
+      },
+      {
+       "pmid": "28958943",
+       "title": "The p38 MAP kinase inhibitor, PD 169316, inhibits flagellar motility in Leishmania donovani.",
+       "journal": "Biochem Biophys Res Commun",
+       "year": 2017,
+       "authors": [
+        "Reddy GS",
+        "Mukhopadhyay AG",
+        "Dey CS"
+       ],
+       "url": "https://pubmed.ncbi.nlm.nih.gov/28958943/"
+      }
+     ]
+    },
+    "image_ids": [],
+    "created_at": "2026-10-29T08:17:33.873821Z"
+   }
+  ],
+  "allowed_pmids": [
+   "37075613",
+   "22069054",
+   "28958943"
+  ],
+  "conclusion": {
+   "top_moa": "Kinase inhibitors",
+   "probability": 0.4,
+   "key_evidence_ids": [
+    "e5"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "smoke test",
+   "rationale": "smoke test of submit_conclusion"
+  },
+  "review": null,
+  "unblinding": null,
+  "verdict": {
+   "correct": true,
+   "truth_moa": "Kinase inhibitors",
+   "agent_moa": "Kinase inhibitors"
+  },
+  "model_calls": [
+   {
+    "model": "muse-spark-1.3",
+    "purpose": "schema check",
+    "input_tokens": 1894,
+    "output_tokens": 130,
+    "reasoning_tokens": 47,
+    "cost_usd": 0.00292,
+    "seconds": 1.736,
+    "attempts": 1,
+    "finish_reason": "tool_calls"
+   },
+   {
+    "model": "muse-spark-1.3",
+    "purpose": "microscopist",
+    "input_tokens": 7050,
+    "output_tokens": 3149,
+    "reasoning_tokens": 2604,
+    "cost_usd": 0.02219575,
+    "seconds": 13.701,
+    "attempts": 1,
+    "finish_reason": "stop"
+   }
+  ],
+  "cost_usd": 0.02511575,
+  "model_ids": {
+   "scientist": "muse-spark-1.3",
+   "microscopist": "muse-spark-1.3"
+  },
+  "started_at": "2026-10-29T08:17:16.176777Z"
+ },
+ "leak_hits": [],
+ "total_cost_usd": 0.02511575
+}
