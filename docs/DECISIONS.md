@@ -74,3 +74,10 @@ Client: `openai.OpenAI(base_url="https://api.meta.ai/v1", api_key=os.environ["MO
 ### Baseline (`scripts/baseline_nsc.py` → `eval/baseline.json`)
 - NSC 1-NN, LOCO, cosine on robust-z profiles: **treatment-level 75.7 % (78/103), compound-level (majority vote) 71.1 % (27/38)**. Weak classes: Epithelial 1/8, Actin disruptors 1/5, Protein degradation 3/7.
 - DMSO PCA whitening: 60.2 % / 57.9 % — reported, not used. The default stays the spec's plain cosine; it was not chosen by comparing these numbers.
+
+### Phase 2 follow-up (2026-10-29)
+- **Independent check of classical nuclei with SAM tiles.** On 256-px composite tiles SAM does answer, and what it outlines for `cell` are **nuclei** (DMSO tile: median IoU 0.85 with classical nuclei; 93 % matched at IoU > 0.5), not cell bodies. F1 at IoU ≥ 0.5 vs classical nuclei, objects not cut by the tile edge: DMSO 0.97 (18 vs 17) and 0.82 (10 vs 12); etoposide 1.00 (6 vs 6). Treated tiles at fixed positions hold 0–4 nuclei and are uninformative; on one demecolcine tile SAM returned 22 objects vs 3 nuclei (not a clean reference there). Cost $0.03. Classical cell bodies still have no independent check.
+- Bug fixed in the bake-off's `match_f1`: it counted objects as `labels.max()`, wrong for crops (non-sequential labels) — now relabels first. Earlier full-field numbers were unaffected (0 SAM nuclei).
+- GLCM contrast vectorised (`glcm_contrast_all`, bincount over same-label neighbour pairs): bit-identical to the cached per-cell values (checked on 3 fields, max diff 0) and tested against the skimage version. Per-field time is now dominated by `solidity` (convex hulls, ~55 %); left as is because the atlas is cached and changing it would alter feature values.
+- `.env.example`: added `NUCLEI_SEGMENTER`, `CELL_SEGMENTER`.
+- Not done on purpose: tuning thresholds or the feature set to raise the LOCO baseline — the 38 compounds are the evaluation set, so tuning on them would inflate the yardstick.

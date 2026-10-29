@@ -40,6 +40,8 @@ COLORS = {"nuclei": (255, 255, 255), "cells": (255, 214, 0)}
 
 def match_f1(ref: np.ndarray, test: np.ndarray, iou_min: float = 0.5) -> float:
     """F1 of one-to-one object matches at IoU >= iou_min (IoU > 0.5 matches are unique)."""
+    ref = skseg.relabel_sequential(ref)[0]  # labels of a crop are not 1..n; count objects, not max label
+    test = skseg.relabel_sequential(test)[0]
     n_ref, n_test = int(ref.max()), int(test.max())
     if n_ref == 0 or n_test == 0:
         return 0.0
@@ -64,6 +66,36 @@ def panel(composite: Image.Image, title: str, nuclei: np.ndarray | None, cells: 
     im = im.resize((PANEL_W, round(im.height * PANEL_W / im.width)), Image.LANCZOS)
     ImageDraw.Draw(im).text((8, 6), title, fill=(255, 255, 255))
     return im
+
+
+def tile_check(row: pd.Series, nuc_c: np.ndarray, settings) -> tuple[list[dict], float]:
+    """SAM 'cell' on 256-px composite tiles as an independent reference for classical nuclei.
+
+    On small tiles SAM answers (conf ~0.9), and what it outlines for 'cell' are the nuclei
+    (median IoU 0.85 with classical nuclei on the DMSO tile), not whole cell bodies.
+    Compares objects not cut by the tile border: counts and F1 at IoU >= 0.5.
+    """
+    from skimage.segmentation import clear_border
+
+    composite = Image.open(png_paths(settings.data_path, row)["composite"])
+    composite = composite.resize((nuc_c.shape[1], nuc_c.shape[0]), Image.LANCZOS)
+    out, cost = [], 0.0
+    for y, x in TILES:
+        name = f"tile_{y}_{x}"
+        path = settings.data_path / "cache" / "sam_tiles" / row["field_id"] / f"{name}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        composite.crop((x, y, x + TILE, y + TILE)).save(path)
+        res = sam.segment(path, "cell", row["field_id"], name, settings)
+        cost += res.cost_usd
+        ref = clear_border(res.labels.astype(np.int32))
+        cls = clear_border(nuc_c[y:y + TILE, x:x + TILE].copy())
+        out.append({"tile": [y, x], "sam_objects": int(len(np.unique(ref)) - 1),
+                    "classical_nuclei": int(len(np.unique(cls)) - 1), "f1_iou50": round(match_f1(ref, cls), 3)})
+    return out, cost
+
+
+TILE = 256
+TILES = [(256, 256), (512, 768)]
 
 
 def main() -> None:
@@ -100,6 +132,8 @@ def main() -> None:
                 "median_confidence": round(float(np.median(conf)), 3) if conf else None,
                 "seconds": round(time.perf_counter() - t0, 2), "cached": res.cached,
             }
+        entry["tiles"], c = tile_check(row, nuc_c, settings)
+        cost += c
         report.append(entry)
 
         composite = Image.open(pngs["composite"])
@@ -114,7 +148,8 @@ def main() -> None:
         rows.append({"field": label[:34], "cls nuc": entry["classical"]["nuclei"],
                      "cls cell": entry["classical"]["cells"], "cls s": entry["classical"]["seconds_total"],
                      **{f"{k}": v["objects"] for k, v in entry["sam"].items()},
-                     "F1 nucleus": entry["sam"]["dna:nucleus"]["nucleus_f1_vs_classical"]})
+                     "tile SAM/cls nuc": " ".join(f"{t['sam_objects']}/{t['classical_nuclei']}" for t in entry["tiles"]),
+                     "tile F1": " ".join(f"{t['f1_iou50']:.2f}" for t in entry["tiles"])})
 
     pd.set_option("display.width", 220)
     print(pd.DataFrame(rows).to_string(index=False))

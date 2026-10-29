@@ -6,8 +6,8 @@
    "classical": {
     "nuclei": 359,
     "cells": 359,
-    "seconds_nuclei": 0.5,
-    "seconds_total": 1.22
+    "seconds_nuclei": 0.41,
+    "seconds_total": 1.06
    },
    "sam": {
     "dna:nucleus": {
@@ -15,42 +15,62 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.7,
-     "cached": false
+     "seconds": 0.12,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.25,
-     "cached": false
+     "seconds": 0.07,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.16,
-     "cached": false
+     "seconds": 0.06,
+     "cached": true
     },
     "composite:cell": {
      "objects": 2,
      "objects_size_filtered": 2,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.52,
-     "seconds": 5.1,
-     "cached": false
+     "seconds": 0.02,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.8,
-     "cached": false
+     "seconds": 0.07,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 18,
+     "classical_nuclei": 17,
+     "f1_iou50": 0.971
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 10,
+     "classical_nuclei": 12,
+     "f1_iou50": 0.818
+    }
+   ]
   },
   {
    "field": "Microtubule_stabilizers_taxol_3uM",
@@ -58,8 +78,8 @@
    "classical": {
     "nuclei": 87,
     "cells": 87,
-    "seconds_nuclei": 0.39,
-    "seconds_total": 0.7
+    "seconds_nuclei": 0.34,
+    "seconds_total": 0.58
    },
    "sam": {
     "dna:nucleus": {
@@ -67,42 +87,62 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.34,
-     "cached": false
+     "seconds": 0.07,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.57,
-     "cached": false
+     "seconds": 0.07,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 1.86,
-     "cached": false
+     "seconds": 0.06,
+     "cached": true
     },
     "composite:cell": {
      "objects": 43,
      "objects_size_filtered": 43,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.675,
-     "seconds": 8.45,
-     "cached": false
+     "seconds": 0.02,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 4.51,
-     "cached": false
+     "seconds": 0.07,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 0,
+     "f1_iou50": 0.0
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 2,
+     "f1_iou50": 0.0
+    }
+   ]
   },
   {
    "field": "Microtubule_destabilizers_demecolcine_10uM",
@@ -110,8 +150,8 @@
    "classical": {
     "nuclei": 82,
     "cells": 82,
-    "seconds_nuclei": 0.44,
-    "seconds_total": 0.81
+    "seconds_nuclei": 0.43,
+    "seconds_total": 0.77
    },
    "sam": {
     "dna:nucleus": {
@@ -119,42 +159,62 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.46,
-     "cached": false
+     "seconds": 0.1,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.05,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.5,
-     "cached": false
+     "seconds": 0.12,
+     "cached": true
     },
     "composite:cell": {
      "objects": 39,
      "objects_size_filtered": 39,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.688,
-     "seconds": 10.5,
-     "cached": false
+     "seconds": 0.02,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.47,
-     "cached": false
+     "seconds": 0.1,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 2,
+     "f1_iou50": 0.0
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 22,
+     "classical_nuclei": 3,
+     "f1_iou50": 0.0
+    }
+   ]
   },
   {
    "field": "Actin_disruptors_cytochalasin_B_30uM",
@@ -162,8 +222,8 @@
    "classical": {
     "nuclei": 118,
     "cells": 118,
-    "seconds_nuclei": 0.49,
-    "seconds_total": 0.94
+    "seconds_nuclei": 0.47,
+    "seconds_total": 0.82
    },
    "sam": {
     "dna:nucleus": {
@@ -171,42 +231,62 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.97,
-     "cached": false
+     "seconds": 0.08,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.0,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.09,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "composite:cell": {
      "objects": 58,
      "objects_size_filtered": 58,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.706,
-     "seconds": 7.69,
-     "cached": false
+     "seconds": 0.02,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.33,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 1,
+     "classical_nuclei": 4,
+     "f1_iou50": 0.0
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 3,
+     "f1_iou50": 0.0
+    }
+   ]
   },
   {
    "field": "Eg5_inhibitors_AZ138_3uM",
@@ -214,8 +294,8 @@
    "classical": {
     "nuclei": 75,
     "cells": 75,
-    "seconds_nuclei": 0.52,
-    "seconds_total": 0.9
+    "seconds_nuclei": 0.44,
+    "seconds_total": 0.74
    },
    "sam": {
     "dna:nucleus": {
@@ -223,42 +303,62 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.42,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.39,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 3.18,
-     "cached": false
+     "seconds": 0.1,
+     "cached": true
     },
     "composite:cell": {
      "objects": 18,
      "objects_size_filtered": 18,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.574,
-     "seconds": 5.32,
-     "cached": false
+     "seconds": 0.02,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.8,
-     "cached": false
+     "seconds": 0.11,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 1,
+     "f1_iou50": 0.0
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 0,
+     "classical_nuclei": 1,
+     "f1_iou50": 0.0
+    }
+   ]
   },
   {
    "field": "DNA_damage_etoposide_10uM",
@@ -266,8 +366,8 @@
    "classical": {
     "nuclei": 137,
     "cells": 137,
-    "seconds_nuclei": 0.69,
-    "seconds_total": 1.52
+    "seconds_nuclei": 0.52,
+    "seconds_total": 1.18
    },
    "sam": {
     "dna:nucleus": {
@@ -275,43 +375,63 @@
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.53,
-     "cached": false
+     "seconds": 0.09,
+     "cached": true
     },
     "dna:nuclei": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.01,
-     "cached": false
+     "seconds": 0.1,
+     "cached": true
     },
     "dna:blob": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.28,
-     "cached": false
+     "seconds": 0.11,
+     "cached": true
     },
     "composite:cell": {
      "objects": 103,
      "objects_size_filtered": 103,
      "nucleus_f1_vs_classical": null,
      "median_confidence": 0.636,
-     "seconds": 5.81,
-     "cached": false
+     "seconds": 0.03,
+     "cached": true
     },
     "composite:nucleus": {
      "objects": 0,
      "objects_size_filtered": 0,
      "nucleus_f1_vs_classical": 0.0,
      "median_confidence": null,
-     "seconds": 2.9,
-     "cached": false
+     "seconds": 0.12,
+     "cached": true
     }
-   }
+   },
+   "tiles": [
+    {
+     "tile": [
+      256,
+      256
+     ],
+     "sam_objects": 6,
+     "classical_nuclei": 6,
+     "f1_iou50": 1.0
+    },
+    {
+     "tile": [
+      512,
+      768
+     ],
+     "sam_objects": 1,
+     "classical_nuclei": 2,
+     "f1_iou50": 0.0
+    }
+   ]
   }
  ],
- "sam_cost_usd": 0.07500000000000002
+ "sam_cost_usd": 0.0
 }

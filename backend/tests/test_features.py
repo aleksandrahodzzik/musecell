@@ -106,3 +106,14 @@ def test_dose_response_and_compare():
     assert short.spearman_rho is None and short.note
     dev = compare_to_dmso(pd.Series({"a": 0.5, "b": -4.0, "c": 2.0}), k=2)
     assert [(d.feature, d.direction) for d in dev] == [("b", "down"), ("c", "up")]
+
+
+def test_vectorized_glcm_matches_skimage():
+    rng = np.random.default_rng(1)
+    image = rng.uniform(0, 2.5, SHAPE).astype(np.float32)
+    labels = np.zeros(SHAPE, np.int32)
+    for k, (y, x, _, rc, _) in enumerate(BLOBS, start=1):
+        labels[disc(y, x, rc)] = k
+    fast = F.glcm_contrast_all(image, labels)
+    for k in range(1, len(BLOBS) + 1):
+        assert fast[k] == pytest.approx(F.glcm_contrast(image, labels == k), rel=1e-9)

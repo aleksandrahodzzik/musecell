@@ -54,9 +54,16 @@ def _form_factor(area: np.ndarray, perimeter: np.ndarray) -> np.ndarray:
     return 4 * np.pi * area / np.maximum(perimeter, EPS) ** 2
 
 
+def _quantize(image: np.ndarray) -> np.ndarray:
+    return 1 + np.floor(np.clip(image, 0, GLCM_MAX) / GLCM_MAX * (GLCM_LEVELS - 2)).astype(np.int32)
+
+
 def glcm_contrast(image: np.ndarray, mask: np.ndarray) -> float:
-    """GLCM contrast (distance 1, 0 and 90 degrees) over pixel pairs that both lie inside the mask."""
-    q = 1 + np.floor(np.clip(image, 0, GLCM_MAX) / GLCM_MAX * (GLCM_LEVELS - 2)).astype(np.uint8)
+    """GLCM contrast (distance 1, 0 and 90 degrees) over pixel pairs that both lie inside the mask.
+
+    Reference implementation with skimage; glcm_contrast_all computes the same for every label at once.
+    """
+    q = _quantize(image).astype(np.uint8)
     q[~mask] = 0
     glcm = graycomatrix(q, [1], [0, np.pi / 2], levels=GLCM_LEVELS, symmetric=True)[1:, 1:].sum(axis=(2, 3))
     total = glcm.sum()
@@ -64,6 +71,19 @@ def glcm_contrast(image: np.ndarray, mask: np.ndarray) -> float:
         return 0.0
     i, j = np.indices(glcm.shape)
     return float(((i - j) ** 2 * glcm).sum() / total * (GLCM_MAX / (GLCM_LEVELS - 2)) ** 2)
+
+
+def glcm_contrast_all(image: np.ndarray, labels: np.ndarray) -> np.ndarray:
+    """GLCM contrast per label (index = label), from right and down neighbour pairs within the same label."""
+    q = _quantize(image)
+    n = int(labels.max()) + 1
+    total, count = np.zeros(n), np.zeros(n)
+    for a, b, qa, qb in ((labels[:, :-1], labels[:, 1:], q[:, :-1], q[:, 1:]),
+                         (labels[:-1, :], labels[1:, :], q[:-1, :], q[1:, :])):
+        same = (a == b) & (a > 0)
+        total += np.bincount(a[same], weights=((qa[same] - qb[same]) ** 2).astype(float), minlength=n)
+        count += np.bincount(a[same], minlength=n)
+    return np.where(count > 0, total / np.maximum(count, 1), 0.0) * (GLCM_MAX / (GLCM_LEVELS - 2)) ** 2
 
 
 def cell_features(nuclei: np.ndarray, cells: np.ndarray, channels: dict[str, np.ndarray]) -> pd.DataFrame:
@@ -108,14 +128,8 @@ def cell_features(nuclei: np.ndarray, cells: np.ndarray, channels: dict[str, np.
     df["act_std"] = cel["intensity_std-1"]
     df["act_tub_ratio"] = cel["intensity_mean-1"] / np.maximum(cel["intensity_mean-0"], EPS)
 
-    tub_c, act_c = [], []
-    for label, r in cel.iterrows():
-        sl = np.s_[int(r["bbox-0"]):int(r["bbox-2"]), int(r["bbox-1"]):int(r["bbox-3"])]
-        mask = cells[sl] == label
-        tub_c.append(glcm_contrast(tub[sl], mask))
-        act_c.append(glcm_contrast(act[sl], mask))
-    df["tub_glcm_contrast"] = tub_c
-    df["act_glcm_contrast"] = act_c
+    df["tub_glcm_contrast"] = glcm_contrast_all(tub, cells)[common]
+    df["act_glcm_contrast"] = glcm_contrast_all(act, cells)[common]
 
     df["centroid_y"] = nuc["centroid-0"]
     df["centroid_x"] = nuc["centroid-1"]
