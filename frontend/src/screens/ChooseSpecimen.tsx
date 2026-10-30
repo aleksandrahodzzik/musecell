@@ -280,13 +280,14 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
  * microscope. Decorative only (aria-hidden); everything stops under prefers-reduced-motion. Uses shipped
  * thumbnails, so it also works in replay-only mode.
  */
-const CELLS = Array.from({ length: 9 }, (_, i) => {
+const CELLS = Array.from({ length: 12 }, (_, i) => {
   const r = (k: number) => { const x = Math.sin((i + 1) * 9301 + k * 49297) * 233280; return x - Math.floor(x); };
+  const col = i % 4, row = Math.floor(i / 4); // an even 4 x 3 grid over the hero, jittered
   return {
-    left: 4 + r(1) * 88, top: 6 + r(2) * 80, size: 150 + r(3) * 190,  // % of the hero, px
-    bx: r(4) * 100, by: r(5) * 100,                                  // which part of the field this crop shows
-    dx: (r(6) - 0.5) * 220, dy: (r(7) - 0.5) * 160, rot: (r(8) - 0.5) * 50,
-    dur: 16 + r(9) * 14, delay: -r(10) * 30, opacity: 0.22 + r(11) * 0.25,
+    left: 3 + col * 24 + r(1) * 14, top: 4 + row * 31 + r(2) * 16, size: 170 + r(3) * 170,  // % of the hero, px
+    bx: r(4) * 100, by: r(5) * 100,                                                     // which part of the field
+    dx: (r(6) < 0.5 ? -1 : 1) * (140 + r(7) * 200), dy: (r(8) < 0.5 ? -1 : 1) * (90 + r(9) * 140),
+    rot: (r(10) - 0.5) * 70, dur: 9 + r(11) * 7, delay: -r(12) * 16, opacity: 0.32 + r(13) * 0.25,
   };
 });
 
@@ -302,7 +303,7 @@ function DriftingField() {
                                         animate-[drift_24s_ease-in-out_infinite_alternate] motion-reduce:animate-none" />
       {CELLS.map((c, i) => (
         <span key={i}
-              className="absolute rounded-full blur-[3px] saturate-[1.35] animate-[float_var(--dur)_ease-in-out_infinite_alternate] motion-reduce:animate-none
+              className="absolute rounded-full blur-[1.5px] saturate-[1.4] animate-[float_var(--dur)_ease-in-out_infinite_alternate] motion-reduce:animate-none
                          [mask-image:radial-gradient(circle,#000_45%,transparent_72%)]"
               style={{
                 left: `${c.left}%`, top: `${c.top}%`, width: c.size, height: c.size, opacity: c.opacity,
