@@ -10,6 +10,21 @@ const MIN_SPEED = 0.25, MAX_SPEED = 20, MAX_GAP_S = 60; // as in runs/replay.py
 
 export const dataUrl = (file: string) => `${BASE}data/${file}`;
 
+// Images the static demo ships (data/images.json). Others resolve to an empty data URL: the <img> fails at once
+// and shows its fallback, with no request and no 404.
+let shippedImages: Set<string> | null = null;
+const NO_IMAGE = "data:,";
+
+/** Loads the list of shipped images; main.tsx awaits it before the first render. */
+export async function loadImageManifest(): Promise<void> {
+  try {
+    const r = await fetch(dataUrl("images.json"));
+    if (r.ok) shippedImages = new Set(await r.json());
+  } catch {
+    shippedImages = null; // no list: ask for every image, as before
+  }
+}
+
 /** Static replay ids carry their source run and speed: "replay_<run_id>~<speed>". */
 export const sourceOf = (runId: string) => (runId.startsWith("replay_") ? runId.slice(7).split("~")[0] : runId);
 const speedOf = (runId: string) => {
@@ -32,7 +47,7 @@ export function staticPath(path: string): string | null {
   m = p.match(/^\/api\/runs\/([^/]+)$/);
   if (m) return dataUrl(`runs/${sourceOf(decodeURIComponent(m[1]))}.json`);
   m = p.match(/^\/api\/images\/(.+)$/);
-  if (m) return dataUrl(`images/${m[1]}.png`);
+  if (m) return shippedImages && !shippedImages.has(m[1]) ? NO_IMAGE : dataUrl(`images/${m[1]}.png`);
   return null;
 }
 

@@ -80,6 +80,9 @@ def main_() -> int:
         main.app.state.manager = None
 
     shutil.copytree(main.DEMO_THUMBS, out / "images")
+    # The browser asks only for images in this list, so fields a recording does not ship are never requested (no 404s).
+    (out / "images.json").write_text(json.dumps(sorted(p.stem for p in (out / "images").glob("*.png"))),
+                                     encoding="utf-8")
     # GitHub Pages: serve files as they are (no Jekyll), and fall back to the app for unknown paths.
     (args.dist / ".nojekyll").write_text("", encoding="utf-8")
     shutil.copyfile(args.dist / "index.html", args.dist / "404.html")
