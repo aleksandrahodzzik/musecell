@@ -14,6 +14,7 @@ import OpenWeightsBadge from "../components/OpenWeightsBadge";
 import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
 import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, setCompositeOnly, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
+import { STATIC } from "../lib/staticDemo";
 import type { Health, ModelIds, RecordedRun, SpecimenCard } from "../lib/types";
 import { useFetch } from "../lib/useFetch";
 import { SWATCH } from "../components/run/Microscope";
@@ -127,7 +128,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
               </h1>
               <p className="tag mt-6 self-start inline-flex items-center gap-2.5 rounded-full bg-white/[0.06] ring-1 ring-white/10 px-3.5 py-2 backdrop-blur">
                 <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${live ? "bg-lime animate-[pulse-lime_1.8s_ease-out_infinite]" : "bg-mist/60"}`} />
-                {live ? <>Live · <b className="font-medium text-lime">{sealed}</b> sealed specimens</> : "Replays on this server"}
+                {live ? <>Live · <b className="font-medium text-lime">{sealed}</b> sealed specimens</> : STATIC ? "Recorded live runs · replayed in your browser" : "Replays on this server"}
               </p>
               <HeadlineNumber />
             </div>

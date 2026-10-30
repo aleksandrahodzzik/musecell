@@ -2,6 +2,8 @@
 
 **MuseCell is an autonomous screening scientist.** Give it a blinded compound and a small budget of microscope wells. It images real cells, measures them, forms mechanism-of-action hypotheses, chooses the next experiment that best separates them, has its conclusion reviewed by a second model, and only then unblinds the compound and checks itself against chemistry databases and literature.
 
+**▶ Live demo: https://aleksandrahodzzik.github.io/musecell/** · replays of recorded live runs in your browser, the benchmark and the dossiers; no install, no key. Live runs need the [Quickstart](#quickstart).
+
 *Research tool for cell-biology screening data. Not for clinical use.*
 
 ![A recorded blinded run replayed at 6×: the agent acquires wells, the hypothesis board converges, the PI reviewer asks for one more experiment, then the compound is unblinded and the call is checked](docs/hero.gif)
