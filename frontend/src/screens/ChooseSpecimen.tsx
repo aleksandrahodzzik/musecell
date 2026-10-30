@@ -275,17 +275,43 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
 }
 
 /**
- * Behind the hero: one real BBBC021 field, heavily blurred, drifting slowly (a 60 s loop). Decorative only; stops
- * under prefers-reduced-motion. Uses a shipped thumbnail, so it works in replay-only mode too.
+ * Behind the hero, a living culture: a real BBBC021 field, blurred, drifting; over it a few round crops of real cells
+ * from another field, each floating on its own slow path with a little rotation, like cells seen alive under a
+ * microscope. Decorative only (aria-hidden); everything stops under prefers-reduced-motion. Uses shipped
+ * thumbnails, so it also works in replay-only mode.
  */
+const CELLS = Array.from({ length: 9 }, (_, i) => {
+  const r = (k: number) => { const x = Math.sin((i + 1) * 9301 + k * 49297) * 233280; return x - Math.floor(x); };
+  return {
+    left: 4 + r(1) * 88, top: 6 + r(2) * 80, size: 150 + r(3) * 190,  // % of the hero, px
+    bx: r(4) * 100, by: r(5) * 100,                                  // which part of the field this crop shows
+    dx: (r(6) - 0.5) * 220, dy: (r(7) - 0.5) * 160, rot: (r(8) - 0.5) * 50,
+    dur: 16 + r(9) * 14, delay: -r(10) * 30, opacity: 0.22 + r(11) * 0.25,
+  };
+});
+
 function DriftingField() {
   const gallery = useFetch<string[]>("/api/gallery");
-  const id = gallery.data?.length ? gallery.data[Math.min(7, gallery.data.length - 1)] : null;
-  if (!id) return null;
+  const ids = gallery.data ?? [];
+  if (!ids.length) return null;
+  const back = imageUrl(ids[Math.min(7, ids.length - 1)]);
+  const cells = imageUrl(ids[Math.min(2, ids.length - 1)]);
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
-      <img src={imageUrl(id)} alt="" className="absolute -inset-[15%] h-[130%] w-[130%] max-w-none object-cover opacity-[0.5] blur-[16px] saturate-[1.3]
-                                              animate-[drift_60s_ease-in-out_infinite_alternate] motion-reduce:animate-none" />
+      <img src={back} alt="" className="absolute -inset-[15%] h-[130%] w-[130%] max-w-none object-cover opacity-[0.45] blur-[14px] saturate-[1.3]
+                                        animate-[drift_24s_ease-in-out_infinite_alternate] motion-reduce:animate-none" />
+      {CELLS.map((c, i) => (
+        <span key={i}
+              className="absolute rounded-full blur-[3px] saturate-[1.35] animate-[float_var(--dur)_ease-in-out_infinite_alternate] motion-reduce:animate-none
+                         [mask-image:radial-gradient(circle,#000_45%,transparent_72%)]"
+              style={{
+                left: `${c.left}%`, top: `${c.top}%`, width: c.size, height: c.size, opacity: c.opacity,
+                backgroundImage: `url(${cells})`, backgroundSize: "1100px auto", backgroundPosition: `${c.bx}% ${c.by}%`,
+                animationDelay: `${c.delay}s`,
+                ["--dur" as string]: `${c.dur}s`, ["--dx" as string]: `${c.dx}px`, ["--dy" as string]: `${c.dy}px`,
+                ["--rot" as string]: `${c.rot}deg`,
+              }} />
+      ))}
     </div>
   );
 }

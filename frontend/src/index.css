@@ -73,7 +73,13 @@
 
 @keyframes grain { 0%{transform:translate(0,0)} 17%{transform:translate(-6%,4%)} 33%{transform:translate(5%,-7%)} 50%{transform:translate(-3%,8%)} 67%{transform:translate(7%,2%)} 83%{transform:translate(-8%,-4%)} }
 /* The hero's blurred field drifts slowly (ChooseSpecimen DriftingField). */
-@keyframes drift { 0% { transform: translate(-3%, -2%) scale(1.04) rotate(-1deg); } 100% { transform: translate(3%, 2%) scale(1.12) rotate(1.5deg); } }
+@keyframes drift { 0% { transform: translate(-6%, -4%) scale(1.06) rotate(-2deg); } 100% { transform: translate(6%, 4%) scale(1.16) rotate(2.5deg); } }
+/* One floating cell crop: its own path from CSS variables set inline (--dx, --dy, --rot). */
+@keyframes float {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate(calc(var(--dx) * 0.55), calc(var(--dy) * -0.35)) rotate(calc(var(--rot) * 0.5)) scale(1.06); }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.97); }
+}
 @keyframes pulse-lime { 0% { box-shadow: 0 0 0 0 rgb(215 255 63 / .7); } 100% { box-shadow: 0 0 0 10px rgb(215 255 63 / 0); } }
 
 @media (prefers-reduced-motion: reduce) {
