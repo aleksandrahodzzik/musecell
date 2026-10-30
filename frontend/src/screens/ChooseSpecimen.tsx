@@ -570,7 +570,7 @@ function RecordedRuns() {
       )}
       {!!recorded.data?.length && (
         <ul className="flex flex-col divide-y divide-white/[0.07]">
-          {recorded.data.map((r) => (
+          {recorded.data.filter((r) => (r.budget_used ?? 0) > 0).map((r) => ( // nothing to watch before the first well
             <li key={r.run_id} className="flex items-center gap-5 py-2.5 text-sm">
               <span className="font-serif text-[16px] font-semibold text-white w-[110px] shrink-0 whitespace-nowrap">{r.specimen_label ?? "Specimen"}</span>
               <span className="text-mist whitespace-nowrap">Recorded {dateTime(r.recorded_at)}</span>

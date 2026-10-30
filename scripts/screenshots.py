@@ -85,6 +85,7 @@ def main() -> int:
         page.get_by_role("radio").first.wait_for()
         shot(page, "01_choose_specimen")
         page.get_by_role("button", name="Watch a recorded run").click()
+        page.wait_for_timeout(2200)  # design v2: the button scrolls to the section, which then fades in
         page.get_by_role("button", name="Replay").first.wait_for()
         shot(page, "02_choose_recorded")
 

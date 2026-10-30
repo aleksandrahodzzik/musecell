@@ -366,3 +366,9 @@ Daily cap raised per process (`DAILY_COST_CAP_USD=70`) because Baseten credits c
   - Above NSC on 4 random wells (81.3 % ± 4.9, ≈ 1.7 sd), one compound below NSC on all wells (92.1 %).
 - Some text-only edits were made after the v5 eval had started: the unblinded brief now names both calls, and the dossier wording changed. They do not affect calls or scoring.
 - **Decision: freeze the agent at v5.** With these features the ceiling is NSC on all wells (35/38). Another version would gain at most 1–2 compounds, which is within noise, and would spend the held-out half again: the test half has been read for v4 and v5.
+
+## Design polish (2026-10-30, after v5)
+- Hero: a real BBBC021 field (shipped thumbnail), blurred and drifting on a 60 s loop behind the grain (off under reduced motion); the headline number plaque reads the main agent row of eval/results.json (accuracy, held-out test, random-well baseline in the same feature space), never typed in.
+- Run view: the unblinding panel takes 72 % of the height; the compound resolves from blur as a 52–112 px display title; the verdict stamp is larger and lands with a slight rotation.
+- Phone width (390 px) checked: hero, bench panel, timeline and headline tiles stack; the eyepiece scales to 78vw.
+- Recorded-runs list hides runs that ended before acquiring a well (nothing to replay). docs/screens/ and docs/hero.gif re-recorded (hero GIF 720 px, 6 fps, 6.0 MB); 0 console errors.
