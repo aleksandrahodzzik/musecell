@@ -23,6 +23,7 @@ Three Meta models play different roles in one run; every call is metered and cap
 | Scientist agent | `muse-spark-1.3` | Tool-calling loop over 9 strict-schema tools: plans which wells to image, reads the measurements, keeps a hypothesis board, submits a blinded conclusion, then writes the reflection | [`agent/loop.py#L166`](backend/app/agent/loop.py#L166), [`agent/tools.py#L135`](backend/app/agent/tools.py#L135) |
 | Microscopist | `muse-spark-1.3` (vision) | Looks at the treated composite + per-channel images next to a same-plate DMSO control, gets our measured top-deviating features, and returns a strict-schema morphology description that says which findings agree with the numbers | [`agent/tools.py#L337`](backend/app/agent/tools.py#L337), [`agent/microscopist.py`](backend/app/agent/microscopist.py) |
 | PI reviewer | `muse-wonder-1.0` | Reads the blinded evidence ledger and the conclusion; approves or requests one more experiment (one revision round) | [`agent/reviewer.py#L66`](backend/app/agent/reviewer.py#L66), [`agent/loop.py#L226`](backend/app/agent/loop.py#L226) |
+| Open weights (optional) | `meta-models/muse-spark-open-1026` on Baseten | Same Scientist + Microscopist on Meta's open-weights Muse Spark Open; the reviewer and SAM stay on the Meta API. See [Runs on Meta open weights](#runs-on-meta-open-weights) | [`config.py`](backend/app/config.py), [`llm.py`](backend/app/llm.py) |
 | Segmenter | `sam-3.1` | Benchmarked against classical segmentation and used as an independent check of the classical nuclei (median IoU 0.85 on DMSO tiles). Classical segmentation won the bake-off on full fields, so it produces the masks; SAM stays selectable with `NUCLEI_SEGMENTER=sam` | [`sam.py`](backend/app/sam.py), [`scripts/segmentation_bakeoff.py`](scripts/segmentation_bakeoff.py), [`docs/DECISIONS.md`](docs/DECISIONS.md) |
 
 One client, [`LLMClient`](backend/app/llm.py#L175), talks to `https://api.meta.ai/v1`. At startup it calls `GET /v1/models` and refuses to start with a model id that does not exist ([`check_models`](backend/app/llm.py#L198)). It retries on 429/5xx, counts tokens, prices every call, and enforces a per-run and a daily cost cap ([`llm.py#L218`](backend/app/llm.py#L218)).
@@ -104,7 +105,7 @@ cd frontend; npm ci; npm run build; cd ..
 python -m uvicorn app.main:app --app-dir backend --port 8787
 ```
 
-Open http://127.0.0.1:8787, choose **Watch a recorded run**, and pick one of the four recorded runs. Without a key and data the app says that live runs are off; replays, dossiers and the benchmark page work. Cell masks and hover measurements need the data.
+Open http://127.0.0.1:8787, choose **Watch a recorded run**, and pick one of the five recorded runs (one of them on open weights). Without a key and data the app says that live runs are off; replays, dossiers and the benchmark page work. Cell masks and hover measurements need the data.
 
 macOS / Linux: the same, with `python3.12 -m venv .venv`, `source .venv/bin/activate`, and `&&` or new lines instead of `;`.
 
@@ -135,10 +136,43 @@ Then **Start blinded run** in the UI, or `python scripts/run_agent_cli.py --list
 | MuseCell agent (muse-spark-1.3-contributor) | 2 | 42.1% | 16/38 | 36.8% | 2.00 | $0.107 | 203 s | 103/103 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
+| MuseCell agent, Muse Spark Open (Baseten) | 4 | 44.7% | 17/38 | 31.6% | 3.97 | $0.365 | 167 s | 111/112 (99.1%) |
 
 **The agent is below the classical baseline,** and more wells do not help it. The error analysis in [`eval/RESULTS.md`](eval/RESULTS.md) shows where it goes wrong. Strong cytoskeletal and mitotic phenotypes are nearly always right (microtubule destabilizers 12/12, Aurora kinase inhibitors 9/9, stabilizers 8/9). Subtle classes are never right: it over-calls "Microtubule stabilizers" (35 of 114 runs, 9 true) and never calls Epithelial, Protein degradation or Cholesterol-lowering. The PI review changed a wrong call to a right one in 3 runs and a right one to wrong in 1. Every cited PMID (320/320) was one the agent had retrieved in that run.
 
 The eval ran on `muse-spark-1.3-contributor` (same model, cheaper tier; allowed because BBBC021 is public); 114 runs cost $14.60. The demo runs and the app use `muse-spark-1.3`. Every run is logged in [`eval/agent_runs.jsonl`](eval/agent_runs.jsonl); `python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only` rebuilds the tables and chart from it without API calls (needs the data for the baselines).
+
+## Runs on Meta open weights
+
+The same agent runs on **Muse Spark Open**, Meta's open-weights model, served by **Baseten**: model id `meta-models/muse-spark-open-1026` at `https://inference.baseten.co/v1` (OpenAI-compatible). In open-weights mode the Scientist, the Microscopist and the reflection run on Muse Spark Open. The PI reviewer stays `muse-wonder-1.0` and SAM stays `sam-3.1` on the Meta Model API, so a run uses both providers. The UI says so: the start screen has a **Models** switch (Meta Model API / Open weights); the run header, recorded-runs list and dossier carry an **"Open weights · Muse Spark Open via Baseten"** badge; and the agent circuit names the provider of each model.
+
+Nothing in the agent loop is forked. [`LLMClient`](backend/app/llm.py) routes each call by model id ([`provider_of`](backend/app/config.py)), checks `GET /v1/models` on both providers at startup, and meters every call (Baseten list price $1.25 / $4.25 per 1M tokens, paid from hackathon credits, logged as `credits`). [`scripts/probe_baseten.py`](scripts/probe_baseten.py) found that strict tool schemas, parallel tool calls and strict `json_schema` output all work and are enforced. It also found two limits: reasoning is always on (returned in `reasoning_content`), and a request can carry at most 8 images. For that limit, the Microscopist sends composites only when the per-channel images would exceed 8. Details are in [docs/DECISIONS.md](docs/DECISIONS.md) ("Stretch").
+
+Same 38 compounds, budget 4, same tools and same PI reviewer, from [`eval/RESULTS.md`](eval/RESULTS.md):
+
+| | Muse Spark 1.3 (contributor tier), Meta API | Muse Spark Open (Baseten) | NSC baseline, 4 random wells |
+|---|---|---|---|
+| Accuracy | 36.8% (14/38) | **44.7% (17/38)** | 57.8% ± 5.8 |
+| Before PI review | 36.8% | 31.6% | – |
+| Failed runs | 0 | 3 (1 before a conclusion; 2 in the reflection, after the verdict) | – |
+| Mean latency | 208 s | 167 s | – |
+| Citations verified | 109/109 | 111/112 | – |
+
+On open weights the PI reviewer turned 5 wrong calls into right ones and no right call into a wrong one. The open model is still below the NSC baseline, and with 38 compounds a 3-compound difference is within noise. It shares the over-call of "Microtubule stabilizers" (11 of 38 calls, 3 true). Mean cost was $0.365 per run at Baseten list price plus the reviewer. That is not comparable with the contributor tier, which is priced 10–20× lower.
+
+One recorded demo run is on open weights: `run_2bee8860f390` (epothilone B, correct, reviewer approved, citations 5/5).
+
+Reproduce (needs `MODEL_API_KEY` for the reviewer and `BASETEN_API_KEY`, both in `backend/.env`):
+
+```powershell
+python scripts/probe_baseten.py                                   # PASS/FAIL per capability, writes docs/probe/baseten_probe.json
+$env:PROVIDER="baseten"; python scripts/run_agent_cli.py --specimen s_89c9462717 --budget 4; Remove-Item Env:PROVIDER
+python scripts/evaluate.py --provider baseten --budgets 4 --model muse-spark-1.3-contributor        # estimate only
+python scripts/evaluate.py --provider baseten --budgets 4 --model muse-spark-1.3-contributor --yes  # 38 runs
+python scripts/evaluate.py --model muse-spark-1.3-contributor --compare meta-models/muse-spark-open-1026 --aggregate-only
+```
+
+Or set `PROVIDER=baseten` in `backend/.env` to make open weights the default; with only `BASETEN_API_KEY` added, the start screen offers the switch per run.
 
 ## Guardrails
 

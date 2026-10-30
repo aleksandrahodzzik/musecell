@@ -14,6 +14,8 @@ Usage:
   python scripts/record_demo_runs.py --dry-run          # show the candidate order, no API calls
   python scripts/record_demo_runs.py [--budget 5] [--n 4] [--max-runs 6]
   python scripts/record_demo_runs.py --copy run_a run_b ...   # only copy already recorded runs
+  python scripts/record_demo_runs.py --provider baseten --n 1 --max-runs 1 --add
+      # one more run on open weights (Muse Spark Open via Baseten), kept next to the runs already in demo/
 """
 
 from __future__ import annotations
@@ -56,12 +58,12 @@ def candidates(manager: RunManager) -> list[tuple[str, str, float]]:
     return out
 
 
-async def record(manager: RunManager, n: int, max_runs: int, budget: int) -> list[str]:
+async def record(manager: RunManager, n: int, max_runs: int, budget: int, provider: str | None = None) -> list[str]:
     kept: list[tuple[str, bool]] = []  # (run_id, reviewer requested)
     for i, (sid, _moa, strength) in enumerate(candidates(manager)[:max_runs], start=1):
         if len(kept) >= n and any(r for _, r in kept):
             break
-        loop = await manager.create_run(sid, budget, "blinded")
+        loop = await manager.create_run(sid, budget, "blinded", provider)
         run = await loop.run_all()
         requested = bool(run.review and run.review.verdict == "request_experiment")
         print(f"[{i}] {run.run_id} {sid} strength {strength:.1f}: {run.status}, review {run.review and run.review.verdict}, "
@@ -72,7 +74,7 @@ async def record(manager: RunManager, n: int, max_runs: int, budget: int) -> lis
         if len(kept) > n:  # over by one only when the newest run is the first request: drop a non-request run
             drop = next(k for k in reversed(kept[:-1]) if not k[1])
             kept.remove(drop)
-    if not any(r for _, r in kept):
+    if not any(r for _, r in kept) and n > 1:
         print("!! no recorded run got a reviewer request within --max-runs")
     return [r for r, _ in kept]
 
@@ -148,6 +150,8 @@ async def main() -> int:
     p.add_argument("--budget", type=int, default=5)
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--copy", nargs="+", metavar="RUN_ID", help="copy these recorded runs; record nothing")
+    p.add_argument("--provider", choices=["meta", "baseten"], help="who serves the Scientist + Microscopist")
+    p.add_argument("--add", action="store_true", help="keep the runs already in demo/runs next to the new ones")
     args = p.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -161,7 +165,10 @@ async def main() -> int:
             for sid, moa, n in candidates(manager):
                 print(f"{sid}  strength {n:6.1f}  ({moa})")
             return 0
-        run_ids = args.copy or await record(manager, args.n, args.max_runs, args.budget)
+        run_ids = args.copy or await record(manager, args.n, args.max_runs, args.budget, args.provider)
+        if args.add:
+            existing = sorted({f.name.split(".")[0] for f in DEMO_RUNS.glob("run_*.jsonl")})
+            run_ids = list(dict.fromkeys([*existing, *run_ids]))
         for r in run_ids:
             hits = await leak_check(manager, r)
             print(f"leak re-scan {r}: {hits} hits")

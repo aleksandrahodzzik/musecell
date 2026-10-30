@@ -5,7 +5,8 @@ import { ArrowLeft, Check, Download, Printer, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
 import FieldThumb from "../components/FieldThumb";
-import { dateTime, featureName, modelName, prob, signed, toolName, uM, usd } from "../lib/format";
+import OpenWeightsBadge from "../components/OpenWeightsBadge";
+import { PROVIDER_LABEL, dateTime, featureName, isOpenWeights, modelName, prob, providerOf, signed, toolName, uM, usd } from "../lib/format";
 import { href } from "../lib/router";
 import type { Article, Conclusion, Deviation, Hypothesis, Reflection, Review, Unblinded, Verdict } from "../lib/types";
 import { useFetch } from "../lib/useFetch";
@@ -123,8 +124,11 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
             <Stat value={usd(d.cost_usd)} label="API cost" />
             <Stat value={d.citations_label.replace(/^Citations verified:\s*/, "")} label="citations verified" />
           </div>
-          <p className="text-[12px] text-mist print:text-graphite">
-            Scientist {modelName(d.model_ids.scientist)} · Reviewer {modelName(d.model_ids.reviewer)} · Segmentation {modelName(d.model_ids.segmentation)}
+          <p className="text-[12px] text-mist print:text-graphite flex flex-wrap items-center gap-x-3 gap-y-2">
+            <OpenWeightsBadge ids={d.model_ids} className="print:text-ink print:border-rule" />
+            <span>
+              Scientist {modelName(d.model_ids.scientist)}{isOpenWeights(d.model_ids) && ` (${PROVIDER_LABEL[providerOf(d.model_ids)]})`} · Reviewer {modelName(d.model_ids.reviewer)}{isOpenWeights(d.model_ids) && " (Meta API)"} · Segmentation {modelName(d.model_ids.segmentation)}
+            </span>
           </p>
         </div>
         {d.unblinding?.structure_url && (

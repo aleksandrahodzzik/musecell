@@ -215,3 +215,17 @@ def test_gallery_lists_servable_demo_composites(client):
     ids = c.get("/api/gallery").json()
     assert ids and all(main.IMAGE_ID.match(i) and i.endswith(".composite") for i in ids)
     assert c.get(f"/api/images/{ids[0]}").headers["content-type"] == "image/png"
+
+
+def test_provider_switch_per_run(client):
+    c, m = client
+    sid = c.get("/api/specimens").json()[0]["specimen_id"]
+    r = c.post("/api/runs", json={"specimen_id": sid, "budget": 3, "provider": "baseten"})
+    assert r.status_code == 400 and "not available" in r.json()["detail"]  # no Baseten key in this fixture
+    m.providers = ["meta", "baseten"]
+    providers = {p["provider"]: p for p in c.get("/api/health").json()["providers"]}
+    assert providers["baseten"]["model_ids"]["scientist"] == "meta-models/muse-spark-open-1026"
+    assert providers["baseten"]["model_ids"]["reviewer"] == "muse-wonder-1.0"  # mixed setup, explicit
+    run_id = c.post("/api/runs", json={"specimen_id": sid, "budget": 3, "provider": "baseten"}).json()["run_id"]
+    assert m.runs[run_id].model_ids["provider"] == "baseten"
+    sse_events(c, run_id)

@@ -70,12 +70,12 @@ def png_data_url(path: Path, max_side: int) -> tuple[str, tuple[int, int]]:
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii"), size
 
 
-def field_images(label: str, field_id: str, paths: dict[str, Path]) -> list[dict]:
-    """Content parts for one field: a caption, the composite, then each channel."""
+def field_images(label: str, field_id: str, paths: dict[str, Path], channels: bool = True) -> list[dict]:
+    """Content parts for one field: a caption, the composite, then each channel (unless channels=False)."""
     url, (w, h) = png_data_url(paths["composite"], COMPOSITE_MAX_SIDE)
     parts = [{"type": "text", "text": f"{label} field {field_id}: composite ({w}x{h} px)."},
              {"type": "image_url", "image_url": {"url": url}}]
-    for ch in CHANNELS:
+    for ch in CHANNELS if channels else ():
         url, _ = png_data_url(paths[ch], CHANNEL_MAX_SIDE)
         parts += [{"type": "text", "text": f"{label} field {field_id}: {ch} channel (grayscale)."},
                   {"type": "image_url", "image_url": {"url": url}}]
@@ -83,15 +83,19 @@ def field_images(label: str, field_id: str, paths: dict[str, Path]) -> list[dict
 
 
 def build_messages(treated: list[tuple[str, dict[str, Path]]], controls: list[tuple[str, dict[str, Path]]],
-                   measurements: dict, moa_classes: list[str]) -> list[dict]:
-    """treated / controls: (field_id, {composite, dna, tubulin, actin: png path})."""
+                   measurements: dict, moa_classes: list[str], channels: bool = True) -> list[dict]:
+    """treated / controls: (field_id, {composite, dna, tubulin, actin: png path}). channels=False sends only the
+    composites (a provider with a small per-request image cap) and tells the model so."""
     content: list[dict] = [{"type": "text", "text": (
         "Measured features of the treated wells (robust z vs same-plate DMSO; |z| > 3 is a strong change):\n"
         + json.dumps(measurements, indent=1)
         + f"\n\nMoA classes you may name: {moa_classes} (or '{UNKNOWN_MOA}').")}]
     for fid, paths in treated:
-        content += field_images("Treated", fid, paths)
+        content += field_images("Treated", fid, paths, channels)
     for fid, paths in controls:
-        content += field_images("DMSO control", fid, paths)
-    content.append({"type": "text", "text": "Compare the treated fields to the DMSO control and fill in the schema."})
+        content += field_images("DMSO control", fid, paths, channels)
+    note = "" if channels else (" Only the composites are given this time (no separate grayscale channels): read "
+                                 "each stain from its colour.")
+    content.append({"type": "text", "text": "Compare the treated fields to the DMSO control and fill in the schema."
+                    + note})
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}]

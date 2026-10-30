@@ -16,7 +16,7 @@ from app.agent.guardrails import BlindingScanner, load_moa_classes
 from app.agent.loop import AgentLoop
 from app.agent.schemas import AgentRun, RunMode
 from app.agent.specimens import Specimen, SpecimenCatalog
-from app.config import MAX_BUDGET_WELLS, Settings, get_settings
+from app.config import MAX_BUDGET_WELLS, PROVIDERS, Settings, get_settings
 from app.external.chembl import ChemblClient
 from app.fields import load_reference
 from app.external.pubchem import PubChemClient
@@ -43,6 +43,8 @@ class RunManager:
         self.llm: LLMClient | None = None
         self.data_error: str | None = None
         self.llm_error: str | None = None
+        self.providers: list[str] = [self.settings.provider]  # providers a live run may use; startup verifies
+        self.provider_notes: dict[str, str] = {}  # why an optional provider is not offered
         self.pubchem = PubChemClient(self.settings.cache_dir)
         self.chembl = ChemblClient(self.settings.cache_dir)
         self.pubmed = PubMedClient(self.settings.cache_dir, self.settings.ncbi_email)
@@ -62,12 +64,30 @@ class RunManager:
         except (OSError, KeyError, ValueError) as exc:
             self.catalog, self.data_error = None, (f"BBBC021 data not found under DATA_DIR ({type(exc).__name__}). "
                                                    "Live runs are off; recorded runs can still be replayed.")
-        if self.settings.model_api_key is None and self.settings.provider == "meta":
+        if self.settings.model_api_key is None:  # the PI reviewer is on the Meta API for every provider
             self.llm_error = "MODEL_API_KEY is empty in backend/.env. Live runs are off; replays work."
             return
         self.llm = LLMClient(self.settings)
         if check_models:
             await self.llm.check_models()  # raises ModelCheckError: refuse to start
+        self.providers = [self.settings.provider]
+        # Other providers with a key are offered on the start screen once their open-weights id is verified.
+        for name in self.llm.providers:
+            if name in self.providers or PROVIDERS[name].open_model is None:
+                continue
+            if check_models:
+                try:
+                    await self.llm.check_models([PROVIDERS[name].open_model])
+                except Exception as exc:  # noqa: BLE001 - optional provider: drop it, keep the server up
+                    self.provider_notes[name] = str(exc)[:300]
+                    continue
+            self.providers.append(name)
+        if "meta" not in self.providers and check_models:
+            try:
+                await self.llm.check_models(sorted(set(self.settings.for_provider("meta").role_models.values())))
+                self.providers.insert(0, "meta")
+            except Exception as exc:  # noqa: BLE001
+                self.provider_notes["meta"] = str(exc)[:300]
 
     @property
     def live_enabled(self) -> bool:
@@ -84,10 +104,16 @@ class RunManager:
                         "wells": len(sp.wells)})
         return out
 
-    def model_ids(self) -> dict[str, str]:
-        s = self.settings
-        return {"scientist": s.scientist_model, "microscopist": s.microscopist_model, "reviewer": s.reviewer_model,
-                "segmentation": SEGMENTATION_LABEL[s.nuclei_segmenter]}
+    def model_ids(self, provider: str | None = None) -> dict[str, str]:
+        """Model id per role, plus the provider of the Scientist/Microscopist (reviewer: always Meta API)."""
+        s = self.settings.for_provider(provider) if provider else self.settings
+        roles = s.role_models
+        return {"scientist": roles["scientist"], "microscopist": roles["microscopist"], "reviewer": roles["reviewer"],
+                "segmentation": SEGMENTATION_LABEL[s.nuclei_segmenter], "provider": s.provider}
+
+    def provider_list(self) -> list[dict]:
+        """For the start screen's switch: which providers a live run may use and what runs where."""
+        return [{"provider": p, "label": PROVIDERS[p].label, "model_ids": self.model_ids(p)} for p in self.providers]
 
     async def _blinding_terms(self, sp: Specimen) -> list[str]:
         """Name, PubChem synonyms (found via the dataset structure when there is one), SMILES, plates, wells."""
@@ -104,9 +130,15 @@ class RunManager:
             synonyms = []
         return sp.blinding_terms(synonyms)
 
-    async def create_run(self, specimen_id: str, budget: int, mode: RunMode = "blinded") -> AgentLoop:
+    async def create_run(self, specimen_id: str, budget: int, mode: RunMode = "blinded",
+                         provider: str | None = None) -> AgentLoop:
         if not self.live_enabled:
             raise RunRequestError(self.data_error or self.llm_error or "Live runs are not available.")
+        provider = provider or self.settings.provider
+        if provider not in self.providers:
+            raise RunRequestError(f"Provider '{provider}' is not available for live runs "
+                                  f"(available: {', '.join(self.providers) or 'none'}).")
+        settings = self.settings.for_provider(provider)
         if not 1 <= budget <= MAX_BUDGET_WELLS:
             raise RunRequestError(f"Budget must be 1-{MAX_BUDGET_WELLS} wells.")
         try:
@@ -115,17 +147,18 @@ class RunManager:
             raise RunRequestError(str(exc.args[0])) from None
         run_id = "run_" + uuid.uuid4().hex[:12]
         run = AgentRun(run_id=run_id, mode=mode, specimen_id=sp.specimen_id, budget_total=budget,
-                       model_ids=self.model_ids())
+                       model_ids=self.model_ids(provider))
         ctx = T.ToolContext(run=run, specimen=sp, catalog=self.catalog, atlas=self.atlas, moa_classes=self.moa_classes,
                             meter=CostMeter(run_id=run_id, cap_usd=self.settings.run_cost_cap_usd), llm=self.llm,
-                            pubchem=self.pubchem, chembl=self.chembl, pubmed=self.pubmed, settings=self.settings)
+                            pubchem=self.pubchem, chembl=self.chembl, pubmed=self.pubmed, settings=settings)
         scanner = BlindingScanner(await self._blinding_terms(sp)) if mode == "blinded" else None
         bus = RunBus(run_id, self.runs_dir / f"{run_id}.jsonl")
         self.buses[run_id], self.runs[run_id] = bus, run
         return AgentLoop(ctx, bus, scanner, runs_dir=self.runs_dir)
 
-    async def start_run(self, specimen_id: str, budget: int, mode: RunMode = "blinded") -> str:
-        loop = await self.create_run(specimen_id, budget, mode)
+    async def start_run(self, specimen_id: str, budget: int, mode: RunMode = "blinded",
+                        provider: str | None = None) -> str:
+        loop = await self.create_run(specimen_id, budget, mode, provider)
         self.tasks[loop.run.run_id] = asyncio.create_task(loop.run_all())
         return loop.run.run_id
 

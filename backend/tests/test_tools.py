@@ -362,3 +362,17 @@ def test_other_compounds_are_name_only(catalog, atlas):
     ctx.run.phase = "unblinded"
     out = call(ctx, "lookup_compound", name="colchicine")
     assert out.evidence.data["identity_check"] == "name only" and ctx.chembl.calls[0][1].startswith("IAKH")
+
+
+def test_describe_phenotype_fits_the_open_weights_image_cap(catalog, atlas):
+    """Baseten serves Muse Spark Open with <= 8 images per request: composites only, and the prompt says so."""
+    llm = FakeLLM()
+    ctx = make_ctx(catalog, atlas, llm=llm)
+    ctx.settings = Settings(_env_file=None, provider="baseten")
+    well = call(ctx, "acquire_well", concentration_index=2, replicate=1).evidence.data
+    out = call(ctx, "describe_phenotype", field_ids=well["field_ids"])
+    content = llm.calls[0]["messages"][1]["content"]
+    images = [p for p in content if p["type"] == "image_url"]
+    assert len(images) == len(well["field_ids"]) + len(out.evidence.data["dmso_field_ids"]) <= 8
+    assert "Only the composites are given" in content[-1]["text"]
+    assert out.evidence.data["images"] == "composites only"

@@ -2,8 +2,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FileText, History, Loader2, Lock, Square, Unlock } from "lucide-react";
 import { useState } from "react";
 import { postJSON } from "../../lib/api";
-import { dateOnly, modelName, usd } from "../../lib/format";
+import { dateOnly, isOpenWeights, modelName, usd } from "../../lib/format";
 import { href } from "../../lib/router";
+import OpenWeightsBadge from "../OpenWeightsBadge";
 import type { Phase, RunState } from "../../lib/runState";
 
 const PHASE: Record<Phase, string> = {
@@ -74,10 +75,11 @@ export default function RunHeader({ run, label }: { run: RunState; label: string
         <span className="text-mist">Cost </span><span className="text-white">{usd(run.cost.usd)}</span>
       </span>
 
+      <OpenWeightsBadge ids={run.started?.model_ids} />
       {replay && (
         <span className="chip h-7 px-2.5 border-white/25 text-haze min-w-0 overflow-hidden whitespace-nowrap" role="note">
           <History aria-hidden className="h-3.5 w-3.5 shrink-0" />
-          Replay of a live run · {dateOnly(replay.recorded_at)}<span className="hidden xl:inline"> · {[replay.model_ids.scientist, replay.model_ids.reviewer].filter(Boolean).map(modelName).join(", ")}</span>
+          Replay<span className="hidden 2xl:inline"> of a live run</span> · {dateOnly(replay.recorded_at)}{!isOpenWeights(replay.model_ids) && <span className="hidden xl:inline"> · {[replay.model_ids.scientist, replay.model_ids.reviewer].filter(Boolean).map(modelName).join(", ")}</span>}
         </span>
       )}
 

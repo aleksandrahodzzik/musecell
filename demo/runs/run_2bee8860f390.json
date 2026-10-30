@@ -1,0 +1,2144 @@
+{
+ "run_id": "run_2bee8860f390",
+ "mode": "blinded",
+ "phase": "finished",
+ "specimen_id": "s_f3007822f1",
+ "budget_total": 5,
+ "budget_used": 4,
+ "acquired_well_ids": [
+  "w_56c0ae0535",
+  "w_b414b296e0",
+  "w_a15719a464",
+  "w_82fe9cfd0d"
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "tool": "list_available_experiments",
+   "args": {
+    "rationale": "Need to see dose range and replicates to plan discriminative sampling."
+   },
+   "rationale": "Need to see dose range and replicates to plan discriminative sampling.",
+   "evidence_id": "e1",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:19:30.666981Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 2,
+   "tool": "acquire_well",
+   "args": {
+    "rationale": "Acquire highest dose to reveal maximal phenotype; informs discriminative hypothesis.",
+    "concentration_index": 7,
+    "replicate": 1
+   },
+   "rationale": "Acquire highest dose to reveal maximal phenotype; informs discriminative hypothesis.",
+   "evidence_id": "e2",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:19:32.384240Z",
+   "seconds": 0.079
+  },
+  {
+   "step": 3,
+   "tool": "acquire_well",
+   "args": {
+    "rationale": "Acquire mid dose to see onset/gradation of effect.",
+    "concentration_index": 4,
+    "replicate": 1
+   },
+   "rationale": "Acquire mid dose to see onset/gradation of effect.",
+   "evidence_id": "e3",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:19:32.522921Z",
+   "seconds": 0.124
+  },
+  {
+   "step": 4,
+   "tool": "acquire_well",
+   "args": {
+    "rationale": "Acquire low dose 0.01 to find threshold and reversibility of tubulin signal.",
+    "concentration_index": 2,
+    "replicate": 1
+   },
+   "rationale": "Acquire low dose 0.01 to find threshold and reversibility of tubulin signal.",
+   "evidence_id": "e4",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:19:36.629544Z",
+   "seconds": 0.104
+  },
+  {
+   "step": 5,
+   "tool": "acquire_well",
+   "args": {
+    "rationale": "Acquire 1.0 uM to see full curve shape near high dose.",
+    "concentration_index": 6,
+    "replicate": 1
+   },
+   "rationale": "Acquire 1.0 uM to see full curve shape near high dose.",
+   "evidence_id": "e5",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:19:36.774693Z",
+   "seconds": 0.129
+  },
+  {
+   "step": 6,
+   "tool": "describe_phenotype",
+   "args": {
+    "rationale": "Describe high-dose phenotype vs DMSO to interpret tubulin changes.",
+    "field_ids": [
+     "f_81288dce1fd4",
+     "f_d7ae853e3eb2"
+    ]
+   },
+   "rationale": "Describe high-dose phenotype vs DMSO to interpret tubulin changes.",
+   "evidence_id": "e6",
+   "error": null,
+   "cost_usd": 0.017419750000000005,
+   "started_at": "2026-10-30T09:19:58.022991Z",
+   "seconds": 21.232
+  },
+  {
+   "step": 7,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "rationale": "Compare acquired wells to reference atlas to see nearest MoA neighbors.",
+    "well_ids": [
+     "w_56c0ae0535",
+     "w_82fe9cfd0d",
+     "w_b414b296e0"
+    ],
+    "k": 10
+   },
+   "rationale": "Compare acquired wells to reference atlas to see nearest MoA neighbors.",
+   "evidence_id": "e7",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:01.244557Z",
+   "seconds": 0.012
+  },
+  {
+   "step": 8,
+   "tool": "dose_response",
+   "args": {
+    "rationale": "Check dose dependency of tubulin signal to confirm true pharmacology.",
+    "feature": "tub_mean"
+   },
+   "rationale": "Check dose dependency of tubulin signal to confirm true pharmacology.",
+   "evidence_id": "e8",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:01.278174Z",
+   "seconds": 0.013
+  },
+  {
+   "step": 9,
+   "tool": "dose_response",
+   "args": {
+    "rationale": "Check nuclear solidity dose response supporting mitotic failure.",
+    "feature": "nuc_solidity"
+   },
+   "rationale": "Check nuclear solidity dose response supporting mitotic failure.",
+   "evidence_id": "e9",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:01.297820Z",
+   "seconds": 0.012
+  },
+  {
+   "step": 10,
+   "tool": "dose_response",
+   "args": {
+    "rationale": "Check cell count decline with dose indicating cytotoxicity/arrest.",
+    "feature": "cell_count"
+   },
+   "rationale": "Check cell count decline with dose indicating cytotoxicity/arrest.",
+   "evidence_id": "e10",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:01.315253Z",
+   "seconds": 0.011
+  },
+  {
+   "step": 11,
+   "tool": "dose_response",
+   "args": {
+    "rationale": "Test act_tub_ratio to discriminate stabilizers vs destabilizers.",
+    "feature": "act_tub_ratio"
+   },
+   "rationale": "Test act_tub_ratio to discriminate stabilizers vs destabilizers.",
+   "evidence_id": "e11",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:02.591979Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 12,
+   "tool": "dose_response",
+   "args": {
+    "rationale": "Check frac_large_nucleus dose response for polyploidy signature.",
+    "feature": "frac_large_nucleus"
+   },
+   "rationale": "Check frac_large_nucleus dose response for polyploidy signature.",
+   "evidence_id": "e12",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:02.599680Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 13,
+   "tool": "update_hypotheses",
+   "args": {
+    "rationale": "Integrate tubulin gain, atlas neighbors, dose response; stabilize is dominant.",
+    "hypotheses": [
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.93,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9",
+       "e12"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e11"
+      ]
+     },
+     {
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.02,
+      "supporting_evidence_ids": [
+       "e9",
+       "e12"
+      ],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     },
+     {
+      "moa": "Actin disruptors",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6"
+      ]
+     },
+     {
+      "moa": "Protein degradation",
+      "probability": 0.01,
+      "supporting_evidence_ids": [
+       "e7"
+      ],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     },
+     {
+      "moa": "DNA damage",
+      "probability": 0.005,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e7"
+      ]
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.005,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     }
+    ]
+   },
+   "rationale": "Integrate tubulin gain, atlas neighbors, dose response; stabilize is dominant.",
+   "evidence_id": "e13",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:06.467987Z",
+   "seconds": 0.001
+  },
+  {
+   "step": 14,
+   "tool": "submit_conclusion",
+   "args": {
+    "rationale": "Huge tubulin gain/bundling, dose-dependent solidity loss and polyploidy, microscopist bundling, and atlas docetaxel/taxol neighbors support stabilizers.",
+    "top_moa": "Microtubule stabilizers",
+    "probability": 0.93,
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e7",
+     "e9"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Immunofluorescence for acetylated/ detyrosinated tubulin plus mitotic marker phospho-H3 dose curve, and live-cell tubulin polymerization assay to confirm increased polymer mass vs destabilizer control."
+   },
+   "rationale": "Huge tubulin gain/bundling, dose-dependent solidity loss and polyploidy, microscopist bundling, and atlas docetaxel/taxol neighbors support stabilizers.",
+   "evidence_id": "e14",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:10.074692Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 15,
+   "tool": "lookup_compound",
+   "args": {
+    "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+    "name": "epothilone B"
+   },
+   "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+   "evidence_id": "e15",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:18.420087Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 16,
+   "tool": "lookup_compound",
+   "args": {
+    "rationale": "Verify epothilone B identity and ChEMBL mechanism.",
+    "name": "epothilone B"
+   },
+   "rationale": "Verify epothilone B identity and ChEMBL mechanism.",
+   "evidence_id": "e16",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:20.656342Z",
+   "seconds": 0.004
+  },
+  {
+   "step": 17,
+   "tool": "search_literature",
+   "args": {
+    "rationale": "Find papers on epothilone B tubulin stabilizer mechanism.",
+    "query": "epothilone B microtubule stabilizer tubulin",
+    "max_results": 5
+   },
+   "rationale": "Find papers on epothilone B tubulin stabilizer mechanism.",
+   "evidence_id": "e17",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:21.909878Z",
+   "seconds": 1.251
+  },
+  {
+   "step": 18,
+   "tool": "search_literature",
+   "args": {
+    "rationale": "Find papers on microtubule stabilizer phenotype tubulin bundling mitotic arrest.",
+    "query": "microtubule stabilizer phenotype tubulin bundling mitotic arrest polyploidy",
+    "max_results": 5
+   },
+   "rationale": "Find papers on microtubule stabilizer phenotype tubulin bundling mitotic arrest.",
+   "evidence_id": "e18",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-30T09:20:22.469340Z",
+   "seconds": 0.569
+  }
+ ],
+ "hypotheses": [
+  {
+   "moa": "Microtubule stabilizers",
+   "probability": 0.93,
+   "supporting_evidence_ids": [
+    "e2",
+    "e3",
+    "e5",
+    "e6",
+    "e7",
+    "e8",
+    "e9",
+    "e12"
+   ],
+   "contradicting_evidence_ids": []
+  },
+  {
+   "moa": "Microtubule destabilizers",
+   "probability": 0.02,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e3",
+    "e5",
+    "e6",
+    "e7",
+    "e8",
+    "e11"
+   ]
+  },
+  {
+   "moa": "Aurora kinase inhibitors",
+   "probability": 0.02,
+   "supporting_evidence_ids": [
+    "e9",
+    "e12"
+   ],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e7"
+   ]
+  },
+  {
+   "moa": "Actin disruptors",
+   "probability": 0.01,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e3",
+    "e5",
+    "e6"
+   ]
+  },
+  {
+   "moa": "Protein degradation",
+   "probability": 0.01,
+   "supporting_evidence_ids": [
+    "e7"
+   ],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e7"
+   ]
+  },
+  {
+   "moa": "DNA damage",
+   "probability": 0.005,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e5",
+    "e7"
+   ]
+  },
+  {
+   "moa": "Eg5 inhibitors",
+   "probability": 0.005,
+   "supporting_evidence_ids": [],
+   "contradicting_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e7"
+   ]
+  }
+ ],
+ "hypothesis_history": [
+  {
+   "step": 13,
+   "hypotheses": [
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.93,
+     "supporting_evidence_ids": [
+      "e2",
+      "e3",
+      "e5",
+      "e6",
+      "e7",
+      "e8",
+      "e9",
+      "e12"
+     ],
+     "contradicting_evidence_ids": []
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.02,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e3",
+      "e5",
+      "e6",
+      "e7",
+      "e8",
+      "e11"
+     ]
+    },
+    {
+     "moa": "Aurora kinase inhibitors",
+     "probability": 0.02,
+     "supporting_evidence_ids": [
+      "e9",
+      "e12"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e5",
+      "e6",
+      "e7"
+     ]
+    },
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.01,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e3",
+      "e5",
+      "e6"
+     ]
+    },
+    {
+     "moa": "Protein degradation",
+     "probability": 0.01,
+     "supporting_evidence_ids": [
+      "e7"
+     ],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e5",
+      "e6",
+      "e7"
+     ]
+    },
+    {
+     "moa": "DNA damage",
+     "probability": 0.005,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e5",
+      "e7"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.005,
+     "supporting_evidence_ids": [],
+     "contradicting_evidence_ids": [
+      "e2",
+      "e5",
+      "e6",
+      "e7"
+     ]
+    }
+   ]
+  }
+ ],
+ "evidence": [
+  {
+   "evidence_id": "e1",
+   "kind": "experiments",
+   "tool": "list_available_experiments",
+   "summary": "8 doses (0.001-3 µM); 5 of 5 wells left",
+   "data": {
+    "specimen_id": "s_f3007822f1",
+    "doses": [
+     {
+      "concentration_index": 0,
+      "concentration_uM": 0.001,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 1,
+      "concentration_uM": 0.003,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 2,
+      "concentration_uM": 0.01,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 3,
+      "concentration_uM": 0.03,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 4,
+      "concentration_uM": 0.1,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 5,
+      "concentration_uM": 0.3,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 6,
+      "concentration_uM": 1.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 7,
+      "concentration_uM": 3.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     }
+    ],
+    "budget_total": 5,
+    "budget_used": 0,
+    "budget_left": 5,
+    "acquired_wells": []
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:19:30.666981Z"
+  },
+  {
+   "evidence_id": "e2",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_56c0ae0535 (dose 7, 3 µM, rep 1): 137 cells measured; tub_glcm_contrast z=+121.7, tub_std z=+69.7, nuc_solidity z=-39.8",
+   "data": {
+    "well_id": "w_56c0ae0535",
+    "concentration_index": 7,
+    "concentration_uM": 3.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_81288dce1fd4",
+     "f_d7ae853e3eb2"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 137,
+     "fields": [
+      {
+       "field_id": "f_81288dce1fd4",
+       "nuclei": 97,
+       "touching_border": 15
+      },
+      {
+       "field_id": "f_d7ae853e3eb2",
+       "nuclei": 69,
+       "touching_border": 14
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 1.86,
+     "nuc_dna_integrated": 1.18,
+     "nuc_dna_mean": -1.68,
+     "nuc_eccentricity": 2.46,
+     "nuc_solidity": -39.78,
+     "nuc_form_factor": -18.12,
+     "nuc_major_axis": -1.75,
+     "cell_area": -2.28,
+     "cell_nuc_area_ratio": -2.29,
+     "cell_roundness": 0.85,
+     "cell_eccentricity": -2.16,
+     "cell_solidity": 0.16,
+     "cell_major_axis": -3.17,
+     "tub_mean": 38.87,
+     "tub_std": 69.71,
+     "tub_glcm_contrast": 121.74,
+     "act_mean": 13.26,
+     "act_std": 13.77,
+     "act_glcm_contrast": 10.44,
+     "act_tub_ratio": -3.4,
+     "cell_count": -3.91,
+     "frac_mitotic_like": 0.83,
+     "frac_large_nucleus": 8.91,
+     "frac_multinucleate_proxy": 6.7
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 121.74,
+      "direction": "up",
+      "value": 0.01,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "tub_std",
+      "z": 69.714,
+      "direction": "up",
+      "value": 0.51,
+      "dmso_median": 0.121
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -39.779,
+      "direction": "down",
+      "value": 0.945,
+      "dmso_median": 0.972
+     },
+     {
+      "feature": "tub_mean",
+      "z": 38.872,
+      "direction": "up",
+      "value": 0.723,
+      "dmso_median": 0.247
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -18.118,
+      "direction": "down",
+      "value": 0.828,
+      "dmso_median": 0.911
+     },
+     {
+      "feature": "act_std",
+      "z": 13.768,
+      "direction": "up",
+      "value": 0.156,
+      "dmso_median": 0.07
+     },
+     {
+      "feature": "act_mean",
+      "z": 13.261,
+      "direction": "up",
+      "value": 0.492,
+      "dmso_median": 0.274
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 10.441,
+      "direction": "up",
+      "value": 0.003,
+      "dmso_median": 0.001
+     }
+    ],
+    "dmso_field_ids": [
+     "f_932e066d9dc7",
+     "f_e3d2dc913af4"
+    ],
+    "budget_left": 4
+   },
+   "image_ids": [
+    "f_81288dce1fd4.composite",
+    "f_d7ae853e3eb2.composite"
+   ],
+   "created_at": "2026-10-30T09:19:32.384240Z"
+  },
+  {
+   "evidence_id": "e3",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_b414b296e0 (dose 4, 0.1 µM, rep 1): 356 cells measured; tub_std z=+33.1, tub_glcm_contrast z=+28.0, tub_mean z=+18.3",
+   "data": {
+    "well_id": "w_b414b296e0",
+    "concentration_index": 4,
+    "concentration_uM": 0.1,
+    "replicate": 1,
+    "field_ids": [
+     "f_1bfb6a4da63a",
+     "f_33ef37105584",
+     "f_31060e5e7381",
+     "f_78a28328d53b"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 356,
+     "fields": [
+      {
+       "field_id": "f_1bfb6a4da63a",
+       "nuclei": 105,
+       "touching_border": 18
+      },
+      {
+       "field_id": "f_33ef37105584",
+       "nuclei": 87,
+       "touching_border": 23
+      },
+      {
+       "field_id": "f_31060e5e7381",
+       "nuclei": 124,
+       "touching_border": 29
+      },
+      {
+       "field_id": "f_78a28328d53b",
+       "nuclei": 132,
+       "touching_border": 22
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 3.65,
+     "nuc_dna_integrated": 2.95,
+     "nuc_dna_mean": -1.87,
+     "nuc_eccentricity": 0.94,
+     "nuc_solidity": -13.04,
+     "nuc_form_factor": -8.25,
+     "nuc_major_axis": 1.38,
+     "cell_area": 1.36,
+     "cell_nuc_area_ratio": 0.72,
+     "cell_roundness": 0.55,
+     "cell_eccentricity": -2.62,
+     "cell_solidity": -0.49,
+     "cell_major_axis": 1.56,
+     "tub_mean": 18.29,
+     "tub_std": 33.06,
+     "tub_glcm_contrast": 27.98,
+     "act_mean": 9.51,
+     "act_std": 10.49,
+     "act_glcm_contrast": 6.36,
+     "act_tub_ratio": -1.41,
+     "cell_count": -3.32,
+     "frac_mitotic_like": -0.86,
+     "frac_large_nucleus": 4.35,
+     "frac_multinucleate_proxy": 2.68
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_std",
+      "z": 33.059,
+      "direction": "up",
+      "value": 0.305,
+      "dmso_median": 0.121
+     },
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 27.975,
+      "direction": "up",
+      "value": 0.004,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "tub_mean",
+      "z": 18.289,
+      "direction": "up",
+      "value": 0.471,
+      "dmso_median": 0.247
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -13.045,
+      "direction": "down",
+      "value": 0.963,
+      "dmso_median": 0.972
+     },
+     {
+      "feature": "act_std",
+      "z": 10.486,
+      "direction": "up",
+      "value": 0.135,
+      "dmso_median": 0.07
+     },
+     {
+      "feature": "act_mean",
+      "z": 9.51,
+      "direction": "up",
+      "value": 0.43,
+      "dmso_median": 0.274
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -8.248,
+      "direction": "down",
+      "value": 0.873,
+      "dmso_median": 0.911
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 6.356,
+      "direction": "up",
+      "value": 0.002,
+      "dmso_median": 0.001
+     }
+    ],
+    "dmso_field_ids": [
+     "f_932e066d9dc7",
+     "f_e3d2dc913af4"
+    ],
+    "budget_left": 3
+   },
+   "image_ids": [
+    "f_1bfb6a4da63a.composite",
+    "f_33ef37105584.composite",
+    "f_31060e5e7381.composite",
+    "f_78a28328d53b.composite"
+   ],
+   "created_at": "2026-10-30T09:19:32.522921Z"
+  },
+  {
+   "evidence_id": "e4",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_a15719a464 (dose 2, 0.01 µM, rep 1): 433 cells measured; tub_glcm_contrast z=+5.5, tub_std z=+5.2, nuc_solidity z=-3.8",
+   "data": {
+    "well_id": "w_a15719a464",
+    "concentration_index": 2,
+    "concentration_uM": 0.01,
+    "replicate": 1,
+    "field_ids": [
+     "f_6f39924898e8",
+     "f_9df57c0ca35b"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 433,
+     "fields": [
+      {
+       "field_id": "f_6f39924898e8",
+       "nuclei": 258,
+       "touching_border": 51
+      },
+      {
+       "field_id": "f_9df57c0ca35b",
+       "nuclei": 280,
+       "touching_border": 54
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": -2.01,
+     "nuc_dna_integrated": -1.9,
+     "nuc_dna_mean": -1.74,
+     "nuc_eccentricity": 1.18,
+     "nuc_solidity": -3.82,
+     "nuc_form_factor": -1.8,
+     "nuc_major_axis": -3.05,
+     "cell_area": -0.09,
+     "cell_nuc_area_ratio": -0.01,
+     "cell_roundness": -0.16,
+     "cell_eccentricity": -0.23,
+     "cell_solidity": -0.08,
+     "cell_major_axis": -0.4,
+     "tub_mean": 2.75,
+     "tub_std": 5.16,
+     "tub_glcm_contrast": 5.52,
+     "act_mean": 3.14,
+     "act_std": 2.79,
+     "act_glcm_contrast": 3.34,
+     "act_tub_ratio": 0.11,
+     "cell_count": -0.16,
+     "frac_mitotic_like": -1.35,
+     "frac_large_nucleus": 0.45,
+     "frac_multinucleate_proxy": 0.26
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 5.524,
+      "direction": "up",
+      "value": 0.002,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "tub_std",
+      "z": 5.158,
+      "direction": "up",
+      "value": 0.15,
+      "dmso_median": 0.121
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -3.823,
+      "direction": "down",
+      "value": 0.969,
+      "dmso_median": 0.972
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 3.337,
+      "direction": "up",
+      "value": 0.002,
+      "dmso_median": 0.001
+     },
+     {
+      "feature": "act_mean",
+      "z": 3.135,
+      "direction": "up",
+      "value": 0.325,
+      "dmso_median": 0.274
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": -3.047,
+      "direction": "down",
+      "value": 36.579,
+      "dmso_median": 37.488
+     },
+     {
+      "feature": "act_std",
+      "z": 2.795,
+      "direction": "up",
+      "value": 0.088,
+      "dmso_median": 0.07
+     },
+     {
+      "feature": "tub_mean",
+      "z": 2.746,
+      "direction": "up",
+      "value": 0.281,
+      "dmso_median": 0.247
+     }
+    ],
+    "dmso_field_ids": [
+     "f_932e066d9dc7",
+     "f_e3d2dc913af4"
+    ],
+    "budget_left": 2
+   },
+   "image_ids": [
+    "f_6f39924898e8.composite",
+    "f_9df57c0ca35b.composite"
+   ],
+   "created_at": "2026-10-30T09:19:36.629544Z"
+  },
+  {
+   "evidence_id": "e5",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_82fe9cfd0d (dose 6, 1 µM, rep 1): 183 cells measured; tub_glcm_contrast z=+117.6, tub_std z=+87.2, tub_mean z=+58.7",
+   "data": {
+    "well_id": "w_82fe9cfd0d",
+    "concentration_index": 6,
+    "concentration_uM": 1.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_225a1021d9a0",
+     "f_5b5357485961",
+     "f_37145b261adb",
+     "f_11568a4148c9"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 183,
+     "fields": [
+      {
+       "field_id": "f_225a1021d9a0",
+       "nuclei": 57,
+       "touching_border": 7
+      },
+      {
+       "field_id": "f_5b5357485961",
+       "nuclei": 55,
+       "touching_border": 13
+      },
+      {
+       "field_id": "f_37145b261adb",
+       "nuclei": 60,
+       "touching_border": 10
+      },
+      {
+       "field_id": "f_11568a4148c9",
+       "nuclei": 49,
+       "touching_border": 8
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": 2.08,
+     "nuc_dna_integrated": 1.69,
+     "nuc_dna_mean": 1.42,
+     "nuc_eccentricity": 2.31,
+     "nuc_solidity": -33.24,
+     "nuc_form_factor": -17.15,
+     "nuc_major_axis": -0.32,
+     "cell_area": -4.2,
+     "cell_nuc_area_ratio": -3.22,
+     "cell_roundness": 3.04,
+     "cell_eccentricity": -5.22,
+     "cell_solidity": 2.73,
+     "cell_major_axis": -5.76,
+     "tub_mean": 58.72,
+     "tub_std": 87.2,
+     "tub_glcm_contrast": 117.64,
+     "act_mean": 19.53,
+     "act_std": 18.39,
+     "act_glcm_contrast": 7.71,
+     "act_tub_ratio": -3.84,
+     "cell_count": -4.46,
+     "frac_mitotic_like": -0.88,
+     "frac_large_nucleus": 13.88,
+     "frac_multinucleate_proxy": 8.37
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 117.645,
+      "direction": "up",
+      "value": 0.01,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "tub_std",
+      "z": 87.204,
+      "direction": "up",
+      "value": 0.607,
+      "dmso_median": 0.121
+     },
+     {
+      "feature": "tub_mean",
+      "z": 58.717,
+      "direction": "up",
+      "value": 0.966,
+      "dmso_median": 0.247
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -33.237,
+      "direction": "down",
+      "value": 0.95,
+      "dmso_median": 0.972
+     },
+     {
+      "feature": "act_mean",
+      "z": 19.527,
+      "direction": "up",
+      "value": 0.595,
+      "dmso_median": 0.274
+     },
+     {
+      "feature": "act_std",
+      "z": 18.387,
+      "direction": "up",
+      "value": 0.185,
+      "dmso_median": 0.07
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -17.153,
+      "direction": "down",
+      "value": 0.832,
+      "dmso_median": 0.911
+     },
+     {
+      "feature": "frac_large_nucleus",
+      "z": 13.878,
+      "direction": "up",
+      "value": 0.088,
+      "dmso_median": 0.012
+     }
+    ],
+    "dmso_field_ids": [
+     "f_932e066d9dc7",
+     "f_e3d2dc913af4"
+    ],
+    "budget_left": 1
+   },
+   "image_ids": [
+    "f_225a1021d9a0.composite",
+    "f_5b5357485961.composite",
+    "f_37145b261adb.composite",
+    "f_11568a4148c9.composite"
+   ],
+   "created_at": "2026-10-30T09:19:36.774693Z"
+  },
+  {
+   "evidence_id": "e6",
+   "kind": "phenotype",
+   "tool": "describe_phenotype",
+   "summary": "Microscopist on 2 field(s): density lower vs DMSO; 6 observations; candidates: Microtubule stabilizers",
+   "data": {
+    "field_ids": [
+     "f_81288dce1fd4",
+     "f_d7ae853e3eb2"
+    ],
+    "dmso_field_ids": [
+     "f_932e066d9dc7"
+    ],
+    "model": "meta-models/muse-spark-open-1026",
+    "images": "composites only",
+    "report": {
+     "cell_density": "lower",
+     "observations": [
+      {
+       "channel": "composite",
+       "finding": "At same contrast settings treated fields f_81288dce1fd4 and f_d7ae853e3eb2 (3.0 uM, 137 cells measured) are markedly less confluent than DMSO control f_932e066d9dc7 - isolated cells/clusters with large empty background vs near-monolayer in DMSO.",
+       "agrees_with_measurements": false
+      },
+      {
+       "channel": "tubulin",
+       "finding": "Beta-tubulin (green in composite) is markedly brighter and forms thick, high-contrast bundles/rings/cables around nuclei vs faint diffuse filamentous network in DMSO.",
+       "agrees_with_measurements": true
+      },
+      {
+       "channel": "tubulin",
+       "finding": "Tubulin texture is much more heterogeneous/punctate/bundled vs uniform in DMSO.",
+       "agrees_with_measurements": true
+      },
+      {
+       "channel": "dna",
+       "finding": "DNA (blue) nuclei are enlarged, irregular, lobulated, often bi/multinucleated vs small round/oval uniform nuclei in DMSO.",
+       "agrees_with_measurements": true
+      },
+      {
+       "channel": "actin",
+       "finding": "F-actin (red) retained as bright peripheral cortex with spiky projections; overall red intensity/texture appears higher than DMSO diffuse peripheral staining.",
+       "agrees_with_measurements": true
+      },
+      {
+       "channel": "composite",
+       "finding": "Frequent bright yellow/white rounded cells with condensed chromatin consistent with mitotic arrest scattered in treated fields, rare in DMSO.",
+       "agrees_with_measurements": false
+      }
+     ],
+     "notable_cells": [
+      {
+       "field_id": "f_81288dce1fd4",
+       "x": 120,
+       "y": 420,
+       "why": "Example multinucleated cell with thick green tubulin bundles encircling irregular blue nuclei and red cortical actin."
+      },
+      {
+       "field_id": "f_d7ae853e3eb2",
+       "x": 360,
+       "y": 580,
+       "why": "Isolated rounded bright yellow mitotic cell with condensed DNA and intense tubulin/actin signal."
+      }
+     ],
+     "candidate_mechanisms": [
+      {
+       "moa": "Microtubule stabilizers",
+       "why": "Huge positive tub_mean (z 38.9), tub_std (z 69.7) and tub_glcm_contrast (z 121.7) plus whole-cell green bundling and mitotic arrest matches stabilization/bundling; inconsistent with destabilizers which reduce tubulin. Nuc irregularity (solidity z -39.8, form_factor z -18.1) reflects failed mitosis/polyploidy. Actin changes (mean z 13.2, std z 13.7, contrast z 10.4) are secondary, no actin loss as in Actin disruptors."
+      }
+     ],
+     "uncertainty": "No separate grayscale channels provided - tubulin/actin/DNA inferred from green/red/blue in composite only. Confident on tubulin gain/bundling and nuclear dysmorphia; cell count/mitotic index not in provided feature z-scores."
+    }
+   },
+   "image_ids": [
+    "f_81288dce1fd4.composite",
+    "f_d7ae853e3eb2.composite",
+    "f_932e066d9dc7.composite"
+   ],
+   "created_at": "2026-10-30T09:19:58.022991Z"
+  },
+  {
+   "evidence_id": "e7",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "Nearest references: Microtubule stabilizers (5/10), Protein degradation (2/10), Cholesterol-lowering (1/10)",
+   "data": {
+    "well_ids": [
+     "w_56c0ae0535",
+     "w_82fe9cfd0d",
+     "w_b414b296e0"
+    ],
+    "k": 10,
+    "similarity": "cosine on robust-z profiles",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "neighbors": [
+     {
+      "compound": "docetaxel",
+      "concentration_uM": 0.1,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.967,
+      "image_id": "f_6bb7cf105224.composite"
+     },
+     {
+      "compound": "docetaxel",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.964,
+      "image_id": "f_7f390bd32674.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.958,
+      "image_id": "f_9b59e1d37c99.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 3.0,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.947,
+      "image_id": "f_136d4ffe180f.composite"
+     },
+     {
+      "compound": "taxol",
+      "concentration_uM": 1.0,
+      "moa": "Microtubule stabilizers",
+      "similarity": 0.937,
+      "image_id": "f_491b6ae01668.composite"
+     },
+     {
+      "compound": "MG-132",
+      "concentration_uM": 3.0,
+      "moa": "Protein degradation",
+      "similarity": 0.859,
+      "image_id": "f_315cbad5c7be.composite"
+     },
+     {
+      "compound": "ALLN",
+      "concentration_uM": 100.0,
+      "moa": "Protein degradation",
+      "similarity": 0.833,
+      "image_id": "f_0efc1efd25dd.composite"
+     },
+     {
+      "compound": "mevinolin/lovastatin",
+      "concentration_uM": 15.0,
+      "moa": "Cholesterol-lowering",
+      "similarity": 0.804,
+      "image_id": "f_ce9400223061.composite"
+     },
+     {
+      "compound": "latrunculin B",
+      "concentration_uM": 3.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.752,
+      "image_id": "f_3a20f6e4bc71.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.003,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.728,
+      "image_id": "f_5ada1c0c556d.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Microtubule stabilizers",
+      "neighbors": 5,
+      "mean_similarity": 0.955
+     },
+     {
+      "moa": "Protein degradation",
+      "neighbors": 2,
+      "mean_similarity": 0.846
+     },
+     {
+      "moa": "Cholesterol-lowering",
+      "neighbors": 1,
+      "mean_similarity": 0.804
+     },
+     {
+      "moa": "Actin disruptors",
+      "neighbors": 1,
+      "mean_similarity": 0.752
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "neighbors": 1,
+      "mean_similarity": 0.728
+     }
+    ]
+   },
+   "image_ids": [
+    "f_6bb7cf105224.composite",
+    "f_7f390bd32674.composite",
+    "f_9b59e1d37c99.composite",
+    "f_136d4ffe180f.composite",
+    "f_491b6ae01668.composite",
+    "f_315cbad5c7be.composite",
+    "f_0efc1efd25dd.composite",
+    "f_ce9400223061.composite",
+    "f_3a20f6e4bc71.composite",
+    "f_5ada1c0c556d.composite"
+   ],
+   "created_at": "2026-10-30T09:20:01.244557Z"
+  },
+  {
+   "evidence_id": "e8",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of tub_mean over 4 wells, 4 doses: Spearman rho=+0.80 (p=0.2)",
+   "data": {
+    "feature": "tub_mean",
+    "points": [
+     {
+      "concentration_uM": 0.01,
+      "median": 2.7457,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.1,
+      "median": 18.2888,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 58.7167,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 3.0,
+      "median": 38.8719,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:01.278174Z"
+  },
+  {
+   "evidence_id": "e9",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of nuc_solidity over 4 wells, 4 doses: Spearman rho=-1.00 (p=0)",
+   "data": {
+    "feature": "nuc_solidity",
+    "points": [
+     {
+      "concentration_uM": 0.01,
+      "median": -3.8229,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.1,
+      "median": -13.0445,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -33.2375,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 3.0,
+      "median": -39.7788,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -1.0,
+    "p_value": 0.0,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:01.297820Z"
+  },
+  {
+   "evidence_id": "e10",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of cell_count over 4 wells, 4 doses: Spearman rho=-0.80 (p=0.2)",
+   "data": {
+    "feature": "cell_count",
+    "points": [
+     {
+      "concentration_uM": 0.01,
+      "median": -0.1611,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.1,
+      "median": -3.3221,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -4.4647,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 3.0,
+      "median": -3.906,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:01.315253Z"
+  },
+  {
+   "evidence_id": "e11",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of act_tub_ratio over 4 wells, 4 doses: Spearman rho=-0.80 (p=0.2)",
+   "data": {
+    "feature": "act_tub_ratio",
+    "points": [
+     {
+      "concentration_uM": 0.01,
+      "median": 0.1142,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.1,
+      "median": -1.4081,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -3.8413,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 3.0,
+      "median": -3.3955,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:02.591459Z"
+  },
+  {
+   "evidence_id": "e12",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_large_nucleus over 4 wells, 4 doses: Spearman rho=+0.80 (p=0.2)",
+   "data": {
+    "feature": "frac_large_nucleus",
+    "points": [
+     {
+      "concentration_uM": 0.01,
+      "median": 0.4451,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.1,
+      "median": 4.3465,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 13.8784,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 3.0,
+      "median": 8.9073,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:02.599680Z"
+  },
+  {
+   "evidence_id": "e13",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Microtubule stabilizers 0.93, Microtubule destabilizers 0.02, Aurora kinase inhibitors 0.02, Actin disruptors 0.01",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.93,
+      "supporting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9",
+       "e12"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.02,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e11"
+      ]
+     },
+     {
+      "moa": "Aurora kinase inhibitors",
+      "probability": 0.02,
+      "supporting_evidence_ids": [
+       "e9",
+       "e12"
+      ],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     },
+     {
+      "moa": "Actin disruptors",
+      "probability": 0.01,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e3",
+       "e5",
+       "e6"
+      ]
+     },
+     {
+      "moa": "Protein degradation",
+      "probability": 0.01,
+      "supporting_evidence_ids": [
+       "e7"
+      ],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     },
+     {
+      "moa": "DNA damage",
+      "probability": 0.005,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e7"
+      ]
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.005,
+      "supporting_evidence_ids": [],
+      "contradicting_evidence_ids": [
+       "e2",
+       "e5",
+       "e6",
+       "e7"
+      ]
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:06.467987Z"
+  },
+  {
+   "evidence_id": "e14",
+   "kind": "conclusion",
+   "tool": "submit_conclusion",
+   "summary": "Conclusion: Microtubule stabilizers (p=0.93)",
+   "data": {
+    "top_moa": "Microtubule stabilizers",
+    "probability": 0.93,
+    "key_evidence_ids": [
+     "e2",
+     "e5",
+     "e6",
+     "e7",
+     "e9"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Immunofluorescence for acetylated/ detyrosinated tubulin plus mitotic marker phospho-H3 dose curve, and live-cell tubulin polymerization assay to confirm increased polymer mass vs destabilizer control.",
+    "rationale": "Huge tubulin gain/bundling, dose-dependent solidity loss and polyploidy, microscopist bundling, and atlas docetaxel/taxol neighbors support stabilizers."
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:10.074692Z"
+  },
+  {
+   "evidence_id": "e15",
+   "kind": "compound",
+   "tool": "lookup_compound",
+   "summary": "epothilone B: PubChem CID 448013; ChEMBL CHEMBL94657; mechanisms: Tubulin stabiliser (name and BBBC021 structure agree)",
+   "data": {
+    "name": "epothilone B",
+    "identity_check": "name and BBBC021 structure agree",
+    "pubchem": {
+     "cid": 448013,
+     "title": "Epothilone B",
+     "iupac_name": "(1S,3S,7S,10R,11S,12S,16R)-7,11-dihydroxy-8,8,10,12,16-pentamethyl-3-[(E)-1-(2-methyl-1,3-thiazol-4-yl)prop-1-en-2-yl]-4,17-dioxabicyclo[14.1.0]heptadecane-5,9-dione",
+     "smiles": "C[C@H]1CCC[C@@]2([C@@H](O2)C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C3=CSC(=N3)C)/C)C",
+     "inchikey": "QXRSDHAAWVKZLJ-PVYNADRNSA-N",
+     "molecular_formula": "C27H41NO6S",
+     "molecular_weight": 507.7,
+     "structure_png_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/448013/PNG",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/448013",
+     "synonyms": [
+      "Epothilone B",
+      "Patupilone",
+      "152044-54-7",
+      "(-)-Epothilone B",
+      "Epo B",
+      "Epothilon B",
+      "EPO 906",
+      "patupilona",
+      "Epithilone b",
+      "EPO 906A"
+     ]
+    },
+    "chembl": {
+     "molecule_chembl_id": "CHEMBL94657",
+     "pref_name": "PATUPILONE",
+     "matched_by": "synonym",
+     "max_phase": 3.0,
+     "mechanisms": [
+      {
+       "mechanism_of_action": "Tubulin stabiliser",
+       "action_type": "STABILISER",
+       "target_chembl_id": "CHEMBL2095182",
+       "target_name": "Tubulin",
+       "target_type": "PROTEIN COMPLEX GROUP"
+      }
+     ],
+     "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL94657"
+    }
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:18.420087Z"
+  },
+  {
+   "evidence_id": "e16",
+   "kind": "compound",
+   "tool": "lookup_compound",
+   "summary": "epothilone B: PubChem CID 448013; ChEMBL CHEMBL94657; mechanisms: Tubulin stabiliser (name and BBBC021 structure agree)",
+   "data": {
+    "name": "epothilone B",
+    "identity_check": "name and BBBC021 structure agree",
+    "pubchem": {
+     "cid": 448013,
+     "title": "Epothilone B",
+     "iupac_name": "(1S,3S,7S,10R,11S,12S,16R)-7,11-dihydroxy-8,8,10,12,16-pentamethyl-3-[(E)-1-(2-methyl-1,3-thiazol-4-yl)prop-1-en-2-yl]-4,17-dioxabicyclo[14.1.0]heptadecane-5,9-dione",
+     "smiles": "C[C@H]1CCC[C@@]2([C@@H](O2)C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C3=CSC(=N3)C)/C)C",
+     "inchikey": "QXRSDHAAWVKZLJ-PVYNADRNSA-N",
+     "molecular_formula": "C27H41NO6S",
+     "molecular_weight": 507.7,
+     "structure_png_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/448013/PNG",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/448013",
+     "synonyms": [
+      "Epothilone B",
+      "Patupilone",
+      "152044-54-7",
+      "(-)-Epothilone B",
+      "Epo B",
+      "Epothilon B",
+      "EPO 906",
+      "patupilona",
+      "Epithilone b",
+      "EPO 906A"
+     ]
+    },
+    "chembl": {
+     "molecule_chembl_id": "CHEMBL94657",
+     "pref_name": "PATUPILONE",
+     "matched_by": "synonym",
+     "max_phase": 3.0,
+     "mechanisms": [
+      {
+       "mechanism_of_action": "Tubulin stabiliser",
+       "action_type": "STABILISER",
+       "target_chembl_id": "CHEMBL2095182",
+       "target_name": "Tubulin",
+       "target_type": "PROTEIN COMPLEX GROUP"
+      }
+     ],
+     "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL94657"
+    }
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:20.656342Z"
+  },
+  {
+   "evidence_id": "e17",
+   "kind": "literature",
+   "tool": "search_literature",
+   "summary": "PubMed 'epothilone B microtubule stabilizer tubulin': 116 hits, 5 returned",
+   "data": {
+    "query": "epothilone B microtubule stabilizer tubulin",
+    "total_count": 116,
+    "articles": [
+     {
+      "pmid": "39147581",
+      "title": "Microtubule-Stabilizer Epothilone B Delays Anesthetic-Induced Unconsciousness in Rats.",
+      "journal": "eNeuro",
+      "year": 2024,
+      "authors": [
+       "Khan S",
+       "Huang Y",
+       "Timuçin D",
+       "Bailey S",
+       "Lee S",
+       "Lopes J"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39147581/"
+     },
+     {
+      "pmid": "41224993",
+      "title": "In situ structural mechanism of epothilone-B-induced CNS axon regeneration.",
+      "journal": "Nature",
+      "year": 2025,
+      "authors": [
+       "Bodakuntla S",
+       "Taira K",
+       "Yamada Y",
+       "Alvarez-Brecht P",
+       "Cada AK",
+       "Basnet N"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41224993/"
+     },
+     {
+      "pmid": "18593821",
+      "title": "Patupilone-induced apoptosis is mediated by mitochondrial reactive oxygen species through Bim relocalization to mitochondria.",
+      "journal": "Mol Pharmacol",
+      "year": 2008,
+      "authors": [
+       "Khawaja NR",
+       "Carré M",
+       "Kovacic H",
+       "Estève MA",
+       "Braguer D"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/18593821/"
+     },
+     {
+      "pmid": "25765066",
+      "title": "Axonal regeneration. Systemic administration of epothilone B promotes axon regeneration after spinal cord injury.",
+      "journal": "Science",
+      "year": 2015,
+      "authors": [
+       "Ruschel J",
+       "Hellal F",
+       "Flynn KC",
+       "Dupraz S",
+       "Elliott DA",
+       "Tedeschi A"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/25765066/"
+     },
+     {
+      "pmid": "12802795",
+      "title": "EPO906 (epothilone B): a promising novel microtubule stabilizer.",
+      "journal": "Semin Oncol",
+      "year": 2003,
+      "authors": [
+       "Rothermel J",
+       "Wartmann M",
+       "Chen T",
+       "Hohneker J"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12802795/"
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:21.909878Z"
+  },
+  {
+   "evidence_id": "e18",
+   "kind": "literature",
+   "tool": "search_literature",
+   "summary": "PubMed 'microtubule stabilizer phenotype tubulin bundling mitotic arrest polyploidy': 0 hits, 0 returned",
+   "data": {
+    "query": "microtubule stabilizer phenotype tubulin bundling mitotic arrest polyploidy",
+    "total_count": 0,
+    "articles": []
+   },
+   "image_ids": [],
+   "created_at": "2026-10-30T09:20:22.469340Z"
+  }
+ ],
+ "allowed_pmids": [
+  "39147581",
+  "41224993",
+  "18593821",
+  "25765066",
+  "12802795"
+ ],
+ "conclusion": {
+  "top_moa": "Microtubule stabilizers",
+  "probability": 0.93,
+  "key_evidence_ids": [
+   "e2",
+   "e5",
+   "e6",
+   "e7",
+   "e9"
+  ],
+  "next_experiment_if_this_were_a_real_lab": "Immunofluorescence for acetylated/ detyrosinated tubulin plus mitotic marker phospho-H3 dose curve, and live-cell tubulin polymerization assay to confirm increased polymer mass vs destabilizer control.",
+  "rationale": "Huge tubulin gain/bundling, dose-dependent solidity loss and polyploidy, microscopist bundling, and atlas docetaxel/taxol neighbors support stabilizers."
+ },
+ "conclusion_history": [
+  {
+   "top_moa": "Microtubule stabilizers",
+   "probability": 0.93,
+   "key_evidence_ids": [
+    "e2",
+    "e5",
+    "e6",
+    "e7",
+    "e9"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Immunofluorescence for acetylated/ detyrosinated tubulin plus mitotic marker phospho-H3 dose curve, and live-cell tubulin polymerization assay to confirm increased polymer mass vs destabilizer control.",
+   "rationale": "Huge tubulin gain/bundling, dose-dependent solidity loss and polyploidy, microscopist bundling, and atlas docetaxel/taxol neighbors support stabilizers."
+  }
+ ],
+ "review": {
+  "verdict": "approve",
+  "critique": "Top hypothesis is strongly discriminated from runner-ups: massive dose-graded tubulin gain (tub_mean/mean z +2.7 → +58, tub GLCM contrast z +5.5 → +117) and bundling on imaging (e6) favor stabilizers. This directly contradicts Microtubule destabilizers (would lose tubulin signal) and Actin disruptors (actin increased, not lost; act_tub_ratio falls). Aurora kinase inhibitors could share the polyploidy readouts (nuc_solidity rho -1.0, frac_large_nucleus rising) but do not predict this extreme tubulin bundling/gain, and Atlas (e7) top 5 neighbors are all Microtubule stabilizers (docetaxel/taxol, sim ~0.95-0.97), well above Protein degradation (0.85).",
+  "requested_experiment": null
+ },
+ "unblinding": {
+  "compound": "epothilone B",
+  "pubchem_cid": 448013,
+  "structure_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/448013/PNG",
+  "chembl_mechanisms": [
+   {
+    "mechanism_of_action": "Tubulin stabiliser",
+    "action_type": "STABILISER",
+    "target_chembl_id": "CHEMBL2095182",
+    "target_name": "Tubulin",
+    "target_type": "PROTEIN COMPLEX GROUP"
+   }
+  ],
+  "identity_check": "name and BBBC021 structure agree"
+ },
+ "verdict": {
+  "correct": true,
+  "truth_moa": "Microtubule stabilizers",
+  "agent_moa": "Microtubule stabilizers"
+ },
+ "reflection": {
+  "text": "This was a true positive for Microtubule stabilizers and the evidence was unusually direct. Unblinding shows epothilone B, PubChem CID 448013, ChEMBL CHEMBL94657, annotated as Tubulin stabiliser - target CHEMBL2095182 - name and BBBC021 structure agree, which is consistent with the known literature that epothilone B is a microtubule stabilizer PMID 12802795 and PMID 39147581.\n\nWhat we got right and why:\n\n1. Acquisition choice: Starting with highest dose w_56c0ae0535 3 uM (e2) immediately revealed maximal phenotype: tub_glcm_contrast z=+121.7, tub_std z=+69.7, nuc_solidity z=-39.8 with 137 cells. Adding w_82fe9cfd0d 1 uM (e5) tub_glcm_contrast +117.6, tub_std +87.2, tub_mean +58.7, then w_b414b296e0 0.1 uM (e3) tub_std +33.1, tub_glcm_contrast +28.0, and w_a15719a464 0.01 uM (e4) tub_glcm_contrast +5.5, tub_std +5.2 gave a graded curve. That 4-well sampling across 0.01 to 3 uM of the available 8 doses (e1) was sufficient to see threshold at 0.01 uM and saturation by 1-3 uM. We left 1 well unused but did not need it.\n\n2. Measurement interpretation: The extreme tubulin texture/contrast gain rather than loss correctly discriminated stabilizer vs destabilizer. Microtubule destabilizers would decrease tubulin polymer mass and mean intensity; here tub_mean rho=+0.80 (e8), tub_std and tub_glcm_contrast increase with dose, and describe_phenotype (e6) independently noted density lower vs DMSO with 6 observations favoring Microtubule stabilizers - consistent with bundling and mitotic arrest, not microtubule loss. act_tub_ratio rho=-0.80 (e11) reflects rising tubulin relative to actin, contradicting Actin disruptors.\n\n3. Comparison: compare_to_reference_atlas (e7) 5/10 nearest neighbors Microtubule stabilizers, 2/10 Protein degradation, 1/10 Cholesterol-lowering. As the review noted, the stabilizer neighbors dominated and the protein degradation hits were lower-ranked; we correctly downweighted them.\n\n4. Nuclear phenotype dose response: nuc_solidity rho=-1.00 (e9) and frac_large_nucleus rho=+0.80 (e12) with cell_count rho=-0.80 (e10) captured dose-dependent lobulation/polyploidy and arrest/cytotoxicity. We correctly did not attribute this in isolation to Aurora kinase inhibitors - which can share polyploidy - because Aurora inhibitors do not predict the +60 to +120z tubulin bundling/gain seen in e2/e5.\n\nWhat could have misled and what we missed:\n\n- Aurora kinase/Eg5 inhibitors were the main alternative to exclude, because they also produce large nuclei and solidity loss. Without the tubulin channel, e9/e12 alone would have been ambiguous. The discrimination rested entirely on e2/e3/e5 tubulin gain/bundling and e6 microscopy. If we had only acquired low dose e4 (+5z), we would have under-called.\n- Protein degradation 2/10 neighbors in e7 could have been distracting, but the magnitude difference (+120z vs typical proteasome phenotypes) made it implausible. We did not acquire additional markers to formally rule it out.\n- Dose_response statistics were underpowered: N=4 wells, p=0.2 for e8, e10, e11, e12, p=0 for e9. We correctly relied on effect size and monotonicity rather than p-value threshold, but we did not add a replicate well at same high dose to estimate technical variance, nor did we image tubulin post-translational modifications. The stated next experiment - acetylated/detyrosinated tubulin immunofluorescence with phospho-H3 and a polymerization assay vs destabilizer control - is appropriate.\n- Literature search 1 returned 116 hits for epothilone B microtubule stabilizer (including PMID 12802795, PMID 39147581, PMID 18593821, PMID 25765066, PMID 41224993) and search 2 correctly returned 0 hits for generic bundling/arrest phrase, so no contradictory literature burdened the call.\n\nOverall hypothesis updating to 0.93 stabilizers vs 0.02 destabilizer/Aurora at step 13 (e13) and submission (e14) was warranted and approved; unblinding confirms no correction needed.",
+  "what_was_right": [
+   "High-dose tubulin texture/contrast gain (+117 to +121z) and tub_mean rise discriminated stabilizer from destabilizer",
+   "Graded dose response from 0.01 to 3 uM showed threshold and saturation",
+   "Atlas 5/10 stabilizer neighbors and microscopist bundling supported same MoA",
+   "Nuclear solidity loss and large-nucleus fraction correctly linked to secondary mitotic failure, not primary Aurora mechanism"
+  ],
+  "what_was_wrong": [
+   "Did not acquire replicate at same dose; dose_response p-values remained 0.2 due to N=4 despite huge effect sizes",
+   "Protein degradation atlas neighbors could have been over-interpreted without magnitude context",
+   "Relied on summary phenotype e6 without field-level images for bundling quantification"
+  ],
+  "citations": [
+   {
+    "pmid": "12802795",
+    "claim": "epothilone B is a known microtubule stabilizer"
+   },
+   {
+    "pmid": "39147581",
+    "claim": "epothilone B described as microtubule-stabilizer"
+   }
+  ],
+  "next_experiment": "No correction experiment needed; for lab follow-up: acetylated tubulin immunofluorescence plus phospho-H3 dose curve with polymerization assay vs destabilizer control as proposed.",
+  "citations_cited": [
+   "12802795",
+   "39147581",
+   "18593821",
+   "25765066",
+   "41224993"
+  ],
+  "citations_removed": []
+ },
+ "status": "finished",
+ "error": null,
+ "turns": 10,
+ "model_calls": [
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 1",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 2882,
+   "output_tokens": 91,
+   "reasoning_tokens": 5,
+   "cost_usd": 0.00398925,
+   "seconds": 1.021,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 2",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 3322,
+   "output_tokens": 288,
+   "reasoning_tokens": 60,
+   "cost_usd": 0.0053765,
+   "seconds": 1.582,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 3",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 5381,
+   "output_tokens": 649,
+   "reasoning_tokens": 325,
+   "cost_usd": 0.0094845,
+   "seconds": 3.913,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "microscopist",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 4086,
+   "output_tokens": 2897,
+   "reasoning_tokens": 2155,
+   "cost_usd": 0.01741975,
+   "seconds": 19.263,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 4",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 8336,
+   "output_tokens": 631,
+   "reasoning_tokens": 248,
+   "cost_usd": 0.01310175,
+   "seconds": 3.102,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 5",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 10157,
+   "output_tokens": 151,
+   "reasoning_tokens": 0,
+   "cost_usd": 0.013338,
+   "seconds": 1.147,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 6",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 10756,
+   "output_tokens": 860,
+   "reasoning_tokens": 341,
+   "cost_usd": 0.0171,
+   "seconds": 3.769,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 7",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 11710,
+   "output_tokens": 595,
+   "reasoning_tokens": 330,
+   "cost_usd": 0.01716625,
+   "seconds": 3.454,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-wonder-1.0",
+   "purpose": "reviewer",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 9969,
+   "output_tokens": 981,
+   "reasoning_tokens": 652,
+   "cost_usd": 0.059496,
+   "seconds": 8.235,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 8",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 11122,
+   "output_tokens": 457,
+   "reasoning_tokens": 113,
+   "cost_usd": 0.01584475,
+   "seconds": 2.215,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "scientist turn 9",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 12684,
+   "output_tokens": 478,
+   "reasoning_tokens": 156,
+   "cost_usd": 0.0178865,
+   "seconds": 2.645,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "purpose": "reflection",
+   "provider": "baseten",
+   "billing": "credits",
+   "input_tokens": 3501,
+   "output_tokens": 3531,
+   "reasoning_tokens": 2168,
+   "cost_usd": 0.019382999999999997,
+   "seconds": 14.836,
+   "attempts": 1,
+   "finish_reason": "stop"
+  }
+ ],
+ "cost_usd": 0.20958625,
+ "model_ids": {
+  "scientist": "meta-models/muse-spark-open-1026",
+  "microscopist": "meta-models/muse-spark-open-1026",
+  "reviewer": "muse-wonder-1.0",
+  "segmentation": "classical (scikit-image)",
+  "provider": "baseten"
+ },
+ "started_at": "2026-10-30T09:19:29.544861Z"
+}

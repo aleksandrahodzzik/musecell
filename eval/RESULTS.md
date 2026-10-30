@@ -1,11 +1,11 @@
 # MuseCell evaluation
 
-Generated 2026-10-29T11:00:03+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
+Generated 2026-10-30T09:45:01+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
 
 - Compounds: 38 MoA-annotated BBBC021 compounds, leave-one-compound-out (the atlas never contains the compound under test).
 - Metric: compound-level MoA accuracy (one call per compound).
 - Models: scientist `muse-spark-1.3-contributor`, microscopist `muse-spark-1.3-contributor`, reviewer `muse-wonder-1.0`, segmentation `classical (scikit-image)`.
-- Blinding-leak test: pytest leak/blinding tests: 13 passed, 80 deselected in 8.57s; offline re-scan of 114 eval run logs (events before unblinding): 0 hits
+- Blinding-leak test: pytest leak/blinding tests: 13 passed, 86 deselected in 6.21s; offline re-scan of 114 eval run logs (events before unblinding): 0 hits
 
 | Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
 |---|---|---|---|---|---|---|---|---|
@@ -16,10 +16,29 @@ Generated 2026-10-29T11:00:03+00:00 by `scripts/evaluate.py`. Numbers are writte
 | MuseCell agent (muse-spark-1.3-contributor) | 2 | 42.1% | 16/38 | 36.8% | 2.00 | $0.107 | 203 s | 103/103 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
+| MuseCell agent, Muse Spark Open (Baseten) | 4 | 44.7% | 17/38 | 31.6% | 3.97 | $0.365 | 167 s | 111/112 (99.1%) |
 
 ± = standard deviation over random well draws. "Before review" = the agent's first conclusion, before the PI reviewer's critique and any requested experiment.
 
 ![Accuracy against wells per compound](accuracy_vs_budget.png)
+
+## Open weights vs Meta API, budget 4
+
+Same 38 compounds, same tools, same PI reviewer (`muse-wonder-1.0`, Meta API); only the Scientist + Microscopist + reflection model differs.
+
+| | muse-spark-1.3-contributor | Muse Spark Open (Baseten) | NSC baseline, random wells |
+|---|---|---|---|
+| Scientist model | `muse-spark-1.3-contributor` | `meta-models/muse-spark-open-1026` | – |
+| Provider | Meta Model API | Baseten | – |
+| Accuracy | 36.8% (14/38) | 44.7% (17/38) | 57.8% ± 5.8 |
+| Before review | 36.8% | 31.6% | – |
+| Failed runs | 0 | 3 | – |
+| Mean cost / run | $0.135 | $0.365 (incl. credits) | – |
+| Mean latency | 208 s | 167 s | – |
+| Citations verified | 109/109 | 111/112 | – |
+| Reviewer requests | 18 | 21 | – |
+
+Cost on open weights is nominal: Baseten list price ($1.25 / $4.25 per 1M tokens) for the Scientist/Microscopist tokens, paid from hackathon credits, plus the reviewer at Meta API prices.
 
 ## Where the agent goes wrong
 
@@ -46,6 +65,9 @@ PI review: 46 requests for another experiment, 67 approvals; the final call chan
 ## Notes
 
 - Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.
-- Budget 6, s_89c9462717: run failed (Blinding guard stopped the run: the result of describe_phenotype contained compound-identifying text.); counted as wrong.
-- Budget 6, s_3069b9414e: run failed (muse-spark-1.3-contributor used all 8000 tokens (incl. 7998 reasoning) without answering. Raise max_tokens for this call.); counted as wrong.
+- MuseCell agent (muse-spark-1.3-contributor), budget 6, s_89c9462717: run failed before a conclusion; counted as wrong: Blinding guard stopped the run: the result of describe_phenotype contained compound-identifying text.
+- MuseCell agent (muse-spark-1.3-contributor), budget 6, s_3069b9414e: run failed before a conclusion; counted as wrong: muse-spark-1.3-contributor used all 8000 tokens (incl. 7998 reasoning) without answering. Raise max_tokens for this call.
+- MuseCell agent, Muse Spark Open (Baseten), budget 4, s_14844eef0c: run failed before a conclusion; counted as wrong: meta-models/muse-spark-open-1026 used all 8000 tokens (incl. 7997 reasoning) without answering. Raise max_tokens for this call.
+- MuseCell agent, Muse Spark Open (Baseten), budget 4, s_8dd1eb85a8: run failed after the verdict, which stands (right): meta-models/muse-spark-open-1026 returned invalid JSON for reflection: {
+- MuseCell agent, Muse Spark Open (Baseten), budget 4, s_89e4b24a88: run failed after the verdict, which stands (right): meta-models/muse-spark-open-1026 returned invalid JSON for reflection: {
 - The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses treatment profiles (median over replicates), the published NSC protocol.

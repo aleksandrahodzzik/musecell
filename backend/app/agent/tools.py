@@ -22,7 +22,7 @@ from app.agent import microscopist
 from app.agent.guardrails import GuardrailError, UNKNOWN_MOA, canonical_moa, normalize_hypotheses
 from app.agent.schemas import AgentRun, Conclusion, Evidence, EvidenceKind, Hypothesis, HypothesisSnapshot, Step
 from app.agent.specimens import Specimen, SpecimenCatalog, Well
-from app.config import MAX_BUDGET_WELLS, Settings, get_settings
+from app.config import MAX_BUDGET_WELLS, PROVIDERS, Settings, get_settings, provider_of
 from app.external.chembl import ChemblClient
 from app.external.pubchem import PubChemClient
 from app.external.pubmed import PubMedClient
@@ -352,16 +352,25 @@ async def describe_phenotype(ctx: ToolContext, a: DescribePhenotypeArgs) -> Evid
                                    "cells_measured": ctx.catalog.n_cells(w.well_key),
                                    "top_deviations": [{k: d[k] for k in ("feature", "z", "value", "dmso_median")}
                                                       for d in ctx.top_features(w)]}
+    # Composite + 3 channels per field, unless that exceeds the provider's image cap (Baseten: 8 per request);
+    # then composites only (<= 4 treated + <= 4 controls), and the prompt says so.
+    model = ctx.settings.microscopist_id
+    max_images = PROVIDERS[provider_of(model)].max_images
+    n_fields = len(field_ids) + len(controls)
+    channels = n_fields * (1 + len(microscopist.CHANNELS)) <= max_images
+    if n_fields > max_images:
+        raise ToolError(f"Too many fields for one Microscopist call on this provider ({n_fields} > {max_images}).")
     messages = microscopist.build_messages([(f, paths(f)) for f in field_ids], [(c, paths(c)) for c in controls],
-                                           measurements, ctx.moa_classes)
+                                           measurements, ctx.moa_classes, channels=channels)
     result, record = await ctx.llm.chat_json(
-        model=ctx.settings.microscopist_model, messages=messages, meter=ctx.meter, purpose="microscopist",
+        model=model, messages=messages, meter=ctx.meter, purpose="microscopist",
         schema_name="microscopist_report", schema=microscopist.response_schema(ctx.moa_classes, field_ids))
     for c in result.get("candidate_mechanisms", []):
         if c["moa"] != UNKNOWN_MOA:
             c["moa"] = canonical_moa(c["moa"], ctx.moa_classes)
     result["notable_cells"] = [c for c in result.get("notable_cells", []) if c.get("field_id") in field_ids]
-    data = {"field_ids": field_ids, "dmso_field_ids": controls, "model": record.model, "report": result}
+    data = {"field_ids": field_ids, "dmso_field_ids": controls, "model": record.model,
+            "images": "composite + channels" if channels else "composites only", "report": result}
     cands = ", ".join(c["moa"] for c in result.get("candidate_mechanisms", [])) or "none"
     summary = (f"Microscopist on {len(field_ids)} field(s): density {result.get('cell_density')} vs DMSO; "
                f"{len(result.get('observations', []))} observations; candidates: {cands}")

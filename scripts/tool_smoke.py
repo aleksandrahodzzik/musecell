@@ -61,7 +61,7 @@ async def main() -> None:
     sid = args.specimen or sorted(catalog.specimens)[0]
     specimen = catalog.get(sid)
     run = AgentRun(run_id="smoke_" + uuid.uuid4().hex[:8], specimen_id=sid, budget_total=args.budget,
-                   model_ids={"scientist": settings.scientist_model, "microscopist": settings.microscopist_model})
+                   model_ids={"scientist": settings.scientist_id, "microscopist": settings.microscopist_id})
     meter = CostMeter(run_id=run.run_id, cap_usd=settings.run_cost_cap_usd)
     pubchem, chembl = PubChemClient(settings.cache_dir), ChemblClient(settings.cache_dir)
     pubmed = PubMedClient(settings.cache_dir, settings.ncbi_email)
@@ -79,7 +79,7 @@ async def main() -> None:
     messages = [{"role": "system", "content": "You are testing a tool interface. Call exactly one tool."},
                 {"role": "user", "content": "Call list_available_experiments once, with a one-sentence rationale."}]
     scanner.assert_clean({"messages": messages, "tools": T.tool_specs(ctx)}, "scientist request")
-    res = await llm.chat(model=settings.scientist_model, messages=messages, meter=meter, purpose="schema check",
+    res = await llm.chat(model=settings.scientist_id, messages=messages, meter=meter, purpose="schema check",
                          tools=T.tool_specs(ctx), reasoning_effort="low")
     calls = res.message.tool_calls or []
     print(f"  scientist accepted {len(T.tool_specs(ctx))} strict tool schemas; it called "

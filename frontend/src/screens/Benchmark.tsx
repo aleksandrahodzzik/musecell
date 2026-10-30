@@ -198,15 +198,20 @@ function AccuracyChart({ rows }: { rows: ResultRow[] }) {
   const sx = (b: number) => L + ((b - b0) / (b1 - b0 || 1)) * (W - L - R);
   const sy = (a: number) => T + (1 - a) * (H - T - B);
   const ticks = Array.from(new Set(budgets)).sort((a, b) => a - b);
-  // end-of-line labels, nudged apart vertically so close values stay readable
-  const labels = [...series.entries()].map(([label, pts], i) => {
+  // end-of-line labels, nudged apart vertically so close values stay readable; a series that stops before the
+  // largest budget (e.g. open weights, run at one budget only) gets one short line beside its last point instead
+  const all = [...series.entries()].map(([label, pts], i) => {
     const withBudget = pts.filter((p) => p.budget != null).sort((a, b) => a.budget! - b.budget!);
     const end = withBudget[withBudget.length - 1];
-    return { label, i, lead: isAgent(pts), x: end ? sx(end.budget!) + 10 : W - R + 6, y: sy(end ? end.accuracy : pts[0].accuracy) + 4 };
-  }).sort((a, b) => a.y - b.y);
+    const inside = !!end && end.budget! < b1;
+    return { label, i, lead: isAgent(pts), inside, x: end ? sx(end.budget!) + (inside ? 8 : 10) : W - R + 6,
+             y: sy(end ? end.accuracy : pts[0].accuracy) + 4 };
+  });
+  const labels = all.filter((l) => !l.inside).sort((a, b) => a.y - b.y);
   labels.forEach((l, k) => {
     if (k > 0 && l.y - labels[k - 1].y < 13) l.y = labels[k - 1].y + 13;
   });
+  labels.push(...all.filter((l) => l.inside));
   return (
     <figure>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[720px]" role="img" aria-label="Accuracy against wells per compound for each method">
@@ -241,7 +246,7 @@ function AccuracyChart({ rows }: { rows: ResultRow[] }) {
           );
         })}
         {labels.map((l) => {
-          const [name, model] = l.label.split(/ (?=\()/);
+          const [name, model] = l.inside ? [l.label.replace(/^MuseCell agent, /, "")] : l.label.split(/ (?=\()/);
           return (
             <text key={l.label} x={l.x} y={l.y} fontSize={11.5} fontWeight={l.lead ? 600 : 400} fill={l.lead ? "#17202A" : "#5B6672"}>
               {name}

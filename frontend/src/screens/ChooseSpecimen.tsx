@@ -7,7 +7,8 @@ import type React from "react";
 import HowItWorks from "../components/HowItWorks";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
 import { ApiError, postJSON } from "../lib/api";
-import { dateTime, modelName, usd } from "../lib/format";
+import OpenWeightsBadge from "../components/OpenWeightsBadge";
+import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
 import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
 import type { Health, ModelIds, RecordedRun, SpecimenCard } from "../lib/types";
@@ -18,11 +19,19 @@ const MIN_BUDGET = 2;
 const MAX_BUDGET = 8;
 const SPEEDS = [1, 2, 4];
 
+// Providers the switch offers, in order. A provider is selectable when /api/health lists it (key set, model id verified).
+const PROVIDER_OPTIONS = [
+  { provider: "meta", title: "Meta Model API", sub: "Muse Spark 1.3" },
+  { provider: "baseten", title: "Open weights", sub: "Muse Spark Open via Baseten" },
+];
+
 export function ModelLine({ ids }: { ids: ModelIds }) {
+  // On open weights the run is mixed: name the provider of every model so nobody mistakes it for all-open.
+  const via = (p: string) => (isOpenWeights(ids) ? ` · ${PROVIDER_LABEL[p] ?? p}` : "");
   const parts = [
-    ["Scientist", modelName(ids.scientist)],
-    ["Microscopist", ids.microscopist ? `${modelName(ids.microscopist)} vision` : undefined],
-    ["Reviewer", modelName(ids.reviewer)],
+    ["Scientist", modelName(ids.scientist) + via(providerOf(ids))],
+    ["Microscopist", ids.microscopist ? `${modelName(ids.microscopist)} vision${via(providerOf(ids))}` : undefined],
+    ["Reviewer", modelName(ids.reviewer) + via("meta")],
     ["Segmentation", modelName(ids.segmentation)],
   ].filter(([, v]) => v);
   return (
@@ -41,6 +50,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   const specimens = useFetch<SpecimenCard[]>("/api/specimens");
   const [selected, setSelected] = useState<string | null>(null);
   const [budget, setBudget] = useState(4);
+  const [provider, setProvider] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const [showRecorded, setShowRecorded] = useState(false);
@@ -50,6 +60,10 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   useEffect(() => {
     if (!selected && specimens.data?.length) setSelected(specimens.data[0].specimen_id);
   }, [specimens.data, selected]);
+
+  useEffect(() => {
+    if (!provider && health) setProvider(providerOf(health.model_ids));
+  }, [health, provider]);
 
   useEffect(() => {
     if (showRecorded) recordedRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -82,7 +96,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
     setStarting(true);
     setStartError(null);
     try {
-      const { run_id } = await postJSON<{ run_id: string }>("/api/runs", { specimen_id: selected, budget, mode: "blinded" });
+      const { run_id } = await postJSON<{ run_id: string }>("/api/runs", { specimen_id: selected, budget, mode: "blinded", provider: provider ?? undefined });
       navigate({ name: "run", runId: run_id });
     } catch (e) {
       setStartError((e as ApiError).message);
@@ -93,6 +107,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   const live = health?.live_runs ?? false;
   const offReasons = [health?.data_error, health?.model_error].filter(Boolean) as string[];
   const chosen = specimens.data?.find((s) => s.specimen_id === selected);
+  const runIds = health?.providers?.find((p) => p.provider === provider)?.model_ids ?? health?.model_ids;
 
   return (
     <div className="mx-auto max-w-[1180px] px-8 pt-7 pb-10 flex flex-col gap-8 text-haze">
@@ -148,6 +163,8 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
             </p>
           </section>
 
+          {health && <ProviderSwitch health={health} provider={provider} setProvider={setProvider} />}
+
           <div className="flex flex-wrap items-center gap-3">
             <button className="btn-primary h-11 px-5 text-[15px]" disabled={!live || !selected || starting} onClick={start}>
               {starting ? "Starting…" : `Start blinded run${chosen ? ` on ${chosen.label}` : ""}`}
@@ -167,9 +184,10 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
 
         <aside className="flex flex-col gap-5 pt-2">
           <Eyepiece />
-          {health && (
-            <div className="border-t border-line pt-4">
-              <ModelLine ids={health.model_ids} />
+          {runIds && (
+            <div className="border-t border-line pt-4 flex flex-col gap-3">
+              <OpenWeightsBadge ids={runIds} className="self-start" />
+              <ModelLine ids={runIds} />
             </div>
           )}
         </aside>
@@ -213,6 +231,52 @@ function Slide({ s, on, onClick, onKeyDown }: {
         </span>
       </span>
     </button>
+  );
+}
+
+/** Who runs the Scientist + Microscopist: the Meta Model API or open weights (Muse Spark Open on Baseten). */
+function ProviderSwitch({ health, provider, setProvider }: {
+  health: Health; provider: string | null; setProvider: (p: string) => void;
+}) {
+  const usable = new Set((health.providers ?? []).map((p) => p.provider));
+  const why = (p: string) => health.provider_notes?.[p] ?? (p === "baseten" ? "Needs BASETEN_API_KEY in backend/.env." : "");
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const list = PROVIDER_OPTIONS.filter((o) => usable.has(o.provider));
+    const i = list.findIndex((o) => o.provider === provider);
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step || i < 0) return;
+    e.preventDefault();
+    const next = list[(i + step + list.length) % list.length];
+    setProvider(next.provider);
+    (e.currentTarget.parentElement?.querySelector(`[data-provider="${next.provider}"]`) as HTMLElement | null)?.focus();
+  };
+  return (
+    <section className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-3">
+        <span id="provider-label" className="text-sm font-medium text-white">Models</span>
+        <div role="radiogroup" aria-labelledby="provider-label" className="flex items-center gap-1 rounded-full bg-night-2 border border-line p-1">
+          {PROVIDER_OPTIONS.map((o) => {
+            const on = o.provider === provider;
+            const ok = usable.has(o.provider);
+            return (
+              <button key={o.provider} data-provider={o.provider} role="radio" aria-checked={on} tabIndex={on ? 0 : -1}
+                      disabled={!ok} onClick={() => setProvider(o.provider)} onKeyDown={onKey}
+                      title={ok ? undefined : why(o.provider)}
+                      className={`h-9 px-3.5 rounded-full flex flex-col items-start justify-center leading-tight transition-colors
+                        ${on ? "bg-white/[0.1] border border-white/40" : "border border-transparent hover:border-white/20"}
+                        ${ok ? "" : "opacity-40 cursor-not-allowed"}`}>
+                <span className={`text-[12.5px] font-medium ${on ? "text-white" : "text-haze"}`}>{o.title}</span>
+                <span className="text-[10.5px] text-mist">{o.sub}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <p className="text-[12px] text-mist">
+        Open weights moves the Scientist and the Microscopist to Muse Spark Open on Baseten. The PI reviewer stays
+        Muse Wonder 1.0 on the Meta Model API.{!usable.has("baseten") && <> Not available on this server: {why("baseten")}</>}
+      </p>
+    </section>
   );
 }
 
@@ -401,6 +465,7 @@ function RecordedRuns() {
               </span>
               <span className="text-mist">{usd(r.cost_usd)}</span>
               <span className="text-mist truncate">{modelName(r.model_ids.scientist)} · {modelName(r.model_ids.reviewer)}</span>
+              <OpenWeightsBadge ids={r.model_ids} />
               {r.status !== "finished" && <span className="chip">Ended early</span>}
               <button className="btn ml-auto" disabled={busy !== null} onClick={() => play(r.run_id)}
                       aria-label={`Replay ${r.specimen_label ?? "run"} recorded ${dateTime(r.recorded_at)}`}>

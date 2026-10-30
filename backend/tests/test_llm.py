@@ -200,3 +200,57 @@ def test_missing_key_is_a_clear_error(tmp_path, monkeypatch):
     monkeypatch.delenv("MODEL_API_KEY", raising=False)  # other tests may load backend/.env into os.environ
     with pytest.raises(LLMError, match="MODEL_API_KEY is empty"):
         LLMClient(Settings(_env_file=None, data_dir=str(tmp_path)))
+
+
+def test_open_weights_routes_two_roles_to_baseten(tmp_path):
+    """PROVIDER=baseten: Scientist + Microscopist on the open model via Baseten; reviewer and SAM stay on Meta."""
+    from app.config import OPEN_WEIGHTS_MODEL
+
+    seen = []
+
+    def script(request: httpx.Request) -> httpx.Response:
+        seen.append((request.url.host, request.headers["authorization"]))
+        if request.url.path.endswith("/models"):
+            ids = [OPEN_WEIGHTS_MODEL] if request.url.host == "inference.baseten.co" else MODELS
+            return httpx.Response(200, json={"object": "list", "data": [{"id": m, "object": "model", "created": 0,
+                                                                        "owned_by": "x"} for m in ids]})
+        return httpx.Response(200, json=completion())
+
+    settings = Settings(_env_file=None, provider="baseten", model_api_key=SecretStr("meta-key"),
+                        baseten_api_key=SecretStr("bt-key"), data_dir=str(tmp_path))
+    assert settings.role_models == {"scientist": OPEN_WEIGHTS_MODEL, "microscopist": OPEN_WEIGHTS_MODEL,
+                                    "reviewer": "muse-wonder-1.0", "segmenter": "sam-3.1"}
+    client = LLMClient(settings, ledger=DailyLedger(tmp_path / "costs", 20),
+                       http_client=httpx.AsyncClient(transport=httpx.MockTransport(script)))
+    run(client.check_models())  # lists both providers
+    meter = CostMeter(run_id="r", cap_usd=1)
+    open_rec = run(client.chat(model=OPEN_WEIGHTS_MODEL, messages=[], meter=meter, purpose="scientist")).record
+    run(client.chat(model="muse-wonder-1.0", messages=[], meter=meter, purpose="reviewer"))
+    hosts = [h for h, _ in seen]
+    assert hosts.count("inference.baseten.co") == 2 and hosts.count("api.meta.ai") == 2
+    assert all(auth == ("Bearer bt-key" if h == "inference.baseten.co" else "Bearer meta-key") for h, auth in seen)
+    assert (open_rec.provider, open_rec.billing) == ("baseten", "credits") and open_rec.cost_usd > 0
+
+
+def test_open_weights_needs_its_key_and_unverified_providers_are_refused(tmp_path, monkeypatch):
+    monkeypatch.delenv("BASETEN_API_KEY", raising=False)  # other tests may load backend/.env into os.environ
+    with pytest.raises(LLMError, match="BASETEN_API_KEY is empty"):
+        LLMClient(Settings(_env_file=None, provider="baseten", model_api_key=SecretStr("k"), data_dir=str(tmp_path)))
+    with pytest.raises(ValueError, match="not verified"):
+        Settings(_env_file=None, provider="fireworks").role_models
+
+
+def test_chat_json_retries_once_on_cut_off_json(tmp_path):
+    """Open weights can run away inside strict JSON until max_tokens: one repair retry, then a clear error."""
+    script = Script((200, completion(content='{\n "refle', finish="length")), (200, completion(content='{"a": 1}')))
+    client, _ = make(tmp_path, script)
+    meter = CostMeter(run_id="r", cap_usd=1)
+    obj, _rec = run(client.chat_json(model="muse-spark-1.3", messages=[{"role": "user", "content": "x"}], meter=meter,
+                                     purpose="reflection", schema_name="s", schema={"type": "object"}))
+    assert obj == {"a": 1} and len(meter.calls) == 2  # both calls billed
+    retry = json.loads(script.requests[-1].content)["messages"]
+    assert "not a complete JSON object" in retry[-1]["content"]
+    client, _ = make(tmp_path, Script(*[(200, completion(content="{", finish="length"))] * 2))
+    with pytest.raises(LLMError, match="invalid JSON for s twice"):
+        run(client.chat_json(model="muse-spark-1.3", messages=[], meter=CostMeter(run_id="r", cap_usd=1),
+                             purpose="reflection", schema_name="s", schema={"type": "object"}))

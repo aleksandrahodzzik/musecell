@@ -4,6 +4,7 @@ Methods
   (a) NSC 1-NN on all wells (published protocol: treatment profiles, majority vote per compound)
   (b) NSC 1-NN on the same number of wells drawn at random from the specimen (vote over wells; mean of R draws)
   (c) MuseCell agent (Scientist + Microscopist + PI reviewer, full run incl. unblinding/literature) at budgets 2/4/6
+  (d) optional comparison agents (`--compare`), e.g. Muse Spark Open on Baseten (open weights) at budget 4
 
 Steps
   1. Baselines (no API) and a cost estimate from the token use of recorded runs. Without --yes it stops here.
@@ -17,6 +18,10 @@ Usage
   python scripts/evaluate.py --model muse-spark-1.3-contributor --yes
   python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only
       # rebuild the outputs from eval/agent_runs.jsonl; only runs of --model are used (default muse-spark-1.3)
+  python scripts/evaluate.py --provider baseten --budgets 4 --model muse-spark-1.3-contributor --yes
+      # open weights: Scientist + Microscopist on meta-models/muse-spark-open-1026 (Baseten), reviewer stays
+      # muse-wonder-1.0 (Meta API); the outputs keep --model as the main agent and add the open model as a
+      # comparison (same as --compare meta-models/muse-spark-open-1026)
 """
 
 from __future__ import annotations
@@ -37,7 +42,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 from app.agent.guardrails import BlindingScanner  # noqa: E402
 from app.agent.specimens import Specimen  # noqa: E402
-from app.config import PRICES, Settings  # noqa: E402
+from app.config import OPEN_WEIGHTS_MODEL, PRICES, PROVIDERS, Settings  # noqa: E402
 from app.llm import cost_of  # noqa: E402
 from app.runs.manager import RunManager  # noqa: E402
 from app.runs.store import RunBus  # noqa: E402
@@ -48,6 +53,9 @@ RUNS_LOG = EVAL / "agent_runs.jsonl"
 EVAL_RUNS_DIR = ROOT / "runs" / "eval"
 BUDGETS = (2, 4, 6)
 RECORDED = ("run_87e2787d1f1e", "run_39e2d32f1edc", "run_93391a0830e0")  # Phase-4 runs, budget 4
+# Stretch: the same three specimens on Muse Spark Open via Baseten (scripts/run_agent_cli.py, budget 4)
+RECORDED_OPEN = ("run_d5a53adc9c63", "run_0d9f5361415e", "run_0f1c579db128")
+COMPARE_LABELS = {OPEN_WEIGHTS_MODEL: "Muse Spark Open (Baseten)"}
 
 
 # --- specimens and baselines ----------------------------------------------------------------------
@@ -103,22 +111,33 @@ def nsc_random_wells(manager: RunManager, specimens: list[Specimen], k: int, dra
 
 # --- cost estimate --------------------------------------------------------------------------------
 
-def token_profile() -> dict[str, list[float]]:
+def token_profile(recorded: tuple[str, ...] = RECORDED) -> dict[str, list[float]]:
     """Mean [input, output] tokens per role in the recorded budget-4 runs."""
     sums: dict[str, list[float]] = {}
-    for run_id in RECORDED:
+    for run_id in recorded:
         run = json.loads((ROOT / "runs" / f"{run_id}.json").read_text(encoding="utf-8"))
         for c in run["model_calls"]:
             role = c["purpose"].split(" turn")[0]
             s = sums.setdefault(role, [0.0, 0.0])
-            s[0] += c["input_tokens"] / len(RECORDED)
-            s[1] += c["output_tokens"] / len(RECORDED)
+            s[0] += c["input_tokens"] / len(recorded)
+            s[1] += c["output_tokens"] / len(recorded)
     return sums
 
 
-def estimate(n_specimens: int, budgets: tuple[int, ...], model: str, reviewer: str) -> dict:
+def recorded_latency(recorded: tuple[str, ...]) -> float:
+    """Mean wall time (s) of recorded runs, first to last event."""
+    out = []
+    for run_id in recorded:
+        lines = (ROOT / "runs" / f"{run_id}.jsonl").read_text(encoding="utf-8").splitlines()
+        first, last = json.loads(lines[0])["ts"], json.loads(lines[-1])["ts"]
+        out.append((datetime.fromisoformat(last) - datetime.fromisoformat(first)).total_seconds())
+    return float(np.mean(out))
+
+
+def estimate(n_specimens: int, budgets: tuple[int, ...], model: str, reviewer: str,
+             recorded: tuple[str, ...] = RECORDED) -> dict:
     """Scientist and Microscopist tokens scale with the budget (0.75× at 2 wells, 1.25× at 6); others fixed."""
-    prof = token_profile()
+    prof = token_profile(recorded)
     per_budget = {}
     for b in budgets:
         scale = 0.5 + 0.125 * b
@@ -131,7 +150,7 @@ def estimate(n_specimens: int, budgets: tuple[int, ...], model: str, reviewer: s
     reviewer_share = sum(cost_of(reviewer, *prof["reviewer"]) for _ in budgets) * n_specimens
     total = sum(per_budget.values()) * n_specimens
     return {"runs": n_specimens * len(budgets), "per_run": per_budget, "total": total,
-            "reviewer_total": reviewer_share, "with_margin": total * 1.3}
+            "reviewer_total": reviewer_share, "with_margin": total * 1.3, "latency_s": recorded_latency(recorded)}
 
 
 # --- agent runs -----------------------------------------------------------------------------------
@@ -217,10 +236,11 @@ def leak_tests() -> str:
     return (proc.stdout.strip().splitlines() or ["(no output)"])[-1]
 
 
-def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: str) -> tuple[list[dict], list[str]]:
+def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: str,
+               method: str = "agent") -> tuple[list[dict], list[str]]:
     ids = {sp.specimen_id for sp in specimens}
     rows, notes = [], []
-    label = f"MuseCell agent ({model})"
+    label = f"MuseCell agent, {COMPARE_LABELS[model]}" if model in COMPARE_LABELS else f"MuseCell agent ({model})"
     for b in budgets:
         rs = [r for r in records if r["budget"] == b and r["specimen_id"] in ids and r["models"]["scientist"] == model]
         if not rs:
@@ -229,7 +249,7 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
         cited = sum(r.get("citations_cited", 0) for r in rs)
         removed = sum(r.get("citations_removed", 0) for r in rs)
         rows.append({
-            "method": "agent", "label": label, "budget": b, "n": len(rs),
+            "method": method, "label": label, "model": model, "budget": b, "n": len(rs),
             "accuracy": round(sum(r["correct"] for r in rs) / len(rs), 4), "correct": sum(r["correct"] for r in rs),
             "accuracy_before_review": round(sum(r["first_correct"] for r in rs) / len(rs), 4),
             "mean_wells": round(float(np.mean([r["wells_used"] for r in rs])), 2),
@@ -240,10 +260,14 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
             "reviewer_requests": sum(r.get("review") == "request_experiment" for r in rs),
         })
         if len(rs) < len(specimens):
-            notes.append(f"Budget {b}: {len(rs)} of {len(specimens)} specimens have a recorded run.")
+            notes.append(f"{label}, budget {b}: {len(rs)} of {len(specimens)} specimens have a recorded run.")
         for r in rs:
             if r["status"] != "finished":
-                notes.append(f"Budget {b}, {r['specimen_id']}: run {r['status']} ({r.get('error')}); counted as wrong.")
+                # A run can fail after the code computed its verdict (e.g. in the reflection): the verdict stands.
+                outcome = (f"after the verdict, which stands ({'right' if r['correct'] else 'wrong'})"
+                           if r.get("agent_moa") else "before a conclusion; counted as wrong")
+                notes.append(f"{label}, budget {b}, {r['specimen_id']}: run {r['status']} {outcome}: "
+                             f"{(r.get('error') or '').splitlines()[0]}")
     return rows, notes
 
 
@@ -280,6 +304,43 @@ def analysis_markdown(a: dict) -> list[str]:
     return lines
 
 
+def comparison_markdown(res: dict) -> list[str]:
+    """One column per agent model at each budget a comparison model was run at (same compounds, same reviewer)."""
+    compare = [r for r in res["rows"] if r["method"] == "agent_open"]
+    if not compare:
+        return []
+    lines = []
+    for b in sorted({r["budget"] for r in compare}):
+        cols = [r for r in res["rows"] if r["method"] in ("agent", "agent_open") and r["budget"] == b]
+        rand = next((r for r in res["rows"] if r["method"] == "nsc_random" and r["budget"] == b), None)
+        heads = [COMPARE_LABELS.get(r["model"], r["model"]) for r in cols]
+        lines += [f"## Open weights vs Meta API, budget {b}", "",
+                  f"Same {res['n_compounds']} compounds, same tools, same PI reviewer (`muse-wonder-1.0`, Meta API); "
+                  "only the Scientist + Microscopist + reflection model differs.", "",
+                  "| | " + " | ".join(heads) + " | NSC baseline, random wells |",
+                  "|---|" + "---|" * (len(cols) + 1)]
+
+        def line(name, fn, base="–"):
+            return f"| {name} | " + " | ".join(fn(r) for r in cols) + f" | {base} |"
+
+        lines += [
+            line("Scientist model", lambda r: f"`{r['model']}`"),
+            line("Provider", lambda r: r.get("provider_label", "Meta Model API")),
+            line("Accuracy", lambda r: f"{100 * r['accuracy']:.1f}% ({r['correct']}/{r['n']})",
+                 f"{100 * rand['accuracy']:.1f}% ± {100 * rand['sd']:.1f}" if rand else "–"),
+            line("Before review", lambda r: f"{100 * r['accuracy_before_review']:.1f}%"),
+            line("Failed runs", lambda r: str(r["failed"])),
+            line("Mean cost / run", lambda r: "–" if r["mean_cost_usd"] is None else
+                 f"${r['mean_cost_usd']:.3f}" + (" (incl. credits)" if r.get("billing") == "credits" else "")),
+            line("Mean latency", lambda r: "–" if r["mean_latency_s"] is None else f"{r['mean_latency_s']:.0f} s"),
+            line("Citations verified", lambda r: r["citations"]),
+            line("Reviewer requests", lambda r: str(r["reviewer_requests"])),
+        ]
+        lines += ["", "Cost on open weights is nominal: Baseten list price ($1.25 / $4.25 per 1M tokens) for the "
+                  "Scientist/Microscopist tokens, paid from hackathon credits, plus the reviewer at Meta API prices.", ""]
+    return lines
+
+
 def write_markdown(res: dict, path: Path) -> None:
     def pct(x):
         return "–" if x is None else f"{100 * x:.1f}%"
@@ -311,6 +372,7 @@ def write_markdown(res: dict, path: Path) -> None:
     lines += ["", "± = standard deviation over random well draws. \"Before review\" = the agent's first conclusion, "
               "before the PI reviewer's critique and any requested experiment.", "",
               "![Accuracy against wells per compound](accuracy_vs_budget.png)", ""]
+    lines += comparison_markdown(res)
     if res.get("analysis"):
         lines += analysis_markdown(res["analysis"])
     if res.get("notes"):
@@ -324,7 +386,8 @@ def plot(res: dict, path: Path) -> None:
     import matplotlib.pyplot as plt
 
     ink, graphite, paper = "#17202A", "#5B6672", "#F6F8F9"
-    styles = [(ink, "-", 2.0), (graphite, (0, (5, 3)), 1.5), (graphite, (0, (1.5, 2.5)), 1.5)]
+    styles = [(ink, "-", 2.0), (graphite, (0, (5, 3)), 1.5), (graphite, (0, (1.5, 2.5)), 1.5),
+              (ink, (0, (4, 1.5, 1, 1.5)), 1.5)]
     fig, ax = plt.subplots(figsize=(7.2, 4.0), dpi=150, facecolor=paper)
     ax.set_facecolor(paper)
     series: dict[str, list[dict]] = {}
@@ -333,14 +396,19 @@ def plot(res: dict, path: Path) -> None:
     budgets = sorted({r["budget"] for r in res["rows"] if r["budget"] is not None})
     xmax = max(budgets) + 0.4
     for label, pts in series.items():  # the agent is the primary line; baselines are graphite references
-        color, dash, width = styles[{"agent": 0, "nsc_random": 1}.get(pts[0]["method"], 2)]
+        color, dash, width = styles[{"agent": 0, "nsc_random": 1, "agent_open": 3}.get(pts[0]["method"], 2)]
         if pts[0]["budget"] is None:
             ax.axhline(pts[0]["accuracy"], color=color, linestyle=(0, (2, 3)), linewidth=1.25, label=label)
             ax.text(xmax, pts[0]["accuracy"], f" {label}", va="center", fontsize=8, color=color)
             continue
         pts = sorted(pts, key=lambda p: p["budget"])
         xs, ys = [p["budget"] for p in pts], [p["accuracy"] for p in pts]
-        ax.plot(xs, ys, color=color, linestyle=dash, linewidth=width, marker="o", markersize=5, label=label)
+        is_open = pts[0]["method"] == "agent_open"  # hollow diamond: open weights
+        ax.plot(xs, ys, color=color, linestyle=dash, linewidth=width, label=label, markersize=6 if is_open else 5,
+                marker="D" if is_open else "o", markerfacecolor=paper if is_open else color)
+        if is_open:  # a single point: label it beside the marker so it does not collide with the agent line
+            ax.text(xs[-1] + 0.12, ys[-1], "Muse Spark Open\n(open weights, Baseten)", va="center", fontsize=8, color=color)
+            continue
         ax.text(xmax, ys[-1], f" {label}", va="center", fontsize=8, color=color)
     ax.set_xlim(min(budgets) - 0.4, xmax)
     ax.set_ylim(0, 1)
@@ -367,6 +435,9 @@ def plot(res: dict, path: Path) -> None:
 async def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--model", default="muse-spark-1.3", help="Scientist + Microscopist + reflection model")
+    p.add_argument("--provider", choices=["meta", "baseten"], default="meta",
+                   help="who serves the agent runs of this call; baseten = open weights (" + OPEN_WEIGHTS_MODEL + ")")
+    p.add_argument("--compare", nargs="*", default=[], help="extra agent models to add as comparison rows")
     p.add_argument("--reviewer-model", default="muse-wonder-1.0")
     p.add_argument("--budgets", type=int, nargs="+", default=list(BUDGETS))
     p.add_argument("--compounds", type=int, help="stratified subset size (spec: >= 24); default all")
@@ -380,9 +451,11 @@ async def main() -> int:
     budgets = tuple(args.budgets)
 
     contributor = args.model.endswith("-contributor")
-    settings = Settings(scientist_model=args.model, microscopist_model=args.model,
+    settings = Settings(scientist_model=args.model, microscopist_model=args.model, provider=args.provider,
                         reviewer_model=args.reviewer_model, allow_contributor=contributor)
-    for m in (args.model, args.reviewer_model):
+    run_model = settings.scientist_id  # = args.model on meta, the open-weights id on another provider
+    compare = list(dict.fromkeys([*args.compare, *([run_model] if run_model != args.model else [])]))
+    for m in (args.model, run_model, args.reviewer_model, *compare):
         if m not in PRICES:
             p.error(f"no price for '{m}'")
     EVAL_RUNS_DIR.mkdir(parents=True, exist_ok=True)
@@ -400,7 +473,7 @@ async def main() -> int:
         rows = [{"method": "nsc_all", "label": "NSC baseline, all wells", "budget": None, "n": len(specimens),
                  "accuracy": round(nsc_all_wells(manager.atlas, compounds), 4)}]
         rows[0]["correct"] = round(rows[0]["accuracy"] * len(specimens))
-        for b in budgets:
+        for b in sorted(set(BUDGETS) | set(budgets)):  # the table keeps every budget, whatever this call runs
             r = nsc_random_wells(manager, specimens, b, args.draws, args.seed)
             rows.append({"method": "nsc_random", "label": "NSC baseline, random wells", "budget": b,
                          "n": len(specimens), "accuracy": round(r["accuracy"], 4), "sd": round(r["sd"], 4),
@@ -410,22 +483,36 @@ async def main() -> int:
                   + (f" ± {r['sd']:.3f}" if r.get("sd") else ""))
 
         if not args.aggregate_only:
-            est = estimate(len(specimens), budgets, args.model, args.reviewer_model)
-            print(f"\ncost estimate ({est['runs']} agent runs; scientist/microscopist/reflection {args.model}, "
-                  f"reviewer {args.reviewer_model}; from the token use of {len(RECORDED)} recorded runs):")
+            recorded = RECORDED if run_model == args.model else RECORDED_OPEN
+            est = estimate(len(specimens), budgets, run_model, args.reviewer_model, recorded)
+            print(f"\ncost estimate ({est['runs']} agent runs; scientist/microscopist/reflection {run_model} on "
+                  f"{PROVIDERS[args.provider].label}, reviewer {args.reviewer_model}; from the token use of "
+                  f"{len(recorded)} recorded runs):")
             for b, c in est["per_run"].items():
                 print(f"  budget {b}: ~${c:.3f} per run")
-            print(f"  total ~${est['total']:.2f} (reviewer ~${est['reviewer_total']:.2f}); "
-                  f"with 30% margin for revisions/retries ~${est['with_margin']:.2f}")
+            print(f"  total ~${est['total']:.2f} (reviewer ~${est['reviewer_total']:.2f}"
+                  + (f" real USD; the rest is {PROVIDERS[args.provider].label} credits at list price"
+                     if PRICES[run_model].billing == "credits" else "")
+                  + f"); with 30% margin for revisions/retries ~${est['with_margin']:.2f}")
+            wall = est["latency_s"] * est["runs"] / args.concurrency
+            print(f"  latency ~{est['latency_s']:.0f} s per run -> ~{wall / 60:.0f} min wall time at concurrency "
+                  f"{args.concurrency}")
             print(f"  spent today so far: ${manager.llm.ledger.total_today():.2f} of the "
                   f"${settings.daily_cost_cap_usd:.2f} daily cap" if manager.llm else "  (no MODEL_API_KEY)")
             if not args.yes:
                 print("\nNo agent runs started. Re-run with --yes to spend the credits.")
                 return 0
-            await run_agents(manager, specimens, budgets, args.concurrency, args.model)
+            await run_agents(manager, specimens, budgets, args.concurrency, run_model)
 
         records = load_log()
-        a_rows, notes = agent_rows(records, specimens, budgets, args.model)
+        a_rows, notes = agent_rows(records, specimens, BUDGETS, args.model)
+        for m in compare:
+            c_rows, c_notes = agent_rows(records, specimens, sorted(set(BUDGETS) | set(budgets)), m, "agent_open")
+            provider = next(p for p, cfg in PROVIDERS.items() if cfg.open_model == m)
+            for r in c_rows:
+                r.update(provider=provider, provider_label=PROVIDERS[provider].label, billing=PRICES[m].billing)
+            a_rows += c_rows
+            notes += c_notes
         used = [r for r in records if r["specimen_id"] in {s.specimen_id for s in specimens}
                 and r["models"]["scientist"] == args.model and r["budget"] in budgets]
         hits = sum(r.get("leak_hits", 0) for r in used)
@@ -439,6 +526,7 @@ async def main() -> int:
         res = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "models": {"scientist": args.model, "microscopist": args.model, "reviewer": args.reviewer_model,
                           "segmentation": manager.model_ids()["segmentation"]},
+               "comparisons": [{"model": m, "label": COMPARE_LABELS.get(m, m)} for m in compare],
                "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows,
                "analysis": analysis(used) if used else None}
         (EVAL / "results.json").write_text(json.dumps(res, indent=1), encoding="utf-8")

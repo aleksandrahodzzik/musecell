@@ -115,6 +115,8 @@ export interface CallCost {
   reasoning_tokens: number;
   cost_usd: number;
   seconds: number;
+  provider?: string; // "meta" | "baseten" (absent in runs recorded before the open-weights mode)
+  billing?: "usd" | "credits";
 }
 
 export interface ToolCallData {
@@ -194,6 +196,8 @@ export interface Health {
   model_error: string | null;
   model_ids: ModelIds;
   specimens: number;
+  providers?: { provider: string; label: string; model_ids: ModelIds }[]; // usable for live runs
+  provider_notes?: Record<string, string>;
 }
 
 export interface SpecimenCard {

@@ -1,7 +1,9 @@
 """One wrapper for every chat-model call (spec §4).
 
-- Provider config (base url, key, model ids) from Settings / backend/.env.
-- `check_models()` calls GET /v1/models at startup and refuses configured ids that do not exist.
+- Provider config (base url, key, model ids) from Settings / backend/.env. Calls are routed by model id
+  (`config.provider_of`), so one client serves a mixed run: open weights on Baseten for the Scientist and
+  Microscopist, muse-wonder-1.0 / sam-3.1 on the Meta API.
+- `check_models()` calls GET /v1/models of each provider involved and refuses configured ids that do not exist.
 - Retries with exponential backoff on 429 / 5xx / connection errors / timeouts; other errors fail at once.
 - Token usage -> USD cost from the price table in config; every call is recorded on the run's
   CostMeter and in a daily ledger on disk. A run over its cap, or a day over the daily cap, is refused
@@ -27,7 +29,7 @@ import httpx
 import openai
 from pydantic import BaseModel, Field
 
-from app.config import PRICES, PROVIDERS, Settings, get_settings
+from app.config import PRICES, PROVIDERS, Settings, get_settings, provider_of
 
 DEFAULT_MAX_TOKENS = 8000  # generous: reasoning tokens share this budget
 BACKOFF_BASE_S = 1.0
@@ -49,6 +51,8 @@ class ModelCheckError(LLMError):
 class CallRecord(BaseModel):
     model: str
     purpose: str
+    provider: str = "meta"
+    billing: str = "usd"  # "credits": nominal $ at the provider's list price, paid from credits
     input_tokens: int = 0
     output_tokens: int = 0
     reasoning_tokens: int = 0
@@ -162,7 +166,8 @@ def _retry_after(exc: Exception) -> float | None:
 
 def _explain(exc: Exception, model: str) -> str:
     if isinstance(exc, openai.AuthenticationError):
-        return "Meta API rejected the key. Check MODEL_API_KEY in backend/.env."
+        cfg = PROVIDERS[provider_of(model)]
+        return f"{cfg.label} rejected the key. Check {cfg.key_env.upper()} in backend/.env."
     if isinstance(exc, openai.NotFoundError):
         return f"Model '{model}' was not found by the API. Check the model ids in backend/.env."
     if isinstance(exc, openai.APIStatusError):
@@ -177,37 +182,61 @@ class LLMClient:
                  http_client: httpx.AsyncClient | None = None,
                  sleep: Callable[[float], Awaitable[None]] = asyncio.sleep):
         self.settings = settings or get_settings()
-        provider = PROVIDERS[self.settings.provider]
-        base_url = self.settings.model_base_url if self.settings.provider == "meta" else provider.base_url
-        key = getattr(self.settings, provider.key_env)
-        if key is None:
-            raise LLMError(f"{provider.key_env.upper()} is empty. Put your key in backend/.env "
-                           f"(provider '{self.settings.provider}').")
-        # Retries are ours (backoff + logging), so the SDK's own are off.
-        self._client = openai.AsyncOpenAI(base_url=base_url, api_key=key.get_secret_value(),
-                                          timeout=self.settings.model_timeout_s, max_retries=0,
-                                          http_client=http_client)
+        needed = {provider_of(m) for m in self.configured_models}
+        # One client per provider that has a key (so a run can be switched to open weights); every provider the
+        # configured roles need must have one.
+        self._clients: dict[str, openai.AsyncOpenAI] = {}
+        for name, cfg in PROVIDERS.items():
+            key = getattr(self.settings, cfg.key_env)
+            if key is None:
+                if name in needed:
+                    raise LLMError(f"{cfg.key_env.upper()} is empty. Put your key in backend/.env "
+                                   f"(provider '{name}').")
+                continue
+            base_url = self.settings.model_base_url if name == "meta" else cfg.base_url
+            # Retries are ours (backoff + logging), so the SDK's own are off.
+            self._clients[name] = openai.AsyncOpenAI(base_url=base_url, api_key=key.get_secret_value(),
+                                                     timeout=self.settings.model_timeout_s, max_retries=0,
+                                                     http_client=http_client)
         self.ledger = ledger or DailyLedger(self.settings.cache_dir / "costs", self.settings.daily_cost_cap_usd)
         self._sleep = sleep
 
     @property
     def configured_models(self) -> list[str]:
-        s = self.settings
-        return sorted({s.scientist_model, s.microscopist_model, s.reviewer_model, s.segmenter_model})
+        return sorted(set(self.settings.role_models.values()))
+
+    @property
+    def providers(self) -> list[str]:
+        """Providers this client holds a key for."""
+        return list(self._clients)
+
+    def _client_for(self, model: str) -> openai.AsyncOpenAI:
+        name = provider_of(model)
+        if name not in self._clients:
+            cfg = PROVIDERS[name]
+            raise LLMError(f"{model} is served by {cfg.label}, but {cfg.key_env.upper()} is empty in backend/.env.")
+        return self._clients[name]
 
     async def check_models(self, required: list[str] | None = None) -> list[str]:
-        """GET /v1/models; raise ModelCheckError if any configured id is missing. Returns the available ids."""
+        """GET /v1/models on each provider involved; raise ModelCheckError if any configured id is missing.
+        Returns the available ids."""
         required = required or self.configured_models
-        try:
-            page = await self._client.models.list()
-        except Exception as exc:  # noqa: BLE001 - surfaced with a readable message
-            raise ModelCheckError(_explain(exc, "models.list")) from exc
-        available = sorted(m.id for m in page.data)
-        missing = [m for m in required if m not in available]
-        if missing:
-            raise ModelCheckError(f"Configured model id(s) {missing} not offered by the API. "
-                                  f"Available: {available}. Fix backend/.env; model ids are never guessed.")
-        return available
+        available: list[str] = []
+        for name in dict.fromkeys(provider_of(m) for m in required):
+            label = PROVIDERS[name].label
+            try:
+                page = await self._client_for(next(m for m in required if provider_of(m) == name)).models.list()
+            except LLMError as exc:
+                raise ModelCheckError(str(exc)) from exc
+            except Exception as exc:  # noqa: BLE001 - surfaced with a readable message
+                raise ModelCheckError(_explain(exc, f"{label} models.list")) from exc
+            ids = sorted(m.id for m in page.data)
+            missing = [m for m in required if provider_of(m) == name and m not in ids]
+            if missing:
+                raise ModelCheckError(f"Configured model id(s) {missing} not offered by {label}. "
+                                      f"Available: {ids}. Fix backend/.env; model ids are never guessed.")
+            available += ids
+        return sorted(available)
 
     def _check_allowed(self, model: str, meter: CostMeter) -> None:
         if model.endswith("-contributor") and not self.settings.allow_contributor:
@@ -226,6 +255,7 @@ class LLMClient:
                    tools: list[dict] | None = None, response_format: dict | None = None,
                    reasoning_effort: str | None = None, max_tokens: int = DEFAULT_MAX_TOKENS) -> ChatResult:
         self._check_allowed(model, meter)
+        client = self._client_for(model)
         kwargs: dict[str, Any] = {"model": model, "messages": messages, "max_tokens": max_tokens}
         if tools:
             kwargs["tools"] = tools
@@ -240,7 +270,7 @@ class LLMClient:
         while True:
             attempt += 1
             try:
-                response = await self._client.chat.completions.create(**kwargs)
+                response = await client.chat.completions.create(**kwargs)
                 break
             except Exception as exc:  # noqa: BLE001
                 if not _retryable(exc) or attempt > self.settings.model_max_retries:
@@ -252,7 +282,7 @@ class LLMClient:
         details = getattr(usage, "completion_tokens_details", None) if usage else None
         choice = response.choices[0]
         record = CallRecord(
-            model=model, purpose=purpose,
+            model=model, purpose=purpose, provider=provider_of(model), billing=PRICES[model].billing,
             input_tokens=usage.prompt_tokens if usage else 0,
             output_tokens=usage.completion_tokens if usage else 0,
             reasoning_tokens=(getattr(details, "reasoning_tokens", 0) or 0) if details else 0,
@@ -271,14 +301,26 @@ class LLMClient:
 
     async def chat_json(self, *, model: str, messages: list[dict], meter: CostMeter, purpose: str,
                         schema_name: str, schema: dict, **kwargs: Any) -> tuple[dict, CallRecord]:
-        """Strict structured output; returns the parsed JSON object."""
+        """Strict structured output; returns the parsed JSON object (and the last call's record).
+
+        One repair retry: Muse Spark Open on Baseten sometimes runs away inside the strict-schema JSON until
+        max_tokens (finish_reason "length", ~6k non-reasoning tokens, unterminated object; 2 of 38 eval
+        reflections, DECISIONS "Stretch"). The retry is a fresh call that says so; both calls are billed."""
         fmt = {"type": "json_schema", "json_schema": {"name": schema_name, "schema": schema, "strict": True}}
-        result = await self.chat(model=model, messages=messages, meter=meter, purpose=purpose,
-                                 response_format=fmt, **kwargs)
-        try:
-            return json.loads(result.content), result.record
-        except json.JSONDecodeError as exc:
-            raise LLMError(f"{model} returned invalid JSON for {schema_name}: {result.content[:200]}") from exc
+        for attempt in (1, 2):
+            result = await self.chat(model=model, messages=messages, meter=meter, purpose=purpose,
+                                     response_format=fmt, **kwargs)
+            try:
+                return json.loads(result.content), result.record
+            except json.JSONDecodeError as exc:
+                if attempt == 2:
+                    raise LLMError(f"{model} returned invalid JSON for {schema_name} twice: "
+                                   f"{result.content[:200]}") from exc
+                messages = [*messages, {"role": "user", "content": (
+                    "Your previous answer was not a complete JSON object (it was cut off after "
+                    f"{result.record.output_tokens} tokens). Answer again: one concise JSON object, no padding.")}]
+        raise AssertionError("unreachable")
 
     async def aclose(self) -> None:
-        await self._client.close()
+        for client in self._clients.values():
+            await client.close()

@@ -3,7 +3,7 @@
 
 import { ChevronDown, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { modelName, usd } from "../../lib/format";
+import { PROVIDER_LABEL, isOpenWeights, modelName, providerOf, usd } from "../../lib/format";
 import type { RunState } from "../../lib/runState";
 import type { CallCost } from "../../lib/types";
 
@@ -45,6 +45,9 @@ export function activeNode(run: RunState): NodeId | null {
 
 function nodes(run: RunState): NodeInfo[] {
   const ids = run.started?.model_ids;
+  // Mixed setup on open weights: say which provider serves each model node (reviewer: always the Meta API).
+  const open = isOpenWeights(ids);
+  const via = (p: string) => (open ? ` · ${PROVIDER_LABEL[p] ?? p}` : "");
   const by = (id: NodeId) => run.callLog.filter((c) => ROLE_OF(c.purpose) === id);
   const toolCount = (names: string[]) =>
     run.entries.filter((e) => e.kind === "tool" && names.includes(e.call.name) && e.result?.ok).length;
@@ -52,11 +55,11 @@ function nodes(run: RunState): NodeInfo[] {
   const sci = by("scientist"), mic = by("microscopist"), rev = by("reviewer");
   const lit = toolCount(["search_literature"]), look = toolCount(["lookup_compound"]);
   return [
-    { id: "scientist", name: "Scientist", sub: modelName(ids?.scientist), stat: money(sci), calls: sci },
+    { id: "scientist", name: "Scientist", sub: modelName(ids?.scientist) + via(providerOf(ids)), stat: money(sci), calls: sci },
     { id: "microscope", name: "Microscope", sub: "segmentation", stat: `${run.wells.length} ${run.wells.length === 1 ? "well" : "wells"}`, calls: [] },
-    { id: "microscopist", name: "Microscopist", sub: `${modelName(ids?.microscopist)} vision`, stat: money(mic), calls: mic },
+    { id: "microscopist", name: "Microscopist", sub: `${modelName(ids?.microscopist)} vision${via(providerOf(ids))}`, stat: money(mic), calls: mic },
     { id: "atlas", name: "Atlas", sub: "statistics", stat: `${toolCount(["compare_to_reference_atlas", "dose_response"])} queries`, calls: [] },
-    { id: "reviewer", name: "PI reviewer", sub: modelName(ids?.reviewer), stat: money(rev), calls: rev },
+    { id: "reviewer", name: "PI reviewer", sub: modelName(ids?.reviewer) + via("meta"), stat: money(rev), calls: rev },
     {
       id: "databases", name: "PubChem · ChEMBL · PubMed", sub: run.unblinded || run.started?.mode === "open" ? "unlocked" : "locked while blinded",
       stat: run.unblinded || run.started?.mode === "open" ? `${look + lit} queries` : "", calls: [], locked: !run.unblinded && run.started?.mode !== "open",
@@ -156,12 +159,16 @@ function Details({ node }: { node: NodeInfo }) {
                   <td className="py-1 text-right">{c.output_tokens.toLocaleString("en-US")}</td>
                   <td className="py-1 text-right">{c.reasoning_tokens.toLocaleString("en-US")}</td>
                   <td className="py-1 text-right">{c.seconds.toFixed(1)} s</td>
-                  <td className="py-1 text-right">{usd(c.cost_usd)}</td>
+                  <td className="py-1 text-right" title={c.billing === "credits" ? "Nominal: provider list price, paid from credits" : undefined}>
+                    {usd(c.cost_usd)}{c.billing === "credits" && <span className="text-mist"> cr</span>}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <p className="mt-2 text-[11px] text-mist">Metered per call by the backend (token counts from the Meta Model API, prices in backend/app/config.py).</p>
+          <p className="mt-2 text-[11px] text-mist">
+            {`Metered per call by the backend (token counts from ${[...new Set(node.calls.map((c) => PROVIDER_LABEL[c.provider ?? "meta"] ?? c.provider))].join(" and ")}, prices in backend/app/config.py)`}{node.calls.some((c) => c.billing === "credits") && <>. <span className="text-haze">cr</span> = open weights on Baseten at list price, paid from hackathon credits</>}.
+          </p>
         </>
       )}
     </div>

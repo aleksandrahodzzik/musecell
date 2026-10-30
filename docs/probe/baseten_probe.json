@@ -1,0 +1,544 @@
+{
+ "base_url": "https://inference.baseten.co/v1",
+ "model": "meta-models/muse-spark-open-1026",
+ "price_per_m": [
+  1.25,
+  4.25
+ ],
+ "total_usd": 0.031301999999999996,
+ "ran_at": "2026-10-30T09:58:40+0100",
+ "checks": [
+  {
+   "name": "a) GET /v1/models + rate limits",
+   "status": "PASS",
+   "detail": "21 ids; meta-models/muse-spark-open-1026 listed",
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "cost_usd": 0.0,
+   "seconds": 3.64,
+   "extra": {
+    "ids": [
+     "decision-models/baseten-elephant-9b-latest",
+     "decision-models/baseten-joey-2b-latest",
+     "decision-models/baseten-mammoth-27b-latest",
+     "deepseek-ai/DeepSeek-V4-Flash-0731",
+     "deepseek-ai/DeepSeek-V4-Pro-0813",
+     "deepseek-ai/DeepSeek-V4.1-Flash",
+     "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+     "deepseek-ai/DeepSeek-V4.1-Flash-1017-Fast",
+     "deepseek-ai/DeepSeek-V4.1-Flash-Fast",
+     "meta-models/muse-spark-open",
+     "meta-models/muse-spark-open-1026",
+     "moonshotai/Kimi-K3",
+     "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B",
+     "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B",
+     "openai/gpt-oss-120b",
+     "reflection/Beam-1.0",
+     "zai-org/GLM-5.2",
+     "zai-org/GLM-5.2-Fast",
+     "zai-org/GLM-5.3",
+     "zai-org/GLM-5.3-Fast",
+     "zai-org/GLM-5.3-Flash"
+    ],
+    "has_model": true,
+    "model_api_status": 403
+   }
+  },
+  {
+   "name": "b) plain text",
+   "status": "PASS",
+   "detail": "DAPI stains double-stranded DNA in the cell nucleus by binding strongly to AT-rich regions.",
+   "input_tokens": 158,
+   "output_tokens": 601,
+   "reasoning_tokens": 572,
+   "cost_usd": 0.00275175,
+   "seconds": 2.66,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 601,
+      "prompt_tokens": 158,
+      "total_tokens": 759,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 416,
+       "audio_tokens": 0,
+       "reasoning_tokens": 572,
+       "rejected_prediction_tokens": 872,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "message": {
+     "finish_reason": "stop",
+     "message_keys": [
+      "content",
+      "reasoning_content",
+      "role"
+     ],
+     "reasoning_fields_len": {
+      "reasoning_content": 2782
+     },
+     "content_len": 91,
+     "content_head": "DAPI stains double-stranded DNA in the cell nucleus by binding strongly to AT-rich regions.",
+     "n_tool_calls": 0
+    }
+   }
+  },
+  {
+   "name": "c) vision, BBBC021 composite",
+   "status": "PASS",
+   "detail": "Roughly 70 to 90 blue nuclei are distinguishable, but exact counting is difficult because many overlap in dense epithelial clusters and some are out of the fiel",
+   "input_tokens": 471,
+   "output_tokens": 964,
+   "reasoning_tokens": 886,
+   "cost_usd": 0.00468575,
+   "seconds": 8.08,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 964,
+      "prompt_tokens": 471,
+      "total_tokens": 1435,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 632,
+       "audio_tokens": 0,
+       "reasoning_tokens": 886,
+       "rejected_prediction_tokens": 1692,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 384,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "message": {
+     "finish_reason": "stop",
+     "message_keys": [
+      "content",
+      "reasoning_content",
+      "role"
+     ],
+     "reasoning_fields_len": {
+      "reasoning_content": 3820
+     },
+     "content_len": 348,
+     "content_head": "Roughly 70 to 90 blue nuclei are distinguishable, but exact counting is difficult because many overlap in dense epithelial clusters and some are out of the field or focus. No unambiguous mitotic figur",
+     "n_tool_calls": 0
+    },
+    "image_size": [
+     512,
+     410
+    ]
+   }
+  },
+  {
+   "name": "c2) images per request: 8 ok, 9 refused?",
+   "status": "PASS",
+   "detail": "8 \u2192 ok, 9 \u2192 HTTP 400",
+   "input_tokens": 245,
+   "output_tokens": 493,
+   "reasoning_tokens": 482,
+   "cost_usd": 0.0024015,
+   "seconds": 5.12,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 493,
+      "prompt_tokens": 245,
+      "total_tokens": 738,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 348,
+       "audio_tokens": 0,
+       "reasoning_tokens": 482,
+       "rejected_prediction_tokens": 667,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "n8": {
+     "ok": true,
+     "answer": "8"
+    },
+    "n9": {
+     "ok": false,
+     "status": 400,
+     "error": "Error code: 400 - Too many images: 9 (max 8)"
+    }
+   }
+  },
+  {
+   "name": "d) strict tool calling, parallel loop",
+   "status": "PASS",
+   "detail": "turn1 3 call(s) (parallel), args valid=True, final answer names tubulin, 2 turns",
+   "input_tokens": 1786,
+   "output_tokens": 765,
+   "reasoning_tokens": 382,
+   "cost_usd": 0.00548375,
+   "seconds": 3.8,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 330,
+      "prompt_tokens": 723,
+      "total_tokens": 1053,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 254,
+       "audio_tokens": 0,
+       "reasoning_tokens": 65,
+       "rejected_prediction_tokens": 271,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 640,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 435,
+      "prompt_tokens": 1063,
+      "total_tokens": 1498,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 317,
+       "audio_tokens": 0,
+       "reasoning_tokens": 317,
+       "rejected_prediction_tokens": 509,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 768,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "turns": [
+     {
+      "finish_reason": "tool_calls",
+      "message_keys": [
+       "reasoning_content",
+       "role",
+       "tool_calls"
+      ],
+      "reasoning_fields_len": {
+       "reasoning_content": 302
+      },
+      "content_len": 0,
+      "content_head": "",
+      "n_tool_calls": 3,
+      "calls": [
+       {
+        "name": "get_feature_z",
+        "args": "{\"feature\": \"nucleus_area\", \"rationale\": \"Need z-score for nucleus_area to compare deviation vs DMSO against other features.\"}"
+       },
+       {
+        "name": "get_feature_z",
+        "args": "{\"feature\": \"tubulin_intensity\", \"rationale\": \"Need z-score for tubulin_intensity to compare deviation magnitude.\"}"
+       },
+       {
+        "name": "get_feature_z",
+        "args": "{\"feature\": \"actin_texture\", \"rationale\": \"Need z-score for actin_texture to determine which deviates most.\"}"
+       }
+      ],
+      "args_schema_valid": [
+       true,
+       true,
+       true
+      ]
+     },
+     {
+      "finish_reason": "stop",
+      "message_keys": [
+       "content",
+       "reasoning_content",
+       "role"
+      ],
+      "reasoning_fields_len": {
+       "reasoning_content": 1366
+      },
+      "content_len": 327,
+      "content_head": "Based on robust z-score vs DMSO:\n\n* **tubulin_intensity: z = 5.4**\n* **nucleus_area: z = 2.1**\n* **actin_texture: z = -0.7**\n\n**tubulin_intensity deviates most**, with the largest magnitude deviation ",
+      "n_tool_calls": 0,
+      "calls": [],
+      "args_schema_valid": []
+     }
+    ]
+   }
+  },
+  {
+   "name": "e) structured output (json_schema strict / non-strict / json_object)",
+   "status": "PASS",
+   "detail": "json_schema_strict: valid; json_schema_nonstrict: valid; json_object: valid; none: valid",
+   "input_tokens": 792,
+   "output_tokens": 2277,
+   "reasoning_tokens": 2099,
+   "cost_usd": 0.01066725,
+   "seconds": 8.94,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 684,
+      "prompt_tokens": 198,
+      "total_tokens": 882,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 522,
+       "audio_tokens": 0,
+       "reasoning_tokens": 632,
+       "rejected_prediction_tokens": 605,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 604,
+      "prompt_tokens": 198,
+      "total_tokens": 802,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 457,
+       "audio_tokens": 0,
+       "reasoning_tokens": 562,
+       "rejected_prediction_tokens": 572,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 583,
+      "prompt_tokens": 198,
+      "total_tokens": 781,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 438,
+       "audio_tokens": 0,
+       "reasoning_tokens": 541,
+       "rejected_prediction_tokens": 570,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 406,
+      "prompt_tokens": 198,
+      "total_tokens": 604,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 300,
+       "audio_tokens": 0,
+       "reasoning_tokens": 364,
+       "rejected_prediction_tokens": 442,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "json_schema_strict": {
+     "accepted": true,
+     "finish_reason": "stop",
+     "parsed": true,
+     "schema_valid": true,
+     "fenced": false,
+     "head": "{\"cell_density\": \"lower\", \"observations\": [{\"channel\": \"dna\", \"finding\": \"bright condensed DNA\"}, {\"channel\": \"tubulin\", \"finding\": \"bundled tubulin\"}]}"
+    },
+    "json_schema_nonstrict": {
+     "accepted": true,
+     "finish_reason": "stop",
+     "parsed": true,
+     "schema_valid": true,
+     "fenced": false,
+     "head": "{\"cell_density\":\"lower\",\"observations\":[{\"channel\":\"dna\",\"finding\":\"bright condensed DNA\"},{\"channel\":\"tubulin\",\"finding\":\"bundled tubulin\"}]}"
+    },
+    "json_object": {
+     "accepted": true,
+     "finish_reason": "stop",
+     "parsed": true,
+     "schema_valid": true,
+     "fenced": false,
+     "head": "{\"cell_density\":\"lower\",\"observations\":[{\"channel\":\"dna\",\"finding\":\"bright condensed DNA\"},{\"channel\":\"tubulin\",\"finding\":\"bundled tubulin\"}]}"
+    },
+    "none": {
+     "accepted": true,
+     "finish_reason": "stop",
+     "parsed": true,
+     "schema_valid": true,
+     "fenced": false,
+     "head": "{\"cell_density\":\"lower\",\"observations\":[{\"channel\":\"dna\",\"finding\":\"bright condensed DNA\"},{\"channel\":\"tubulin\",\"finding\":\"bundled tubulin\"}]}"
+    }
+   }
+  },
+  {
+   "name": "e2) json_schema strict enforced against a conflicting prompt?",
+   "status": "PASS",
+   "detail": "strict: schema wins; non-strict: prompt wins",
+   "input_tokens": 350,
+   "output_tokens": 251,
+   "reasoning_tokens": 192,
+   "cost_usd": 0.00150425,
+   "seconds": 2.06,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 70,
+      "prompt_tokens": 175,
+      "total_tokens": 245,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 42,
+       "audio_tokens": 0,
+       "reasoning_tokens": 42,
+       "rejected_prediction_tokens": 154,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 181,
+      "prompt_tokens": 175,
+      "total_tokens": 356,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 140,
+       "audio_tokens": 0,
+       "reasoning_tokens": 150,
+       "rejected_prediction_tokens": 147,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "strict": {
+     "follows_schema": true,
+     "head": "{\"verdict\": \"approve\", \"score\": 0}"
+    },
+    "nonstrict": {
+     "follows_schema": false,
+     "head": "{\"answer\": \"maybe\", \"colour\": \"green\", \"notes\": [\"a\", \"b\"]}"
+    }
+   }
+  },
+  {
+   "name": "f) reasoning_effort low vs default",
+   "status": "PASS",
+   "detail": "low: 119 out tok, default: 684 out tok",
+   "input_tokens": 316,
+   "output_tokens": 803,
+   "reasoning_tokens": 749,
+   "cost_usd": 0.00380775,
+   "seconds": 4.95,
+   "extra": {
+    "usage_raw": [
+     {
+      "completion_tokens": 119,
+      "prompt_tokens": 158,
+      "total_tokens": 277,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 81,
+       "audio_tokens": 0,
+       "reasoning_tokens": 92,
+       "rejected_prediction_tokens": 185,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     },
+     {
+      "completion_tokens": 684,
+      "prompt_tokens": 158,
+      "total_tokens": 842,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": 507,
+       "audio_tokens": 0,
+       "reasoning_tokens": 657,
+       "rejected_prediction_tokens": 732,
+       "text_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": 0,
+       "cache_write_tokens": null,
+       "cached_tokens": 128,
+       "image_tokens": null,
+       "text_tokens": null
+      }
+     }
+    ],
+    "low": {
+     "ok": true,
+     "completion_tokens": 119,
+     "reasoning_tokens": 92,
+     "reasoning_chars": {
+      "reasoning_content": 292
+     },
+     "answer": "No, 391 is not prime because 391 = 17 \u00d7 23."
+    },
+    "default": {
+     "ok": true,
+     "completion_tokens": 684,
+     "reasoning_tokens": 657,
+     "reasoning_chars": {
+      "reasoning_content": 2514
+     },
+     "answer": "No, 391 is not prime because 17 \u00d7 23 = 391."
+    }
+   }
+  }
+ ]
+}

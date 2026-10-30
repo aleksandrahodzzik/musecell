@@ -53,13 +53,15 @@ class RunRequest(BaseModel):
     specimen_id: str
     budget: int = Field(4, ge=1, le=MAX_BUDGET_WELLS)
     mode: RunMode = "blinded"
+    provider: str | None = None  # None = PROVIDER from backend/.env; see /api/health "providers"
 
 
 @app.get("/api/health")
 async def health(request: Request) -> dict:
     m = mgr(request)
     return {"ok": True, "live_runs": m.live_enabled, "data": m.catalog is not None, "data_error": m.data_error,
-            "model_error": m.llm_error, "model_ids": m.model_ids(), "specimens": len(m.specimen_list())}
+            "model_error": m.llm_error, "model_ids": m.model_ids(), "specimens": len(m.specimen_list()),
+            "providers": m.provider_list(), "provider_notes": m.provider_notes}
 
 
 @app.get("/api/specimens")
@@ -70,7 +72,7 @@ async def specimens(request: Request) -> list[dict]:
 @app.post("/api/runs")
 async def create_run(body: RunRequest, request: Request) -> dict:
     try:
-        run_id = await mgr(request).start_run(body.specimen_id, body.budget, body.mode)
+        run_id = await mgr(request).start_run(body.specimen_id, body.budget, body.mode, body.provider)
     except RunRequestError as exc:
         raise HTTPException(status_code=400 if mgr(request).live_enabled else 503, detail=str(exc)) from None
     return {"run_id": run_id}

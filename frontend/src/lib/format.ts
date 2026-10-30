@@ -4,11 +4,19 @@ const MODEL_NAMES: Record<string, string> = {
   "muse-spark-1.3": "Muse Spark 1.3",
   "muse-spark-1.3-contributor": "Muse Spark 1.3 (contributor)",
   "muse-wonder-1.0": "Muse Wonder 1.0",
+  "meta-models/muse-spark-open-1026": "Muse Spark Open",
   "sam-3.1": "SAM 3.1",
   "classical (scikit-image)": "classical watershed (scikit-image)",
 };
 
 export const modelName = (id?: string | null) => (id ? MODEL_NAMES[id] ?? id : "unknown");
+
+// Who serves the Scientist + Microscopist. The PI reviewer (and SAM) always run on the Meta Model API.
+export const PROVIDER_LABEL: Record<string, string> = { meta: "Meta API", baseten: "Baseten" };
+export const providerOf = (ids?: Record<string, string> | null) => ids?.provider ?? "meta"; // older runs: Meta only
+export const isOpenWeights = (ids?: Record<string, string> | null) => providerOf(ids) !== "meta";
+export const openWeightsLabel = (ids?: Record<string, string> | null) =>
+  `Open weights · ${modelName(ids?.scientist)} via ${PROVIDER_LABEL[providerOf(ids)] ?? providerOf(ids)}`;
 
 export const TOOL_NAMES: Record<string, string> = {
   list_available_experiments: "List available experiments",

@@ -81,8 +81,8 @@ class AgentLoop:
     def _cost(self, record: CallRecord | None = None) -> None:
         self.run.model_calls = list(self.ctx.meter.calls)
         self.run.cost_usd = self.ctx.meter.total_usd
-        last = {k: getattr(record, k) for k in ("purpose", "model", "input_tokens", "output_tokens",
-                                                 "reasoning_tokens", "cost_usd", "seconds")} if record else None
+        last = {k: getattr(record, k) for k in ("purpose", "model", "provider", "billing", "input_tokens",
+                                                 "output_tokens", "reasoning_tokens", "cost_usd", "seconds")} if record else None
         self._emit("cost_updated", cost_usd=round(self.run.cost_usd, 5), calls=len(self.run.model_calls), last=last)
 
     # --- run --------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ class AgentLoop:
         run.turns += 1
         self._emit("thinking", turn=run.turns, phase=run.phase)
         self._check({"messages": self.messages, "tools": specs}, "the Scientist's request")
-        result = await self.ctx.llm.chat(model=self.ctx.settings.scientist_model, messages=self.messages,
+        result = await self.ctx.llm.chat(model=self.ctx.settings.scientist_id, messages=self.messages,
                                          meter=self.ctx.meter, purpose=f"scientist turn {run.turns}", tools=specs)
         self._cost(result.record)
         m = result.message
@@ -289,7 +289,7 @@ class AgentLoop:
         run.turns += 1
         self._emit("thinking", turn=run.turns, phase=run.phase, note="Writing the reflection.")
         raw, record = await ctx.llm.chat_json(
-            model=ctx.settings.scientist_model, meter=ctx.meter, purpose="reflection",
+            model=ctx.settings.scientist_id, meter=ctx.meter, purpose="reflection",
             messages=[{"role": "system", "content": prompts.REFLECTION_SYSTEM},
                       {"role": "user", "content": self._reflection_input()}],
             schema_name="reflection", schema=prompts.reflection_schema())
