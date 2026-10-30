@@ -299,11 +299,11 @@ function DriftingField() {
   const cells = imageUrl(ids[Math.min(2, ids.length - 1)]);
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
-      <img src={back} alt="" className="absolute -inset-[15%] h-[130%] w-[130%] max-w-none object-cover opacity-[0.45] blur-[14px] saturate-[1.3]
+      <img src={back} alt="" className="absolute -inset-[15%] h-[130%] w-[130%] max-w-none object-cover opacity-[0.45] blur-[22px] saturate-[1.3]
                                         animate-[drift_24s_ease-in-out_infinite_alternate] motion-reduce:animate-none" />
       {CELLS.map((c, i) => (
         <span key={i}
-              className="absolute rounded-full blur-[1.5px] saturate-[1.4] animate-[float_var(--dur)_ease-in-out_infinite_alternate] motion-reduce:animate-none
+              className="absolute rounded-full blur-[7px] saturate-[1.4] animate-[float_var(--dur)_ease-in-out_infinite_alternate] motion-reduce:animate-none
                          [mask-image:radial-gradient(circle,#000_45%,transparent_72%)]"
               style={{
                 left: `${c.left}%`, top: `${c.top}%`, width: c.size, height: c.size, opacity: c.opacity,
