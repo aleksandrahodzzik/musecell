@@ -7,6 +7,7 @@ import { EmptyState, ErrorNote, Loading } from "../components/States";
 import FieldThumb from "../components/FieldThumb";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
 import { PROVIDER_LABEL, dateTime, featureName, isOpenWeights, modelName, prob, providerOf, signed, toolName, uM, usd } from "../lib/format";
+import { dossierUrl } from "../lib/api";
 import { href } from "../lib/router";
 import type { Article, Conclusion, Deviation, Hypothesis, Reflection, Review, Unblinded, Verdict } from "../lib/types";
 import { useFetch } from "../lib/useFetch";
@@ -90,8 +91,8 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
         <a className="btn" href={href({ name: "run", runId })}><ArrowLeft aria-hidden className="h-3.5 w-3.5" /> Back to the run</a>
         <span className="ml-auto" />
         <button className="btn" onClick={() => window.print()}><Printer aria-hidden className="h-3.5 w-3.5" /> Print</button>
-        <a className="btn" href={`/api/runs/${encodeURIComponent(runId)}/dossier.md`} download><Download aria-hidden className="h-3.5 w-3.5" /> Export Markdown</a>
-        <a className="btn" href={`/api/runs/${encodeURIComponent(runId)}/dossier.json`} download><Download aria-hidden className="h-3.5 w-3.5" /> Export JSON</a>
+        <a className="btn" href={dossierUrl(runId, "md")} download><Download aria-hidden className="h-3.5 w-3.5" /> Export Markdown</a>
+        <a className="btn" href={dossierUrl(runId, "json")} download><Download aria-hidden className="h-3.5 w-3.5" /> Export JSON</a>
       </div>
 
       <header className="dark -mx-8 px-8 pt-5 pb-7 bg-night flex gap-8 items-start text-haze print:bg-white print:text-ink">

@@ -27,7 +27,7 @@ export default function App() {
 
   useEffect(() => { if (health.data) setCompositeOnly(!health.data.data); }, [health.data]);
 
-  const liveNote = health.data ? (health.data.live_runs ? "Live runs available" : "Replays only on this server") : undefined;
+  const liveNote = health.data ? (health.data.live_runs ? "Live runs available" : "Public demo · replays") : undefined;
 
   return (
     <div className="h-screen flex flex-col bg-paper text-ink">

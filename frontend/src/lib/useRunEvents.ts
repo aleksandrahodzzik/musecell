@@ -6,6 +6,7 @@
 
 import { useEffect, useReducer, useRef } from "react";
 import { initialRunState, runReducer, type RunState } from "./runState";
+import { STATIC, openStaticReplay } from "./staticDemo";
 import { EVENT_TYPES, type RunEvent } from "./types";
 
 const BACKOFF_MS = [1000, 2000, 4000, 8000, 15000];
@@ -25,6 +26,16 @@ export function useRunEvents(runId: string): RunState & { retry: () => void } {
     let es: EventSource | null = null;
     let timer: number | undefined;
     let disposed = false;
+
+    if (STATIC) { // no server: replay the recording in the browser (lib/staticDemo.ts)
+      dispatch({ type: "connection", connection: "open" });
+      const dispose = openStaticReplay(runId, (event) => {
+        lastSeq.current = event.seq;
+        dispatch({ type: "event", event });
+      }, () => dispatch({ type: "connection", connection: "not_found" }));
+      retryRef.current = () => undefined;
+      return () => { disposed = true; dispose(); };
+    }
 
     const open = () => {
       if (disposed) return;

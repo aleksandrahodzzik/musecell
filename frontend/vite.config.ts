@@ -9,5 +9,7 @@ export default defineConfig({
     strictPort: true,
     proxy: { "/api": { target: "http://127.0.0.1:8787", changeOrigin: false } },
   },
+  // The static demo on GitHub Pages lives under /<repo>/ (VITE_BASE=/musecell/); the app served by FastAPI at /.
+  base: (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.VITE_BASE || "/",
   build: { outDir: "dist", emptyOutDir: true },
 });
