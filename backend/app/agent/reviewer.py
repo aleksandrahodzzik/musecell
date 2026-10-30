@@ -25,7 +25,9 @@ SYSTEM = (
     "Approve when the conclusion is justified, or when no affordable experiment could change it. Request an "
     "experiment only when one specific, affordable step (a named dose index and replicate, or a free analysis "
     "such as an atlas comparison, a dose response or a phenotype description) could discriminate between the "
-    "leading hypotheses. Be concrete and brief; do not guess the compound."
+    "leading hypotheses. Be concrete and brief; do not guess the compound. Never write the name of any specific "
+    "compound or drug, not even as a control: a name may be the hidden compound or one of its synonyms, and the "
+    "blinding guard then stops the run. Refer to controls by class (agent v3 eval: one review was stopped so)."
 )
 
 

@@ -51,8 +51,10 @@ you give them.
 - describe_phenotype(field_ids): a vision model (the Microscopist) compares up to {MAX_PHENOTYPE_FIELDS} acquired \
 fields with a same-plate DMSO control. It can be wrong; weigh it against the numbers.
 - compare_to_reference_atlas(well_ids, k): nearest annotated reference treatments (other compounds only, \
-k ≤ {MAX_ATLAS_K}) by cosine similarity. Neighbours are evidence of similarity, not ground truth; low \
-similarity means weak evidence.
+k ≤ {MAX_ATLAS_K}) by cosine similarity, and the NSC vote: each well you acquired matched to its single nearest \
+reference treatment, then a majority vote. The NSC vote is the classical method (nearest-neighbour profiling); a \
+count of classes among k neighbours is weaker, because classes with many reference treatments fill the list. \
+Neighbours are evidence of similarity, not ground truth; low similarity means weak evidence.
 - dose_response(feature): per-dose medians and Spearman rho of one feature over the wells you acquired.
 - update_hypotheses(hypotheses): your current belief over MoA classes, each with supporting and contradicting \
 evidence ids. Shown live to the user as the hypothesis board.
@@ -71,6 +73,16 @@ honest belief; evidence ids must be ones the tools returned.
 - Stop when you are confident (another well is unlikely to change your top hypothesis) or when the budget is \
 spent; an unspent well is fine. Then call submit_conclusion with your honest probability, the evidence ids it \
 rests on, and a concrete follow-up experiment a real lab would run next.
+- Weighing the evidence: treat the NSC vote over all your wells as your starting prior, and call \
+compare_to_reference_atlas again after new wells so it covers them. Move away from the NSC class only when \
+several independent results (other doses, a dose response, the Microscopist) consistently point to one other \
+class; a single striking feature or image is not enough, because strong changes in one stain occur in many \
+classes. When the per-well votes disagree, spend wells on resolving that split (a replicate or a neighbouring \
+dose of the disagreeing wells), and say in your conclusion which way you went and why.
+- Blinding: until the unblinding, never write the name of any specific compound or drug — not in rationales, \
+hypotheses, notes or the conclusion, and not as a control in the follow-up experiment. A name you write may be \
+the hidden compound or one of its synonyms, and the blinding guard then stops the run. Refer to references and \
+controls by their class (for example "a reference compound of the leading class").
 - Tool errors are messages to you: read them and adjust."""
 
 

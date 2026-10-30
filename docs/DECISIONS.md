@@ -297,3 +297,25 @@ Owner asked for more interactivity. Everything added reads the run's own events;
 
 ### Tooling notes
 - `evaluate.py`: `--provider`, `--compare MODEL…`; comparison rows have `method: "agent_open"`, a `model` and `provider` field; RESULTS.md gets an "Open weights vs Meta API" table with one column per model; the baselines and the main agent rows keep all budgets whatever `--budgets` a call runs. Rebuild: `python scripts/evaluate.py --model muse-spark-1.3-contributor --compare meta-models/muse-spark-open-1026 --aggregate-only`.
+
+## Agent v2 / v3 — the NSC vote as evidence (2026-10-30)
+
+The owner asked for a better agent. Rule kept throughout: no tuning to individual compounds, no dropped runs, every version and every failure stays in `eval/agent_runs.jsonl` and in the tables.
+
+### Diagnosis (`scripts/nsc_on_agent_wells.py`, no API calls)
+Applied the NSC protocol (1-NN per well against the LOCO atlas, majority vote) to exactly the wells the agent had acquired in each logged run. At budget 4 it is right for 23/38 compounds for both v1 agents (open: agent 17/38; contributor: agent 14/38), i.e. **the agent picks informative wells and then loses the answer**. The atlas tool showed it a "classes among k = 10 neighbours" count, which favours classes with many reference treatments and was right less often (k = 10 class count on all acquired wells 17–20/38, 1-NN 21–24/38). When the agent's call differed from the NSC vote on its own wells, it was right 0 times at budgets 4 and 6 (contributor at budget 2: 2 of 10 overrides right).
+
+### Changes (agent version recorded as `model_ids.agent`; older runs are v1)
+- **v2:** `compare_to_reference_atlas` also returns `nsc` (per acquired well: nearest reference class and similarity; tally; vote) over **all** wells acquired so far, and its summary leads with it. The prompt explains why the NSC vote is stronger than a k-neighbour class count, tells the agent to start from it and leave it only when several independent results agree on another class ("a single striking feature or image is not enough, because strong changes in one stain occur in many classes"), and to spend wells on resolving split votes. No class-specific hint.
+- v2 eval (open weights, budget 4) **stopped after 19/38**: 11/19 correct (v1 on the same 19: 9/19), but 2 runs were stopped by the blinding guard. In both, the agent had reached a stabilizer call and then a blinded-phase `tool_call` named a compound (most likely a well-known drug as a control in the follow-up experiment) that was the hidden compound or one of its synonyms.
+- **v3:** v2 + the blinded phase must not name any compound (prompt rule) and the NSC block no longer carries reference compound names (the k-neighbour list still does, for the UI).
+- **v3.1** (after the v3 eval, not evaluated): the PI reviewer gets the same no-names rule; one v3 review named a compound and the guard stopped the run.
+
+### Result — v3, Muse Spark Open on Baseten, 38 compounds, budget 4
+**55.3 % (21/38)**, before review 50.0 %; v1 on the same model 44.7 %; NSC on 4 random wells 57.8 % ± 5.8. Still below the random-wells baseline, now within one standard deviation of it. 1 failed run (guard, reviewer naming), counted wrong. NSC on the wells v3 acquired: 24/38 (63.2 %); v3 followed that vote in 31 of 37 calls, its 6 overrides were right 0 times (2 of them lost a right NSC call). Mean latency 142 s, nominal cost $0.375/run, citations 128/129, leak re-scan 0 hits, reviewer turned 3 wrong calls right and 1 right call wrong.
+
+**Caveat, stated in RESULTS.md by the script:** v2/v3 were designed after reading the v1 runs on these same 38 compounds; BBBC021 has no other annotated compounds, so 55.3 % is not a held-out estimate. The change is generic (show the published NSC protocol, explain how to weigh it, keep names out) and contains nothing compound- or class-specific, but the decision to make it came from these runs.
+
+Not done on purpose: making the NSC vote the final call. On these logs it would score 24/38, but that rule would be fitted to the same 38 compounds and would turn the Scientist into a well picker; reported as an analysis instead.
+
+Spend today: $11.44 real USD (reviewer on all runs, CLI/demo runs) + $25.02 nominal Baseten credits. Daily cap raised per process (`DAILY_COST_CAP_USD=35`, then 45) for the v2/v3 evals because credits count toward it; `backend/.env` unchanged.

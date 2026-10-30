@@ -40,9 +40,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
+from app.agent import AGENT_VERSION  # noqa: E402
 from app.agent.guardrails import BlindingScanner  # noqa: E402
 from app.agent.specimens import Specimen  # noqa: E402
-from app.config import OPEN_WEIGHTS_MODEL, PRICES, PROVIDERS, Settings  # noqa: E402
+from app.config import OPEN_WEIGHTS_MODEL, PRICES, PROVIDERS, Settings, provider_of  # noqa: E402
 from app.llm import cost_of  # noqa: E402
 from app.runs.manager import RunManager  # noqa: E402
 from app.runs.store import RunBus  # noqa: E402
@@ -56,6 +57,21 @@ RECORDED = ("run_87e2787d1f1e", "run_39e2d32f1edc", "run_93391a0830e0")  # Phase
 # Stretch: the same three specimens on Muse Spark Open via Baseten (scripts/run_agent_cli.py, budget 4)
 RECORDED_OPEN = ("run_d5a53adc9c63", "run_0d9f5361415e", "run_0f1c579db128")
 COMPARE_LABELS = {OPEN_WEIGHTS_MODEL: "Muse Spark Open (Baseten)"}
+
+
+def version_of(r: dict) -> str:
+    """Agent version of a logged run; runs logged before versions existed are v1."""
+    return r["models"].get("agent", "v1")
+
+
+def parse_spec(spec: str) -> tuple[str, str]:
+    """'model' or 'model@v2' -> (model, version); no version means v1 (every run before agent v2)."""
+    model, _, ver = spec.partition("@")
+    return model, ver or "v1"
+
+
+def short_label(model: str, ver: str) -> str:
+    return COMPARE_LABELS.get(model, model) + ("" if ver == "v1" else f", agent {ver}")
 
 
 # --- specimens and baselines ----------------------------------------------------------------------
@@ -197,7 +213,8 @@ async def one_run(manager: RunManager, sp: Specimen, budget: int) -> dict:
 
 async def run_agents(manager: RunManager, specimens: list[Specimen], budgets: tuple[int, ...],
                      concurrency: int, model: str) -> None:
-    done = {(r["specimen_id"], r["budget"]) for r in load_log() if r["models"]["scientist"] == model}
+    done = {(r["specimen_id"], r["budget"]) for r in load_log()
+            if r["models"]["scientist"] == model and version_of(r) == AGENT_VERSION}
     todo = [(sp, b) for b in budgets for sp in specimens if (sp.specimen_id, b) not in done]
     print(f"agent runs: {len(done)} already in {RUNS_LOG.relative_to(ROOT)}, {len(todo)} to go")
     sem, lock, stop = asyncio.Semaphore(concurrency), asyncio.Lock(), asyncio.Event()
@@ -237,19 +254,22 @@ def leak_tests() -> str:
 
 
 def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: str,
-               method: str = "agent") -> tuple[list[dict], list[str]]:
+               method: str = "agent", ver: str = "v1") -> tuple[list[dict], list[str]]:
     ids = {sp.specimen_id for sp in specimens}
     rows, notes = [], []
-    label = f"MuseCell agent, {COMPARE_LABELS[model]}" if model in COMPARE_LABELS else f"MuseCell agent ({model})"
+    label = (f"MuseCell agent, {short_label(model, ver)}" if model in COMPARE_LABELS or ver != "v1"
+             else f"MuseCell agent ({model})")
     for b in budgets:
-        rs = [r for r in records if r["budget"] == b and r["specimen_id"] in ids and r["models"]["scientist"] == model]
+        rs = [r for r in records if r["budget"] == b and r["specimen_id"] in ids
+              and r["models"]["scientist"] == model and version_of(r) == ver]
         if not rs:
             continue
         ok = [r for r in rs if r["status"] == "finished"]
         cited = sum(r.get("citations_cited", 0) for r in rs)
         removed = sum(r.get("citations_removed", 0) for r in rs)
         rows.append({
-            "method": method, "label": label, "model": model, "budget": b, "n": len(rs),
+            "method": method, "label": label, "model": model, "agent_version": ver,
+            "short": short_label(model, ver), "budget": b, "n": len(rs),
             "accuracy": round(sum(r["correct"] for r in rs) / len(rs), 4), "correct": sum(r["correct"] for r in rs),
             "accuracy_before_review": round(sum(r["first_correct"] for r in rs) / len(rs), 4),
             "mean_wells": round(float(np.mean([r["wells_used"] for r in rs])), 2),
@@ -313,7 +333,7 @@ def comparison_markdown(res: dict) -> list[str]:
     for b in sorted({r["budget"] for r in compare}):
         cols = [r for r in res["rows"] if r["method"] in ("agent", "agent_open") and r["budget"] == b]
         rand = next((r for r in res["rows"] if r["method"] == "nsc_random" and r["budget"] == b), None)
-        heads = [COMPARE_LABELS.get(r["model"], r["model"]) for r in cols]
+        heads = [r.get("short") or COMPARE_LABELS.get(r["model"], r["model"]) for r in cols]
         lines += [f"## Open weights vs Meta API, budget {b}", "",
                   f"Same {res['n_compounds']} compounds, same tools, same PI reviewer (`muse-wonder-1.0`, Meta API); "
                   "only the Scientist + Microscopist + reflection model differs.", "",
@@ -407,7 +427,7 @@ def plot(res: dict, path: Path) -> None:
         ax.plot(xs, ys, color=color, linestyle=dash, linewidth=width, label=label, markersize=6 if is_open else 5,
                 marker="D" if is_open else "o", markerfacecolor=paper if is_open else color)
         if is_open:  # a single point: label it beside the marker so it does not collide with the agent line
-            ax.text(xs[-1] + 0.12, ys[-1], "Muse Spark Open\n(open weights, Baseten)", va="center", fontsize=8, color=color)
+            ax.text(xs[-1] + 0.12, ys[-1], pts[0].get("short", label), va="center", fontsize=8, color=color)
             continue
         ax.text(xmax, ys[-1], f" {label}", va="center", fontsize=8, color=color)
     ax.set_xlim(min(budgets) - 0.4, xmax)
@@ -437,7 +457,8 @@ async def main() -> int:
     p.add_argument("--model", default="muse-spark-1.3", help="Scientist + Microscopist + reflection model")
     p.add_argument("--provider", choices=["meta", "baseten"], default="meta",
                    help="who serves the agent runs of this call; baseten = open weights (" + OPEN_WEIGHTS_MODEL + ")")
-    p.add_argument("--compare", nargs="*", default=[], help="extra agent models to add as comparison rows")
+    p.add_argument("--compare", nargs="*", default=[],
+                   help="extra agents to add as comparison rows: MODEL or MODEL@VERSION (default v1)")
     p.add_argument("--reviewer-model", default="muse-wonder-1.0")
     p.add_argument("--budgets", type=int, nargs="+", default=list(BUDGETS))
     p.add_argument("--compounds", type=int, help="stratified subset size (spec: >= 24); default all")
@@ -450,12 +471,17 @@ async def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     budgets = tuple(args.budgets)
 
-    contributor = args.model.endswith("-contributor")
-    settings = Settings(scientist_model=args.model, microscopist_model=args.model, provider=args.provider,
+    main_model, main_ver = parse_spec(args.model)  # the main agent rows (and the error analysis)
+    contributor = main_model.endswith("-contributor")
+    settings = Settings(scientist_model=main_model, microscopist_model=main_model, provider=args.provider,
                         reviewer_model=args.reviewer_model, allow_contributor=contributor)
-    run_model = settings.scientist_id  # = args.model on meta, the open-weights id on another provider
-    compare = list(dict.fromkeys([*args.compare, *([run_model] if run_model != args.model else [])]))
-    for m in (args.model, run_model, args.reviewer_model, *compare):
+    run_model = settings.scientist_id  # = main_model on meta, the open-weights id on another provider
+    # runs of this call are always the current agent version; show them as a comparison unless they are the main rows
+    this_run = (run_model, AGENT_VERSION)
+    compare = list(dict.fromkeys([*map(parse_spec, args.compare),
+                                  *([this_run] if not args.aggregate_only and this_run != (main_model, main_ver)
+                                    else [])]))
+    for m in (main_model, run_model, args.reviewer_model, *(m for m, _ in compare)):
         if m not in PRICES:
             p.error(f"no price for '{m}'")
     EVAL_RUNS_DIR.mkdir(parents=True, exist_ok=True)
@@ -483,7 +509,7 @@ async def main() -> int:
                   + (f" ± {r['sd']:.3f}" if r.get("sd") else ""))
 
         if not args.aggregate_only:
-            recorded = RECORDED if run_model == args.model else RECORDED_OPEN
+            recorded = RECORDED if run_model == main_model else RECORDED_OPEN
             est = estimate(len(specimens), budgets, run_model, args.reviewer_model, recorded)
             print(f"\ncost estimate ({est['runs']} agent runs; scientist/microscopist/reflection {run_model} on "
                   f"{PROVIDERS[args.provider].label}, reviewer {args.reviewer_model}; from the token use of "
@@ -505,28 +531,37 @@ async def main() -> int:
             await run_agents(manager, specimens, budgets, args.concurrency, run_model)
 
         records = load_log()
-        a_rows, notes = agent_rows(records, specimens, BUDGETS, args.model)
-        for m in compare:
-            c_rows, c_notes = agent_rows(records, specimens, sorted(set(BUDGETS) | set(budgets)), m, "agent_open")
-            provider = next(p for p, cfg in PROVIDERS.items() if cfg.open_model == m)
+        a_rows, notes = agent_rows(records, specimens, BUDGETS, main_model, "agent", main_ver)
+        for m, ver in compare:
+            c_rows, c_notes = agent_rows(records, specimens, sorted(set(BUDGETS) | set(budgets)), m, "agent_open", ver)
+            provider = provider_of(m)
             for r in c_rows:
                 r.update(provider=provider, provider_label=PROVIDERS[provider].label, billing=PRICES[m].billing)
             a_rows += c_rows
             notes += c_notes
+        if any(ver != "v1" for _, ver in compare):
+            v2 = [r for r in records if version_of(r) == "v2"]
+            notes.insert(0, "Agent v2/v3 (the atlas tool also returns the NSC vote over the wells acquired so far, "
+                            "the prompt says how to weigh it, and the blinded phase names no compound) was designed "
+                            "after reading the v1 runs on these same 38 compounds (`scripts/nsc_on_agent_wells.py`). "
+                            "BBBC021 has no other annotated compounds, so v3 accuracy is not a held-out estimate. "
+                            f"A v2 eval was stopped after {len(v2)} runs ({sum(r['correct'] for r in v2)} correct, "
+                            f"{sum(r['status'] != 'finished' for r in v2)} stopped by the blinding guard) to add the "
+                            "naming rule; its runs stay in eval/agent_runs.jsonl.")
         used = [r for r in records if r["specimen_id"] in {s.specimen_id for s in specimens}
-                and r["models"]["scientist"] == args.model and r["budget"] in budgets]
+                and r["models"]["scientist"] == main_model and version_of(r) == main_ver and r["budget"] in BUDGETS]
         hits = sum(r.get("leak_hits", 0) for r in used)
         leak = (f"pytest leak/blinding tests: {leak_tests()}; offline re-scan of {len(used)} eval run logs "
                 f"(events before unblinding): {hits} hits")
         if contributor:
-            notes.insert(0, f"Eval runs used `{args.model}` (same model, cheaper tier that lets Meta train on "
+            notes.insert(0, f"Eval runs used `{main_model}` (same model, cheaper tier that lets Meta train on "
                             "prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.")
         notes.append("The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses "
                      "treatment profiles (median over replicates), the published NSC protocol.")
         res = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-               "models": {"scientist": args.model, "microscopist": args.model, "reviewer": args.reviewer_model,
+               "models": {"scientist": main_model, "microscopist": main_model, "reviewer": args.reviewer_model,
                           "segmentation": manager.model_ids()["segmentation"]},
-               "comparisons": [{"model": m, "label": COMPARE_LABELS.get(m, m)} for m in compare],
+               "comparisons": [{"model": m, "agent_version": v, "label": short_label(m, v)} for m, v in compare],
                "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows,
                "analysis": analysis(used) if used else None}
         (EVAL / "results.json").write_text(json.dumps(res, indent=1), encoding="utf-8")

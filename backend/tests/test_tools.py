@@ -376,3 +376,16 @@ def test_describe_phenotype_fits_the_open_weights_image_cap(catalog, atlas):
     assert len(images) == len(well["field_ids"]) + len(out.evidence.data["dmso_field_ids"]) <= 8
     assert "Only the composites are given" in content[-1]["text"]
     assert out.evidence.data["images"] == "composites only"
+
+
+def test_atlas_returns_nsc_vote_over_all_acquired_wells(catalog, atlas):
+    """Agent v2: the atlas tool also reports the NSC protocol (1-NN per acquired well, majority vote), LOCO."""
+    ctx = make_ctx(catalog, atlas, budget=3)
+    w1 = call(ctx, "acquire_well", concentration_index=2, replicate=1).evidence.data["well_id"]
+    w2 = call(ctx, "acquire_well", concentration_index=1, replicate=1).evidence.data["well_id"]
+    ev = call(ctx, "compare_to_reference_atlas", well_ids=[w1], k=3).evidence  # queried one, NSC covers both
+    nsc = ev.data["nsc"]
+    assert nsc["wells"] == 2 and [p["well_id"] for p in nsc["per_well"]] == [w1, w2]
+    assert "nearest_compound" not in nsc["per_well"][0]  # classes only; names stay in the k-neighbour list
+    assert nsc["moa"] == nsc["tally"][0]["moa"] and sum(t["votes"] for t in nsc["tally"]) == 2
+    assert ev.summary.startswith(f"NSC vote over 2 acquired well(s): {nsc['moa']}")

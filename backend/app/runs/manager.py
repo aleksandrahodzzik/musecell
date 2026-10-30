@@ -11,6 +11,7 @@ import asyncio
 import uuid
 from pathlib import Path
 
+from app.agent import AGENT_VERSION
 from app.agent import tools as T
 from app.agent.guardrails import BlindingScanner, load_moa_classes
 from app.agent.loop import AgentLoop
@@ -109,7 +110,8 @@ class RunManager:
         s = self.settings.for_provider(provider) if provider else self.settings
         roles = s.role_models
         return {"scientist": roles["scientist"], "microscopist": roles["microscopist"], "reviewer": roles["reviewer"],
-                "segmentation": SEGMENTATION_LABEL[s.nuclei_segmenter], "provider": s.provider}
+                "segmentation": SEGMENTATION_LABEL[s.nuclei_segmenter], "provider": s.provider,
+                "agent": AGENT_VERSION}
 
     def provider_list(self) -> list[dict]:
         """For the start screen's switch: which providers a live run may use and what runs where."""

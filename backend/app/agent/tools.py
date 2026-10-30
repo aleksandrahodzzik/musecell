@@ -153,7 +153,8 @@ def all_tool_specs(moa_classes: list[str]) -> dict[str, dict]:
         "compare_to_reference_atlas": _fn(
             "compare_to_reference_atlas",
             "Nearest annotated reference treatments (other compounds only) to the median profile of the given "
-            "acquired wells, with their MoA and cosine similarity.",
+            "acquired wells, with their MoA and cosine similarity; plus the NSC vote (each acquired well's single "
+            "nearest reference treatment, majority vote) over all wells acquired so far.",
             {"well_ids": _ids("acquired well ids"),
              "k": {"type": "integer", "description": f"number of neighbours, 1-{MAX_ATLAS_K}"}}),
         "dose_response": _fn(
@@ -378,6 +379,27 @@ async def describe_phenotype(ctx: ToolContext, a: DescribePhenotypeArgs) -> Evid
                         [image_id(f) for f in field_ids + controls])
 
 
+def nsc_vote(ctx: ToolContext) -> dict:
+    """The published NSC protocol on the wells acquired so far: each well's single nearest other-compound
+    reference treatment (1-NN, cosine), then a majority vote (ties: summed similarity). A k-neighbour count per
+    class favours classes with many reference treatments; in the Phase-6/Stretch eval logs the 1-NN vote on the
+    agent's own wells was right far more often than the k=10 class count (docs/DECISIONS.md, "Agent v2")."""
+    per_well, votes = [], {}
+    for wid in ctx.run.acquired_well_ids:
+        w = ctx.acquired_well(wid)
+        h = ctx.atlas.neighbors(ctx.catalog.profile(w.well_key), 1, exclude_compound=ctx.specimen.compound)[0]
+        # no reference compound name here: the vote needs only the class (v3: fewer names for the agent to repeat)
+        per_well.append({"well_id": wid, "concentration_uM": w.concentration_uM, "nearest_moa": h.moa,
+                         "similarity": round(h.similarity, 3)})
+        votes.setdefault(h.moa, []).append(h.similarity)
+    if not votes:
+        return {"wells": 0, "moa": None, "votes": 0, "per_well": [], "tally": []}
+    tally = sorted(({"moa": m, "votes": len(s), "summed_similarity": round(sum(s), 3)} for m, s in votes.items()),
+                   key=lambda r: (-r["votes"], -r["summed_similarity"]))
+    return {"wells": len(per_well), "moa": tally[0]["moa"], "votes": tally[0]["votes"], "per_well": per_well,
+            "tally": tally, "protocol": "1-NN per acquired well, majority vote (NSC, Ljosa et al. 2013)"}
+
+
 async def compare_to_reference_atlas(ctx: ToolContext, a: CompareAtlasArgs) -> Evidence:
     wells = [ctx.acquired_well(w) for w in dict.fromkeys(a.well_ids)]
     query = pd.concat([ctx.catalog.profile(w.well_key) for w in wells], axis=1).median(axis=1)
@@ -389,10 +411,12 @@ async def compare_to_reference_atlas(ctx: ToolContext, a: CompareAtlasArgs) -> E
         by_moa.setdefault(h.moa, []).append(h.similarity)
     moa_summary = sorted(({"moa": m, "neighbors": len(s), "mean_similarity": round(sum(s) / len(s), 3)}
                           for m, s in by_moa.items()), key=lambda r: (-r["neighbors"], -r["mean_similarity"]))
+    nsc = nsc_vote(ctx)
     data = {"well_ids": [w.well_id for w in wells], "k": a.k, "similarity": "cosine on robust-z profiles",
             "excluded": "the specimen's own compound (leave-one-compound-out)",
-            "neighbors": neighbors, "moa_summary": moa_summary}
-    summary = "Nearest references: " + ", ".join(f"{r['moa']} ({r['neighbors']}/{a.k})" for r in moa_summary[:3])
+            "nsc": nsc, "neighbors": neighbors, "moa_summary": moa_summary}
+    summary = (f"NSC vote over {nsc['wells']} acquired well(s): {nsc['moa']} ({nsc['votes']}/{nsc['wells']}); "
+               "k-neighbour classes: " + ", ".join(f"{r['moa']} ({r['neighbors']}/{a.k})" for r in moa_summary[:3]))
     return ctx.register("atlas", "compare_to_reference_atlas", summary, data, [n["image_id"] for n in neighbors])
 
 

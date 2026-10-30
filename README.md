@@ -137,8 +137,11 @@ Then **Start blinded run** in the UI, or `python scripts/run_agent_cli.py --list
 | MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
 | MuseCell agent, Muse Spark Open (Baseten) | 4 | 44.7% | 17/38 | 31.6% | 3.97 | $0.365 | 167 s | 111/112 (99.1%) |
+| MuseCell agent, Muse Spark Open (Baseten), agent v3 | 4 | 55.3% | 21/38 | 50.0% | 4.00 | $0.375 | 142 s | 128/129 (99.2%) |
 
 **The agent is below the classical baseline,** and more wells do not help it. The error analysis in [`eval/RESULTS.md`](eval/RESULTS.md) shows where it goes wrong. Strong cytoskeletal and mitotic phenotypes are nearly always right (microtubule destabilizers 12/12, Aurora kinase inhibitors 9/9, stabilizers 8/9). Subtle classes are never right: it over-calls "Microtubule stabilizers" (35 of 114 runs, 9 true) and never calls Epithelial, Protein degradation or Cholesterol-lowering. The PI review changed a wrong call to a right one in 3 runs and a right one to wrong in 1. Every cited PMID (320/320) was one the agent had retrieved in that run.
+
+**Agent v3 closes most of the gap.** [`scripts/nsc_on_agent_wells.py`](scripts/nsc_on_agent_wells.py) applies the NSC protocol to exactly the wells the agent chose: at budget 4 that is right for 23/38 compounds, so the agent was picking informative wells and then losing the answer. The atlas tool had shown it a count of classes among 10 neighbours, which is weaker than the 1-NN vote, and whenever the agent overrode the vote on its own wells it was wrong. In v3 the atlas tool also returns the NSC vote over all acquired wells, the prompt explains how to weigh it, and the blinded phase names no compound. On Muse Spark Open (Baseten) at budget 4 that raised accuracy from 44.7% to **55.3% (21/38)**, within one standard deviation of NSC on 4 random wells (57.8% ± 5.8) but still below it. v3 was designed after reading the v1 runs on these same 38 compounds, and BBBC021 has no other annotated compounds, so this is not a held-out estimate (also stated in `eval/RESULTS.md`). The change is generic, with nothing compound- or class-specific. A first version (v2) was stopped after 19 runs to fix blinding hygiene; its runs stay in the log. Details: [docs/DECISIONS.md](docs/DECISIONS.md) ("Agent v2 / v3").
 
 The eval ran on `muse-spark-1.3-contributor` (same model, cheaper tier; allowed because BBBC021 is public); 114 runs cost $14.60. The demo runs and the app use `muse-spark-1.3`. Every run is logged in [`eval/agent_runs.jsonl`](eval/agent_runs.jsonl); `python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only` rebuilds the tables and chart from it without API calls (needs the data for the baselines).
 
@@ -150,15 +153,15 @@ Nothing in the agent loop is forked. [`LLMClient`](backend/app/llm.py) routes ea
 
 Same 38 compounds, budget 4, same tools and same PI reviewer, from [`eval/RESULTS.md`](eval/RESULTS.md):
 
-| | Muse Spark 1.3 (contributor tier), Meta API | Muse Spark Open (Baseten) | NSC baseline, 4 random wells |
-|---|---|---|---|
-| Accuracy | 36.8% (14/38) | **44.7% (17/38)** | 57.8% ± 5.8 |
-| Before PI review | 36.8% | 31.6% | – |
-| Failed runs | 0 | 3 (1 before a conclusion; 2 in the reflection, after the verdict) | – |
-| Mean latency | 208 s | 167 s | – |
-| Citations verified | 109/109 | 111/112 | – |
+| | Muse Spark 1.3 (contributor tier), Meta API, agent v1 | Muse Spark Open (Baseten), agent v1 | Muse Spark Open (Baseten), agent v3 | NSC baseline, 4 random wells |
+|---|---|---|---|---|
+| Accuracy | 36.8% (14/38) | 44.7% (17/38) | **55.3% (21/38)** | 57.8% ± 5.8 |
+| Before PI review | 36.8% | 31.6% | 50.0% | – |
+| Failed runs | 0 | 3 (1 before a conclusion; 2 in the reflection, after the verdict) | 1 (blinding guard) | – |
+| Mean latency | 208 s | 167 s | 142 s | – |
+| Citations verified | 109/109 | 111/112 | 128/129 | – |
 
-On open weights the PI reviewer turned 5 wrong calls into right ones and no right call into a wrong one. The open model is still below the NSC baseline, and with 38 compounds a 3-compound difference is within noise. It shares the over-call of "Microtubule stabilizers" (11 of 38 calls, 3 true). Mean cost was $0.365 per run at Baseten list price plus the reviewer. That is not comparable with the contributor tier, which is priced 10–20× lower.
+With agent v1 on open weights the PI reviewer turned 5 wrong calls into right ones and no right call into a wrong one; with v3, 3 and 1. Both are still below the NSC baseline, and with 38 compounds a 3-compound difference is within noise (v3 caveat above: designed on these compounds). It shares the over-call of "Microtubule stabilizers" (11 of 38 calls, 3 true). Mean cost was $0.365 per run at Baseten list price plus the reviewer. That is not comparable with the contributor tier, which is priced 10–20× lower.
 
 One recorded demo run is on open weights: `run_2bee8860f390` (epothilone B, correct, reviewer approved, citations 5/5).
 
@@ -169,7 +172,7 @@ python scripts/probe_baseten.py                                   # PASS/FAIL pe
 $env:PROVIDER="baseten"; python scripts/run_agent_cli.py --specimen s_89c9462717 --budget 4; Remove-Item Env:PROVIDER
 python scripts/evaluate.py --provider baseten --budgets 4 --model muse-spark-1.3-contributor        # estimate only
 python scripts/evaluate.py --provider baseten --budgets 4 --model muse-spark-1.3-contributor --yes  # 38 runs
-python scripts/evaluate.py --model muse-spark-1.3-contributor --compare meta-models/muse-spark-open-1026 --aggregate-only
+python scripts/evaluate.py --model muse-spark-1.3-contributor --compare meta-models/muse-spark-open-1026 meta-models/muse-spark-open-1026@v3 --aggregate-only
 ```
 
 Or set `PROVIDER=baseten` in `backend/.env` to make open weights the default; with only `BASETEN_API_KEY` added, the start screen offers the switch per run.
@@ -194,7 +197,7 @@ Compound identity and mechanisms after unblinding come from [PubChem](https://pu
 - **One cell line, one dataset.** MCF-7 cells, 38 annotated compounds in 12 MoA classes, a single public screen. Nothing here has been tested on other cell lines, stains or plates.
 - **The virtual microscope replays existing images.** "Acquiring a well" reads a well that was imaged in 2010; the agent chooses among doses and replicates that already exist and cannot order a new experiment.
 - **Crude features.** Hand-built per-cell features (intensity, shape, GLCM texture) from classical segmentation. Classical cell bodies have no independent check; SAM 3.1 was used to check nuclei only.
-- **Accuracy is below a simple baseline** (see Evaluation), measured on the contributor tier. Full-price accuracy was not benchmarked; the 4 demo runs and 3 earlier test runs are too few to say.
+- **Accuracy is below a simple baseline** (see Evaluation): agent v1 on the contributor tier and on open weights, and agent v3 (55.3% vs 57.8% on open weights, designed on the same 38 compounds). Full-price `muse-spark-1.3` and agent v3 on the Meta API were not benchmarked; the demo runs are too few to say.
 - **Small eval.** 38 compounds is small, so differences of a few compounds are within noise. The 38 compounds are also the only annotated set, so prompts were not tuned on a held-out split.
 - **Replay without data.** In a fresh clone without `DATA_DIR`, masks, hover measurements and fields beyond the 40 shipped thumbnails are unavailable (the UI says so).
 
