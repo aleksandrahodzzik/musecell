@@ -1,10 +1,12 @@
-// Choose a specimen (spec §8 screen 1), darkfield design: the start screen is the instrument. A real BBBC021 field
-// sits in the eyepiece; specimens are sealed glass slides; the budget is a row of wells.
+// Choose a specimen (spec §8 screen 1). Design v2: an editorial landing on bone paper with dark instrument frames.
+// A real BBBC021 field sits in the eyepiece (top right of the hero); specimens are sealed glass slides; the budget
+// is a row of wells.
 
 import { Lock, Play, RefreshCw, Shuffle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type React from "react";
 import HowItWorks from "../components/HowItWorks";
+import { Reveal } from "../components/Shell";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
 import { ApiError, postJSON } from "../lib/api";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
@@ -53,9 +55,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   const [provider, setProvider] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
-  const [showRecorded, setShowRecorded] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
-  const recordedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!selected && specimens.data?.length) setSelected(specimens.data[0].specimen_id);
@@ -64,10 +64,6 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   useEffect(() => {
     if (!provider && health) setProvider(providerOf(health.model_ids));
   }, [health, provider]);
-
-  useEffect(() => {
-    if (showRecorded) recordedRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }, [showRecorded]);
 
   const pickRandom = () => {
     const list = specimens.data ?? [];
@@ -108,94 +104,169 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   const offReasons = [health?.data_error, health?.model_error].filter(Boolean) as string[];
   const chosen = specimens.data?.find((s) => s.specimen_id === selected);
   const runIds = health?.providers?.find((p) => p.provider === provider)?.model_ids ?? health?.model_ids;
+  const sealed = specimens.data?.length ?? 0;
+  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <div className="mx-auto max-w-[1180px] px-8 pt-7 pb-10 flex flex-col gap-8 text-haze">
-      <div className="grid grid-cols-[minmax(0,1fr)_400px] gap-12 items-start">
-        <div className="flex flex-col gap-5 min-w-0">
-          <div className="flex flex-col gap-3">
-            <h1 className="font-serif text-[46px] leading-[1.04] font-semibold tracking-[-0.015em] text-white max-w-[19ch]">
-              Name the mechanism before you know the compound.
-            </h1>
-            <p className="font-serif text-[16.5px] leading-[1.6] text-mist max-w-[64ch]">
-              Each slide holds one compound from the BBBC021 screen (MCF-7 cells, 24 h) and its dose series. The agent
-              chooses which wells to image, measures the cells, and commits to a mechanism. Only after a second model
-              has reviewed the call is the slide unsealed and checked against chemistry databases and the literature.
-            </p>
-          </div>
-
-          <section aria-labelledby="specimens-h" className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-3">
-              <h2 id="specimens-h" className="text-sm font-medium text-white">
-                Specimens{specimens.data?.length ? <span className="text-mist font-normal"> · {specimens.data.length} sealed</span> : null}
-              </h2>
-              {!!specimens.data?.length && (
-                <button className="btn h-7 text-xs ml-auto" onClick={pickRandom}>
-                  <Shuffle aria-hidden className="h-3.5 w-3.5" /> Pick one at random
-                </button>
-              )}
+    <div className="flex flex-col">
+      {/* ── Hero: a dark rounded frame on the paper. The eyepiece stays top right. ───────────────────────── */}
+      <section aria-labelledby="hero-h" className="dark relative mx-2.5 rounded-frame overflow-hidden instrument text-haze min-h-[calc(100vh-106px)] flex flex-col">
+        <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(11_10_9/0.2),transparent_45%,rgb(11_10_9/0.6))]" />
+        <div className="relative flex-1 flex flex-col p-6 lg:p-9">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-8 items-start">
+            <div className="flex flex-col min-w-0 pt-2">
+              <p aria-hidden className="display text-haze -ml-[0.04em] whitespace-nowrap" style={{ fontSize: "clamp(72px, 12.4vw, 210px)" }}>
+                MuseCell
+              </p>
+              <h1 id="hero-h" className="display text-[clamp(28px,3.4vw,50px)] leading-[1.02] tracking-[-0.05em] mt-4 max-w-[17ch]">
+                Name the mechanism <span className="accent text-lime text-[1.12em]">before</span> you know the compound.
+              </h1>
+              <p className="tag mt-6 self-start inline-flex items-center gap-2.5 rounded-full bg-white/[0.06] ring-1 ring-line px-3.5 py-2 backdrop-blur">
+                <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${live ? "bg-lime animate-[pulse-lime_1.8s_ease-out_infinite]" : "bg-mist/60"}`} />
+                {live ? <>Live · <b className="font-medium text-lime">{sealed}</b> sealed specimens</> : "Replays on this server"}
+              </p>
             </div>
-            {specimens.loading && <Loading label="Loading specimens…" />}
-            {specimens.error && <ErrorNote title="Could not load specimens.">{specimens.error.message}</ErrorNote>}
-            {specimens.data && specimens.data.length === 0 && (
-              <div className="panel">
-                <EmptyState title="No specimens on this machine.">
-                  Live runs need the BBBC021 subset under DATA_DIR (see the README quickstart). You can still watch a
-                  recorded run.
-                </EmptyState>
-              </div>
-            )}
-            {!!specimens.data?.length && (
-              <div ref={rowRef} role="radiogroup" aria-label="Specimen"
-                   className="flex gap-3 overflow-x-auto pb-3 pt-1 px-1 -mx-1 snap-x">
-                {specimens.data.map((s) => (
-                  <Slide key={s.specimen_id} s={s} on={s.specimen_id === selected} onKeyDown={onCardKey}
-                         onClick={() => setSelected(s.specimen_id)} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="flex flex-col gap-1.5">
-            <BudgetWells budget={budget} setBudget={setBudget} />
-            <p className="text-[12px] text-mist">
-              Each well the agent images costs one unit. Looking again at wells it already has is free.
-            </p>
-          </section>
-
-          {health && <ProviderSwitch health={health} provider={provider} setProvider={setProvider} />}
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button className="btn-primary h-11 px-5 text-[15px]" disabled={!live || !selected || starting} onClick={start}>
-              {starting ? "Starting…" : `Start blinded run${chosen ? ` on ${chosen.label}` : ""}`}
-            </button>
-            <button className="btn h-11 px-4 text-[15px]" aria-expanded={showRecorded} onClick={() => setShowRecorded((v) => !v)}>
-              Watch a recorded run
-            </button>
+            <aside className="pt-2"><Eyepiece /></aside>
           </div>
 
-          {health && !live && (
-            <ErrorNote title="Live runs are off on this server.">
-              {offReasons.map((r) => <p key={r}>{r}</p>)}
-            </ErrorNote>
-          )}
-          {startError && <ErrorNote title="The run did not start.">{startError}</ErrorNote>}
+          <div aria-hidden className="flex justify-between mt-auto pt-8 mb-7 text-mist/70">
+            {[0, 1, 2, 3].map((i) => <span key={i} className="relative h-[15px] w-[15px] before:absolute before:left-[7px] before:top-0 before:h-[15px] before:w-px before:bg-current after:absolute after:top-[7px] after:left-0 after:h-px after:w-[15px] after:bg-current" />)}
+          </div>
+
+          <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)_auto] gap-8 items-end">
+            <p className="text-[clamp(18px,1.5vw,22px)] leading-[1.25] tracking-[-0.025em] font-medium max-w-[34ch]">
+              An AI scientist built on Meta's models.{" "}
+              <span className="text-mist">It picks which wells of a sealed BBBC021 compound to image, measures every cell,
+              defends its call to a reviewer model, and only then is the slide unsealed and checked.</span>
+            </p>
+            <ol className="text-[15px] font-medium leading-[1.6]">
+              {["Blinded acquisition", "Peer review by a second model", "Unblinding against PubChem · ChEMBL", "A dossier with verified citations"].map((t, i) => (
+                <li key={t} className="flex items-baseline gap-2.5 whitespace-nowrap">
+                  <span className="font-mono text-[11px] text-mist">{String(i + 1).padStart(2, "0")}</span>{t}
+                </li>
+              ))}
+            </ol>
+            <div className="flex flex-col items-end gap-2.5">
+              <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("bench")}>Choose a specimen</button>
+              <button className="btn h-10 px-4" onClick={() => go("recorded")}>
+                <Play aria-hidden className="h-3.5 w-3.5" /> Watch a recorded run
+              </button>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <aside className="flex flex-col gap-5 pt-2">
-          <Eyepiece />
-          {runIds && (
-            <div className="border-t border-line pt-4 flex flex-col gap-3">
-              <OpenWeightsBadge ids={runIds} className="self-start" />
-              <ModelLine ids={runIds} />
+      {/* ── The bench: choose a slide, a budget and the models ─────────────────────────────────────────── */}
+      <section id="bench" aria-labelledby="bench-h" className="scroll-mt-4 px-5 lg:px-9 pt-28 pb-6">
+        <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-12">
+          <div>
+            <p className="tag text-graphite mb-4">01 — The bench</p>
+            <h2 id="bench-h" className="display stop text-[clamp(56px,9vw,140px)]">Start a <span className="accent">run</span></h2>
+          </div>
+          <p className="text-graphite text-[17px] leading-relaxed max-w-[36ch]">
+            Each slide holds one compound from the BBBC021 screen (MCF-7 cells, 24 h) and its dose series. Which one it is
+            stays sealed until the agent has committed.
+          </p>
+        </Reveal>
+      </section>
+      <Reveal className="dark relative mx-2.5 rounded-frame overflow-hidden instrument text-haze">
+        <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
+        <div className="relative grid grid-cols-[minmax(0,1fr)_340px] gap-12 p-6 lg:p-10">
+          <div className="flex flex-col gap-7 min-w-0">
+            <section aria-labelledby="specimens-h" className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <h3 id="specimens-h" className="tag text-mist">
+                  Specimens{sealed ? <> · <span className="text-haze">{sealed} sealed</span></> : null}
+                </h3>
+                {!!sealed && (
+                  <button className="btn h-8 text-xs ml-auto" onClick={pickRandom}>
+                    <Shuffle aria-hidden className="h-3.5 w-3.5" /> Pick one at random
+                  </button>
+                )}
+              </div>
+              {specimens.loading && <Loading label="Loading specimens…" />}
+              {specimens.error && <ErrorNote title="Could not load specimens.">{specimens.error.message}</ErrorNote>}
+              {specimens.data && specimens.data.length === 0 && (
+                <div className="panel">
+                  <EmptyState title="No specimens on this machine.">
+                    Live runs need the BBBC021 subset under DATA_DIR (see the README quickstart). You can still watch a
+                    recorded run.
+                  </EmptyState>
+                </div>
+              )}
+              {!!sealed && (
+                <div ref={rowRef} role="radiogroup" aria-label="Specimen"
+                     className="flex gap-3 overflow-x-auto pb-3 pt-1 px-1 -mx-1 snap-x">
+                  {specimens.data!.map((s) => (
+                    <Slide key={s.specimen_id} s={s} on={s.specimen_id === selected} onKeyDown={onCardKey}
+                           onClick={() => setSelected(s.specimen_id)} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="flex flex-col gap-1.5">
+              <BudgetWells budget={budget} setBudget={setBudget} />
+              <p className="text-[12.5px] text-mist">
+                Each well the agent images costs one unit. Looking again at wells it already has is free.
+              </p>
+            </section>
+
+            {health && <ProviderSwitch health={health} provider={provider} setProvider={setProvider} />}
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button className="btn-primary h-12 pl-5 pr-11 text-[15px]" disabled={!live || !selected || starting} onClick={start}>
+                {starting ? "Starting…" : `Start blinded run${chosen ? ` on ${chosen.label}` : ""}`}
+              </button>
             </div>
-          )}
-        </aside>
-      </div>
 
-      {showRecorded && <div ref={recordedRef}><RecordedRuns /></div>}
+            {health && !live && (
+              <ErrorNote title="Live runs are off on this server.">
+                {offReasons.map((r) => <p key={r}>{r}</p>)}
+              </ErrorNote>
+            )}
+            {startError && <ErrorNote title="The run did not start.">{startError}</ErrorNote>}
+          </div>
+
+          <aside className="flex flex-col gap-4 border-l border-line pl-8">
+            <p className="tag text-mist">Who does what</p>
+            {runIds && (
+              <>
+                <OpenWeightsBadge ids={runIds} className="self-start" />
+                <ModelLine ids={runIds} />
+              </>
+            )}
+            <p className="text-[12.5px] leading-relaxed text-mist mt-auto">
+              Every model call is metered and capped per run. A blinding guard checks every message for the compound's
+              identity before it reaches a model or this page.
+            </p>
+          </aside>
+        </div>
+      </Reveal>
+
+      {/* ── Recorded runs ─────────────────────────────────────────────────────────────────────────────── */}
+      <section id="recorded" aria-labelledby="recorded-h" className="scroll-mt-4 px-5 lg:px-9 pt-28 pb-6">
+        <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-12">
+          <div>
+            <p className="tag text-graphite mb-4">02 — Replays</p>
+            <h2 id="recorded-h" className="display stop text-[clamp(56px,9vw,140px)]">Watch it <span className="accent">think</span></h2>
+          </div>
+          <p className="text-graphite text-[17px] leading-relaxed max-w-[36ch]">
+            Real live runs, replayed event by event with their original pacing, and labelled as replays throughout.
+          </p>
+        </Reveal>
+      </section>
+      <Reveal className="dark mx-2.5 rounded-frame overflow-hidden instrument text-haze">
+        <RecordedRuns />
+      </Reveal>
 
       <HowItWorks ids={health?.model_ids} />
+
+      {/* ── The giant wordmark that closes the page ──────────────────────────────────────────────────── */}
+      <div aria-hidden className="px-5 lg:px-9 pt-24 overflow-hidden">
+        <p className="display whitespace-nowrap -ml-[0.04em] leading-[0.8] translate-y-[12%]" style={{ fontSize: "clamp(80px, 21vw, 360px)" }}>MuseCell</p>
+      </div>
     </div>
   );
 }
@@ -431,9 +502,9 @@ function RecordedRuns() {
   };
 
   return (
-    <section aria-labelledby="recorded-h" className="panel p-5 flex flex-col gap-3">
+    <section aria-label="Recorded runs" className="p-5 lg:p-7 flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <h2 id="recorded-h" className="font-serif text-[20px] font-semibold text-white">Recorded runs</h2>
+        <h3 className="tag text-mist">Recorded runs</h3>
         <span className="label">Real runs, replayed with their original pacing. Labelled as replays throughout.</span>
         <label className="ml-auto flex items-center gap-2 text-xs text-mist">
           Speed
@@ -455,16 +526,16 @@ function RecordedRuns() {
         <ul className="flex flex-col divide-y divide-white/[0.07]">
           {recorded.data.map((r) => (
             <li key={r.run_id} className="flex items-center gap-5 py-2.5 text-sm">
-              <span className="font-serif text-[16px] font-semibold text-white w-[120px]">{r.specimen_label ?? "Specimen"}</span>
-              <span className="text-mist">Recorded {dateTime(r.recorded_at)}</span>
+              <span className="font-serif text-[16px] font-semibold text-white w-[110px] shrink-0 whitespace-nowrap">{r.specimen_label ?? "Specimen"}</span>
+              <span className="text-mist whitespace-nowrap">Recorded {dateTime(r.recorded_at)}</span>
               <span className="flex items-center gap-1" aria-label={`${r.budget_used ?? "?"} of ${r.budget_total} wells`}>
                 {Array.from({ length: r.budget_total }, (_, i) => (
                   <span key={i} aria-hidden className={`h-2 w-2 rounded-full ${i < (r.budget_used ?? 0) ? "bg-haze" : "well"}`} />
                 ))}
-                <span className="ml-1.5 text-mist">{r.budget_used ?? "?"} of {r.budget_total} wells</span>
+                <span className="ml-1.5 text-mist whitespace-nowrap">{r.budget_used ?? "?"} of {r.budget_total} wells</span>
               </span>
               <span className="text-mist">{usd(r.cost_usd)}</span>
-              <span className="text-mist truncate">{modelName(r.model_ids.scientist)} · {modelName(r.model_ids.reviewer)}</span>
+              <span className="text-mist truncate hidden xl:inline">{modelName(r.model_ids.scientist)} · {modelName(r.model_ids.reviewer)}</span>
               <OpenWeightsBadge ids={r.model_ids} />
               {r.status !== "finished" && <span className="chip">Ended early</span>}
               <button className="btn ml-auto" disabled={busy !== null} onClick={() => play(r.run_id)}

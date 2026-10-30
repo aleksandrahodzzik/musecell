@@ -27,7 +27,7 @@ export default function App() {
   const liveNote = health.data ? (health.data.live_runs ? "Live runs available" : "Replays only on this server") : undefined;
 
   return (
-    <div className="h-screen flex flex-col bg-night text-ink">
+    <div className="h-screen flex flex-col bg-paper text-ink">
       <StainTintFilter />
       <Nav route={route} liveNote={liveNote} live={health.data?.live_runs} />
       {health.error && (
@@ -38,9 +38,12 @@ export default function App() {
         </div>
       )}
       {route.name === "run" ? (
-        <main className="flex-1 min-h-0"><RunView key={route.runId} runId={route.runId} labels={labels} /></main>
+        <main className="flex-1 min-h-0 px-2.5 pb-2.5">
+          {/* the instrument sits in a rounded dark frame on the paper, as the landing's hero does */}
+          <div className="h-full rounded-frame overflow-hidden bg-night"><RunView key={route.runId} runId={route.runId} labels={labels} /></div>
+        </main>
       ) : (
-        <Page dark={route.name === "home"}>
+        <Page>
           {route.name === "home" && <ChooseSpecimen health={health.data} />}
           {route.name === "dossier" && <Dossier runId={route.runId} labels={labels} />}
           {route.name === "benchmark" && <Benchmark />}

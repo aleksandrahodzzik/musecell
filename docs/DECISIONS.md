@@ -319,3 +319,11 @@ Applied the NSC protocol (1-NN per well against the LOCO atlas, majority vote) t
 Not done on purpose: making the NSC vote the final call. On these logs it would score 24/38, but that rule would be fitted to the same 38 compounds and would turn the Scientist into a well picker; reported as an analysis instead.
 
 Spend today: $11.44 real USD (reviewer on all runs, CLI/demo runs) + $25.02 nominal Baseten credits. Daily cap raised per process (`DAILY_COST_CAP_USD=35`, then 45) for the v2/v3 evals because credits count toward it; `backend/.env` unchanged.
+
+## Design v2 — editorial landing (2026-10-30)
+The owner supplied an MIT-licensed landing template (fictional art expo) as the visual reference. Taken: the look, not the content.
+- **Tokens** (`frontend/tailwind.config.js`, names kept so every screen re-skins): paper `#EBE6DC` (bone), sheet `#F7F4EE`, ink `#0D0C0B`, instrument night `#0B0A09` / `#151311` / `#1F1C19`, haze `#EFE9DF`, mist `#8F897F`, and one UI accent **lime `#D7FF3F`** (primary-button dot, live dot, emphasis). Stain and verdict colours unchanged and still reserved for their meaning; lime is not a stain colour (tubulin stays `#3FCF7F`).
+- **Type:** Host Grotesk for text and headings (`font-serif` now maps to it, since Instrument Serif has one weight), Instrument Serif italic as `.accent` for one emphasised word, JetBrains Mono uppercase `.tag` for labels.
+- **Start screen:** a dark rounded hero frame (film grain, giant wordmark, italic-lime "before", live pill) with the **eyepiece kept top right**; sections "Start a run." (controls in a dark frame), "Watch it think." (recorded runs, now always listed), "From sealed slide to verified dossier." (timeline whose line draws in), "Measured, not claimed." (benchmark headline); a giant closing wordmark. Pill buttons whose lime dot floods the button on hover. Reveals use IntersectionObserver + CSS, not GSAP/Lenis; all motion is off under prefers-reduced-motion.
+- **Run view** sits in a rounded dark frame on the paper; header and footer are light. Benchmark page title restyled.
+- Checked at 1440 and 1024 px with Playwright (0 console errors). `docs/screens/` and `docs/hero.gif` still show the darkfield design until they are re-recorded.

@@ -3,50 +3,81 @@
 @tailwind utilities;
 
 @layer base {
-  html { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #17202A; background: #07090C; }
-  body { margin: 0; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+  html { font-family: "Host Grotesk", system-ui, sans-serif; color: #0D0C0B; background: #EBE6DC; }
+  body { margin: 0; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
   /* Visible keyboard focus everywhere (spec §8 quality floor). */
   :focus { outline: none; }
-  :focus-visible { outline: 2px solid #17202A; outline-offset: 2px; border-radius: 4px; }
-  .dark :focus-visible, .on-dark :focus-visible, .on-dark:focus-visible { outline-color: #FFFFFF; }
+  :focus-visible { outline: 2px solid #0D0C0B; outline-offset: 3px; border-radius: 6px; }
+  .dark :focus-visible, .on-dark :focus-visible, .on-dark:focus-visible { outline-color: #EFE9DF; }
   button:disabled { cursor: not-allowed; }
-  ::selection { background: rgb(23 32 42 / 0.15); }
-  .dark ::selection { background: rgb(255 255 255 / 0.2); }
+  ::selection { background: #D7FF3F; color: #0D0C0B; }
+  /* Headings use the display grotesk with tight tracking (design v2). */
+  .font-serif { letter-spacing: -0.035em; }
 }
 
 @layer components {
   .panel { @apply bg-sheet rounded-panel border border-rule dark:bg-night-2 dark:border-line; }
-  .btn { @apply inline-flex items-center gap-1.5 rounded-control px-3 h-8 text-sm font-medium border border-rule bg-sheet text-ink hover:bg-white transition-colors disabled:opacity-50 disabled:hover:bg-sheet
-                 dark:bg-night-3 dark:text-haze dark:border-line dark:hover:bg-[#1E242C] dark:hover:text-white dark:disabled:hover:bg-night-3; }
-  .btn-primary { @apply inline-flex items-center gap-1.5 rounded-control px-4 h-9 text-sm font-medium bg-ink text-sheet hover:bg-[#2a3542] transition-colors disabled:opacity-40 disabled:hover:bg-ink
-                         dark:bg-white dark:text-night dark:hover:bg-haze dark:disabled:hover:bg-white; }
-  .chip { @apply inline-flex items-center gap-1 rounded-control px-1.5 py-0.5 text-xs border border-rule bg-white/60 text-ink dark:bg-white/5 dark:border-line dark:text-haze; }
+
+  /* Pill buttons. The primary one carries a lime dot that floods the pill on hover (design v2). */
+  .btn { @apply inline-flex items-center gap-1.5 rounded-full px-3.5 h-8 text-sm font-medium border border-rule bg-sheet text-ink hover:bg-white transition-colors disabled:opacity-50 disabled:hover:bg-sheet
+                 dark:bg-night-3 dark:text-haze dark:border-line dark:hover:bg-[#2a2622] dark:hover:text-white dark:disabled:hover:bg-night-3; }
+  .btn-primary { @apply relative isolate overflow-hidden inline-flex items-center gap-1.5 rounded-full pl-4 pr-9 h-9 text-sm font-medium bg-ink text-sheet disabled:opacity-40
+                         dark:bg-haze dark:text-ink;
+                 transition: color .45s cubic-bezier(.7,0,.2,1); }
+  .btn-primary::after { content: ""; position: absolute; z-index: -1; right: 15px; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+                        border-radius: 999px; background: #D7FF3F; transition: transform .6s cubic-bezier(.7,0,.2,1); }
+  @media (hover: hover) {
+    .btn-primary:not(:disabled):hover { color: #0D0C0B; }
+    .btn-primary:not(:disabled):hover::after { transform: scale(60); }
+  }
+  .chip { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs border border-rule bg-white/60 text-ink dark:bg-white/5 dark:border-line dark:text-haze; }
   .label { @apply text-xs text-graphite dark:text-mist; }
   .serif { @apply font-serif; }
   .ids { @apply font-mono text-[11px] tracking-tight; }
 
+  /* Editorial type (design v2). */
+  .accent { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
+  .tag { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+  .display { font-family: "Host Grotesk", system-ui, sans-serif; font-weight: 600; line-height: .9; letter-spacing: -0.058em; }
+  /* A full stop drawn as a dot, as in the template's titles. */
+  .stop::after { content: ""; display: inline-block; width: .15em; height: .15em; border-radius: 999px; background: currentColor; margin-left: .04em; }
+
   /* Lab-notebook ruling: a faint 24 px grid on the paper surfaces where the agent writes. */
   .ruled {
-    background-color: #F6F8F9;
+    background-color: #F7F4EE;
     background-image:
-      linear-gradient(rgb(23 32 42 / 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(23 32 42 / 0.045) 1px, transparent 1px);
+      linear-gradient(rgb(13 12 11 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(13 12 11 / 0.04) 1px, transparent 1px);
     background-size: 24px 24px;
     background-position: -1px -1px;
   }
 
   /* The instrument body: near-black with a soft light falling from the top. */
   .instrument {
-    background-color: #07090C;
-    background-image: radial-gradient(120% 80% at 50% -20%, rgb(255 255 255 / 0.05), transparent 60%);
+    background-color: #0B0A09;
+    background-image: radial-gradient(120% 80% at 50% -20%, rgb(255 244 228 / 0.06), transparent 60%);
   }
 
+  /* Film grain over dark frames (inline SVG noise, no image file). */
+  .grain { position: absolute; inset: -50%; pointer-events: none; opacity: .13;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1.2s steps(1) infinite; }
+
   /* A plate well: recessed into the plate. */
-  .well { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.9), inset 0 0 0 1px rgb(255 255 255 / 0.07), 0 1px 0 rgb(255 255 255 / 0.04); background: #030405; }
+  .well { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.9), inset 0 0 0 1px rgb(255 255 255 / 0.07), 0 1px 0 rgb(255 255 255 / 0.04); background: #030303; }
+
+  /* Reveal on scroll (useReveal): rise and fade in once. */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-in { opacity: 1; transform: none; }
 }
+
+@keyframes grain { 0%{transform:translate(0,0)} 17%{transform:translate(-6%,4%)} 33%{transform:translate(5%,-7%)} 50%{transform:translate(-3%,8%)} 67%{transform:translate(7%,2%)} 83%{transform:translate(-8%,-4%)} }
+@keyframes pulse-lime { 0% { box-shadow: 0 0 0 0 rgb(215 255 63 / .7); } 100% { box-shadow: 0 0 0 10px rgb(215 255 63 / 0); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  .grain { animation: none; }
+  .reveal { opacity: 1; transform: none; }
 }
 
 @media print {

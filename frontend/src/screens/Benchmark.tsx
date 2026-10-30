@@ -43,8 +43,9 @@ export default function Benchmark() {
   return (
     <div className="mx-auto max-w-[1040px] px-6 py-8 flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-[40px] leading-tight font-semibold tracking-[-0.01em]">Benchmark</h1>
-        <p className="font-serif text-[16.5px] text-graphite max-w-[72ch] leading-relaxed">
+        <p className="tag text-graphite">Evaluation · leave one compound out</p>
+        <h1 className="display stop text-[clamp(56px,8vw,120px)]">Bench<span className="accent">mark</span></h1>
+        <p className="text-[17px] text-graphite max-w-[72ch] leading-relaxed">
           Mechanism-of-action accuracy on the 38 annotated BBBC021 compounds, each held out from the reference atlas
           (leave-one-compound-out). Every number on this page is read from the files the evaluation scripts write.
         </p>
@@ -166,17 +167,18 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
     ["Nearest-neighbour baseline", all, "all wells of the compound"],
   ];
   return (
-    <section aria-label="Headline result" className="dark instrument rounded-panel border border-line p-6 flex flex-col gap-5 text-haze">
+    <section aria-label="Headline result" className="dark instrument relative overflow-hidden rounded-frame p-7 lg:p-10 flex flex-col gap-8 text-haze">
+      <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
       {rand && (
-        <p className="font-serif text-[22px] leading-snug text-white max-w-[52ch]">
+        <p className="relative display text-[clamp(24px,2.4vw,34px)] leading-[1.1] tracking-[-0.04em] text-white max-w-[34ch]">
           At {b} wells the agent is {below ? "below" : "at or above"} the nearest-neighbour baseline on the same number of wells.
         </p>
       )}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="relative grid grid-cols-3 gap-6">
         {tiles.map(([name, row, sub], i) => row && (
           <div key={i} className={`flex flex-col gap-1 ${i ? "border-l border-line pl-6" : ""}`}>
-            <span className="text-sm text-mist">{name}</span>
-            <span className={`font-serif text-[52px] leading-none font-semibold tracking-tight ${i === 0 ? "text-white" : "text-haze"}`}>
+            <span className="tag text-mist">{name}</span>
+            <span className={`display text-[clamp(56px,6.4vw,104px)] mt-2 ${i === 0 ? "text-lime" : "text-haze"}`}>
               {pct(row.accuracy)}
             </span>
             <span className="text-xs text-mist">{sub}{row.correct != null && row.n != null ? ` · ${row.correct} of ${row.n} correct` : ""}</span>
