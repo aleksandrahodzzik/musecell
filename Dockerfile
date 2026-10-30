@@ -4,7 +4,7 @@
 #   docker build -t musecell .
 #   docker run --rm -p 7860:7860 musecell        # then open http://localhost:7860
 #
-# The same image runs on Hugging Face Spaces (deploy/huggingface/), Render, Fly.io or any container host.
+# The public demo is the static build on GitHub Pages (.github/workflows/pages.yml); this image is for running it yourself.
 
 FROM node:22-slim AS web
 WORKDIR /src/frontend
@@ -24,7 +24,7 @@ COPY demo demo
 COPY eval eval
 COPY LICENSE DATA_LICENSE.md ./
 COPY --from=web /src/frontend/dist frontend/dist
-# Hugging Face Spaces runs the container as uid 1000; give it the app folder (runs/ and caches are created here).
+# Run as an unprivileged user that owns the app folder (runs/ and caches are created here).
 RUN useradd -m -u 1000 app && mkdir -p /app/runs /app/.no-data && chown -R app /app
 USER app
 EXPOSE 7860
