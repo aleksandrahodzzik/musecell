@@ -20,7 +20,7 @@ RunStatus = Literal["running", "finished", "failed"]
 EvidenceKind = Literal["experiments", "well", "phenotype", "atlas", "dose_response", "hypotheses",
                        "conclusion", "compound", "literature"]
 EventType = Literal["run_started", "thinking", "tool_call", "tool_result", "hypotheses_updated", "budget_updated",
-                    "conclusion", "review", "unblinded", "verdict", "report_ready", "cost_updated", "error",
+                    "conclusion", "review", "protocol_call", "unblinded", "verdict", "report_ready", "cost_updated", "error",
                     "run_finished"]
 
 
@@ -102,11 +102,19 @@ class Reflection(BaseModel):
 
 
 class Verdict(BaseModel):
-    """Computed by code (agent top MoA vs ground truth), never by a model."""
+    """Computed by code (the run's call vs ground truth), never by a model.
+
+    `agent_moa` is the run's final call. From agent v5 it comes from the protocol (NSC vote over the wells the
+    Scientist chose, `call_source="protocol"`), and the Scientist's own conclusion is kept as `scientist_moa`.
+    Runs before v5 have only the Scientist's call (`call_source="scientist"`)."""
 
     correct: bool
     truth_moa: str
     agent_moa: str
+    call_source: Literal["scientist", "protocol"] = "scientist"
+    scientist_moa: str | None = None
+    scientist_correct: bool | None = None
+    protocol: dict[str, Any] | None = None  # the NSC vote: moa, votes, wells, tally
 
 
 class AgentRun(BaseModel):

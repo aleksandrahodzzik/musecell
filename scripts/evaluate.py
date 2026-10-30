@@ -205,6 +205,10 @@ async def one_run(manager: RunManager, sp: Specimen, budget: int) -> dict:
         "budget": budget, "models": run.model_ids, "status": run.status, "error": run.error,
         "agent_moa": run.verdict.agent_moa if run.verdict else None,
         "correct": bool(run.verdict and run.verdict.correct),
+        # agent v5+: the final call is the protocol's; the Scientist's own conclusion is scored separately
+        "call_source": run.verdict.call_source if run.verdict else None,
+        "scientist_moa": run.verdict.scientist_moa if run.verdict else None,
+        "scientist_correct": bool(run.verdict and run.verdict.scientist_correct),
         "first_moa": first.top_moa if first else None, "first_correct": bool(first and first.top_moa == sp.moa),
         "review": run.review.verdict if run.review else None,
         "wells_used": run.budget_used, "turns": run.turns, "cost_usd": round(run.cost_usd, 5),
@@ -307,6 +311,8 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
             "citation_validity": round((cited - removed) / cited, 4) if cited else None,
             "citations": f"{cited - removed}/{cited}", "failed": len(rs) - len(ok),
             "reviewer_requests": sum(r.get("review") == "request_experiment" for r in rs),
+            "scientist_accuracy": (round(sum(r.get("scientist_correct", False) for r in rs) / len(rs), 4)
+                                   if any(r.get("call_source") == "protocol" for r in rs) else None),
             # the NSC protocol on exactly the wells this agent chose (its own atlas space); None without run logs
             "nsc_on_chosen_wells": (round(sum(r["nsc_chosen"] for r in rs) / len(rs), 4)
                                     if all("nsc_chosen" in r for r in rs) else None),
@@ -384,6 +390,8 @@ def comparison_markdown(res: dict) -> list[str]:
             line("Accuracy", lambda r: f"{100 * r['accuracy']:.1f}% ({r['correct']}/{r['n']})",
                  lambda r: f"{100 * r['accuracy']:.1f}% ± {100 * r['sd']:.1f}"),
             line("Before review", lambda r: f"{100 * r['accuracy_before_review']:.1f}%"),
+            line("Scientist's own call (v5: final call is the protocol's)", lambda r: "–" if r.get("scientist_accuracy")
+                 is None else f"{100 * r['scientist_accuracy']:.1f}%"),
             line("NSC on the wells the agent chose", lambda r: "–" if r.get("nsc_on_chosen_wells") is None
                  else f"{100 * r['nsc_on_chosen_wells']:.1f}%"),
             line("Failed runs", lambda r: str(r["failed"])),

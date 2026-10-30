@@ -101,6 +101,7 @@ class AgentLoop:
             if not await self._tool_phase(BLINDED_TURNS, until="conclusion"):
                 raise LLMError("The Scientist did not submit a conclusion within its turns.")
             await self._review()
+            self._protocol_call()
             await self._unblind()
             await self._tool_phase(LITERATURE_TURNS, until="text")
             await self._reflect()
@@ -241,6 +242,20 @@ class AgentLoop:
             self._emit("error", message="The Scientist did not resubmit after the review; its first conclusion "
                                         "stands.", fatal=False)
 
+    # --- the protocol's call ----------------------------------------------------------------------
+
+    def _protocol_call(self) -> None:
+        """NSC vote over every well the Scientist acquired (code, still blinded: classes and similarities only)."""
+        run = self.run
+        nsc = T.nsc_vote(self.ctx)
+        self.protocol = nsc if nsc["moa"] else None
+        if self.protocol is None:
+            return
+        agrees = run.conclusion is not None and run.conclusion.top_moa == nsc["moa"]
+        self._emit("protocol_call", moa=nsc["moa"], votes=nsc["votes"], wells=nsc["wells"], tally=nsc["tally"],
+                   scientist_moa=run.conclusion.top_moa if run.conclusion else None, agrees=agrees,
+                   final=self.ctx.settings.final_call == "protocol")
+
     # --- unblinding -------------------------------------------------------------------------------
 
     async def _unblind(self) -> None:
@@ -259,12 +274,26 @@ class AgentLoop:
             identity_check=data.get("identity_check") or f"lookup failed: {outcome.error}")
         self._emit("unblinded", **run.unblinding.model_dump(), chembl_id=chembl.get("molecule_chembl_id"),
                    evidence_id=outcome.evidence.evidence_id if outcome.ok else None)
-        agent_moa = run.conclusion.top_moa
-        run.verdict = Verdict(correct=agent_moa == sp.moa, truth_moa=sp.moa, agent_moa=agent_moa)
+        scientist_moa = run.conclusion.top_moa
+        protocol = getattr(self, "protocol", None)
+        if self.ctx.settings.final_call == "protocol" and protocol:
+            agent_moa = protocol["moa"]
+            run.verdict = Verdict(correct=agent_moa == sp.moa, truth_moa=sp.moa, agent_moa=agent_moa,
+                                  call_source="protocol", scientist_moa=scientist_moa,
+                                  scientist_correct=scientist_moa == sp.moa, protocol=protocol)
+        else:
+            agent_moa = scientist_moa
+            run.verdict = Verdict(correct=agent_moa == sp.moa, truth_moa=sp.moa, agent_moa=agent_moa,
+                                  scientist_moa=scientist_moa, scientist_correct=agent_moa == sp.moa,
+                                  protocol=protocol)
         self._emit("verdict", **run.verdict.model_dump())
         mechs = [m.get("mechanism_of_action", "") for m in run.unblinding.chembl_mechanisms]
-        self.messages.append({"role": "user", "content": prompts.unblinded_brief(
-            sp.compound, run.unblinding.identity_check, mechs, agent_moa, sp.moa, run.verdict.correct)})
+        brief = prompts.unblinded_brief(sp.compound, run.unblinding.identity_check, mechs, scientist_moa, sp.moa,
+                                        scientist_moa == sp.moa)
+        if run.verdict.call_source == "protocol":
+            brief += ("\nThe run's final call, the nearest-neighbour vote over the wells you chose, was "
+                      f"'{agent_moa}' ({'correct' if run.verdict.correct else 'incorrect'}).")
+        self.messages.append({"role": "user", "content": brief})
 
     # --- reflection and dossier -------------------------------------------------------------------
 

@@ -140,6 +140,18 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
           </p>
         </div>
       );
+    case "protocol":
+      return (
+        <div className="flex gap-3">
+          <span className="w-[76px] shrink-0 font-mono text-[11px] text-graphite pt-0.5">Protocol</span>
+          <p className="text-sm">
+            <span className="font-medium">{e.protocol.final ? "Final call" : "NSC vote"}: {e.protocol.moa}</span>
+            <span className="text-graphite"> · nearest-neighbour vote over the {e.protocol.wells} wells the agent chose ({e.protocol.votes}/{e.protocol.wells}) · </span>
+            {e.protocol.agrees ? <span>the Scientist agrees</span>
+              : <span>the Scientist dissents ({e.protocol.scientist_moa})</span>}
+          </p>
+        </div>
+      );
     case "verdict":
       return (
         <div className="flex gap-3">
@@ -148,7 +160,9 @@ function EntryView({ entry: e, onSelectWell, run }: { entry: Entry; onSelectWell
             {e.verdict.correct ? <Check aria-hidden className="h-4 w-4" /> : <X aria-hidden className="h-4 w-4" />}
             {e.verdict.correct
               ? `Correct: ${e.verdict.agent_moa} is the annotated mechanism.`
-              : `Incorrect: the agent said ${e.verdict.agent_moa}; the annotated mechanism is ${e.verdict.truth_moa}.`}
+              : `Incorrect: the call was ${e.verdict.agent_moa}; the annotated mechanism is ${e.verdict.truth_moa}.`}
+            {e.verdict.call_source === "protocol" && e.verdict.scientist_moa !== e.verdict.agent_moa &&
+              <span className="text-graphite">The Scientist's own call ({e.verdict.scientist_moa}) was {e.verdict.scientist_correct ? "right" : "wrong"}.</span>}
             <span className="text-graphite">Computed by code, not by a model.</span>
           </p>
         </div>

@@ -109,10 +109,12 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
               : "border-verdict-no-on-night text-verdict-no-on-night print:border-verdict-no print:text-verdict-no"}`}>
               <p className="flex items-center gap-2 font-serif text-[20px] font-semibold">
                 {d.verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
-                {d.verdict.correct ? "The agent's call matches" : "The agent's call does not match"}
+                {d.verdict.correct ? "MuseCell's call matches" : "MuseCell's call does not match"}
               </p>
               <p className="text-[12px] text-haze print:text-ink mt-0.5">
-                Agent: {d.verdict.agent_moa}{final && ` (probability ${prob(final.probability)})`} · Annotated: {d.verdict.truth_moa}
+                {d.verdict.call_source === "protocol" && d.verdict.protocol
+                  ? <>Final call: {d.verdict.agent_moa} (nearest-neighbour vote, {d.verdict.protocol.votes}/{d.verdict.protocol.wells} wells the agent chose) · Scientist: {d.verdict.scientist_moa}{final && ` (probability ${prob(final.probability)})`}{d.verdict.scientist_moa === d.verdict.agent_moa ? ", agrees" : ", dissents"}</>
+                  : <>Agent: {d.verdict.agent_moa}{final && ` (probability ${prob(final.probability)})`}</>} · Annotated: {d.verdict.truth_moa}
               </p>
               <p className="text-[11px] text-mist print:text-graphite">Compared by code against the BBBC021 annotation, not judged by a model.</p>
             </div>

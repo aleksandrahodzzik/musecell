@@ -7,4 +7,6 @@
 # v3.1: v3 + the PI reviewer must not name any compound either (one v3 eval review was stopped by the guard).
 # v4: v3.1 + the atlas searches ResNet50 (ImageNet) + TVN embeddings instead of the 24 hand-crafted features
 #     (chosen on the dev split, checked once on test; docs/DECISIONS.md, "Deep atlas").
-AGENT_VERSION = "v4"
+# v5: v4 + the run's final call is the protocol's NSC vote over the wells the Scientist chose; the Scientist's
+#     conclusion is kept as its own call; the reviewer sees the vote (dev evidence: 5/5 overrides wrong).
+AGENT_VERSION = "v5"

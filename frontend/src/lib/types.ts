@@ -95,10 +95,23 @@ export interface Unblinded {
   evidence_id?: string;
 }
 
+export interface ProtocolCall {
+  moa: string;
+  votes: number;
+  wells: number;
+  tally: { moa: string; votes: number; summed_similarity: number }[];
+}
+
+/** agent_moa is the run's final call. From agent v5 it is the protocol's NSC vote (call_source "protocol") and the
+ *  Scientist's conclusion is kept as scientist_moa; older runs have only the Scientist's call. */
 export interface Verdict {
   correct: boolean;
   truth_moa: string;
   agent_moa: string;
+  call_source?: "scientist" | "protocol";
+  scientist_moa?: string | null;
+  scientist_correct?: boolean | null;
+  protocol?: ProtocolCall | null;
 }
 
 export interface ReplayInfo {
@@ -150,6 +163,7 @@ export interface EventPayloads {
     replay?: ReplayInfo;
   };
   thinking: { turn: number; phase: string; note?: string };
+  protocol_call: ProtocolCall & { scientist_moa: string | null; agrees: boolean; final: boolean };
   tool_call: ToolCallData;
   tool_result: ToolResultData;
   hypotheses_updated: { step: number; evidence_id: string; hypotheses: Hypothesis[] };
@@ -180,7 +194,7 @@ export interface EventPayloads {
 export type EventType = keyof EventPayloads;
 export const EVENT_TYPES = [
   "run_started", "thinking", "tool_call", "tool_result", "hypotheses_updated", "budget_updated", "conclusion",
-  "review", "unblinded", "verdict", "report_ready", "cost_updated", "error", "run_finished",
+  "review", "protocol_call", "unblinded", "verdict", "report_ready", "cost_updated", "error", "run_finished",
 ] as const satisfies readonly EventType[];
 
 export type RunEvent = {

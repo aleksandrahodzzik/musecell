@@ -25,7 +25,10 @@ SYSTEM = (
     "Approve when the conclusion is justified, or when no affordable experiment could change it. Request an "
     "experiment only when one specific, affordable step (a named dose index and replicate, or a free analysis "
     "such as an atlas comparison, a dose response or a phenotype description) could discriminate between the "
-    "leading hypotheses. Be concrete and brief; do not guess the compound. Never write the name of any specific "
+    "leading hypotheses. The run's final call is made by protocol: the NSC vote over the wells the agent "
+    "acquired (`protocol_call`, the latest one the atlas tool reported). When that vote is split or weak, or the "
+    "conclusion disagrees with it, ask for the one affordable well (dose index and replicate) or free analysis "
+    "most likely to make the vote decisive, if the budget allows. Be concrete and brief; do not guess the compound. Never write the name of any specific "
     "compound or drug, not even as a control: a name may be the hidden compound or one of its synonyms, and the "
     "blinding guard then stops the run. Refer to controls by class (agent v3 eval: one review was stopped so)."
 )
@@ -56,7 +59,20 @@ def ledger(run: AgentRun, specimen: Specimen) -> dict:
                      for e in run.evidence if e.kind not in ("experiments", "conclusion")],
         "hypothesis_history": [h.model_dump() for h in run.hypothesis_history],
         "conclusion": run.conclusion.model_dump() if run.conclusion else None,
+        # agent v5: the run's final call is the NSC vote over the acquired wells; show it next to the conclusion
+        "protocol_call": _protocol(run),
     }
+
+
+def _protocol(run: AgentRun) -> dict | None:
+    """The latest NSC vote the atlas tool reported (over all wells acquired at that time)."""
+    atlas = [e for e in run.evidence if e.kind == "atlas" and (e.data or {}).get("nsc", {}).get("moa")]
+    if not atlas:
+        return None
+    nsc = atlas[-1].data["nsc"]
+    return {"moa": nsc["moa"], "votes": nsc["votes"], "wells": nsc["wells"], "tally": nsc["tally"],
+            "covers_all_acquired_wells": nsc["wells"] == len(run.acquired_well_ids),
+            "agrees_with_conclusion": bool(run.conclusion and run.conclusion.top_moa == nsc["moa"])}
 
 
 def build_messages(run: AgentRun, specimen: Specimen, moa_classes: list[str]) -> list[dict]:

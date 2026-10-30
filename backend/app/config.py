@@ -107,6 +107,9 @@ class Settings(BaseSettings):
     # Feature space of the reference atlas (similarity search only; the agent always sees the measured features).
     # resnet50_tvn falls back to handcrafted when the deep atlas has not been built (docs/DECISIONS.md, "Deep atlas").
     atlas_features: AtlasFeatures = "resnet50_tvn"
+    # Who makes the run's final MoA call (agent v5): "protocol" = NSC vote over the wells the Scientist chose (the
+    # Scientist's conclusion is kept as its own call); "scientist" = the Scientist's conclusion (v1-v4).
+    final_call: Literal["protocol", "scientist"] = "protocol"
     nuclei_segmenter: Segmenter = "classical"
     cell_segmenter: Segmenter = "classical"
 

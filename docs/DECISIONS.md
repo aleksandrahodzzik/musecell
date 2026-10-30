@@ -349,3 +349,20 @@ Owner: improve the agent, spend only the free credits ($150 Meta, $100 Baseten).
 **79.0 % (30/38)** (dev 13/19, **held-out test 17/19**), before review 76.3 %, 0 failed runs, 0 leak hits, citations 116/116, mean 171 s, nominal $0.36/run. NSC on 4 random wells (deep) 81.3 % ± 4.9 → the agent's own call is at the baseline, not above it. **NSC on the 4 wells the agent chose: 92.1 % (35/38)** = NSC on all wells; ≈ +11 points (≈ 2 sd) over random wells → the agent's experiment choice is the measurable contribution. It followed the NSC vote on its wells in 31/38 calls; 7 overrides, 1 right. Not turned into a rule (would be fitted to these compounds); reported instead.
 
 Daily cap raised per process (`DAILY_COST_CAP_USD=70`) because Baseten credits count toward it; `backend/.env` unchanged.
+
+## Agent v5: the protocol makes the call (2026-10-30)
+- **Evidence (dev half only, v4 runs):** the Scientist overrode the NSC vote on its own wells 5 times, wrong all 5. It pulled toward visually striking classes (stabilizers, Aurora kinases), and the reviewer approved 3 of the 5. Over all 38, v4 overrode 7 times and was right once, while NSC on its wells was right 35/38.
+- **Change:**
+  - The run's final call is the NSC vote over the wells the Scientist acquired (`Settings.final_call = "protocol"`; `"scientist"` restores v1–v4).
+  - The loop computes the vote after the review, as a `protocol_call` event that is still blinded (classes and similarities only).
+  - `Verdict` records `call_source`, `scientist_moa`, `scientist_correct` and the vote.
+  - The Scientist's prompt says its job is to choose wells that make the vote decisive and right.
+  - The reviewer's ledger carries the vote and whether the conclusion agrees. The reviewer is told to ask for the well that resolves a split vote.
+  - UI: "Final call" and "Scientist's call · agrees/dissents" in the unblinding stamp, notebook and dossier. The headline compares MuseCell's call with NSC on random and all wells, and shows the Scientist alone.
+- **Result, Muse Spark Open, 38 compounds, budget 4: 89.5 % (34/38).**
+  - Dev 17/19, held-out test 17/19.
+  - Scientist alone 79.0 %. It agreed with the vote in all 38 runs: the prompt change alone removed the dissents.
+  - 0 failures, 0 leak hits, citations 117/117, mean 129 s, nominal $0.30/run, 2 reviewer requests.
+  - Above NSC on 4 random wells (81.3 % ± 4.9, ≈ 1.7 sd), one compound below NSC on all wells (92.1 %).
+- Some text-only edits were made after the v5 eval had started: the unblinded brief now names both calls, and the dossier wording changed. They do not affect calls or scoring.
+- **Decision: freeze the agent at v5.** With these features the ceiling is NSC on all wells (35/38). Another version would gain at most 1–2 compounds, which is within noise, and would spend the held-out half again: the test half has been read for v4 and v5.

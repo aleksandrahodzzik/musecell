@@ -176,7 +176,12 @@ def test_review_requests_one_revision(catalog, atlas, tmp_path):
     r = run(loop)
     assert r.status == "finished", r.error
     assert [c.top_moa for c in r.conclusion_history] == ["Eg5 inhibitors", "Microtubule destabilizers"]
-    assert r.conclusion.top_moa == "Microtubule destabilizers" and not r.verdict.correct
+    assert r.conclusion.top_moa == "Microtubule destabilizers"  # the revised conclusion is the Scientist's call
+    # agent v5: the final call is the protocol's NSC vote over the acquired wells; the Scientist's call is kept
+    v = r.verdict
+    assert v.call_source == "protocol" and v.scientist_moa == "Microtubule destabilizers" and not v.scientist_correct
+    assert v.agent_moa == v.protocol["moa"] and v.correct == (v.protocol["moa"] == v.truth_moa)
+    assert [e for e in bus.events if e.type == "protocol_call"][0].data["agrees"] is False
     assert sum(s["purpose"] == "reviewer" for s in llm.sent) == 1  # at most one review round
     assert types(bus).count("conclusion") == 2 and r.budget_used == 3
     revision = next(s for s in llm.sent if s["purpose"] == "scientist turn 5")

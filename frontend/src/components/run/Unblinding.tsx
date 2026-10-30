@@ -108,11 +108,23 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
                 <div className={`-rotate-[0.8deg] rounded-panel border-2 p-4 bg-white/[0.03] ${verdict.correct ? "border-verdict-yes-on-night shadow-[0_0_40px_-12px_rgba(95,191,143,0.45)]" : "border-verdict-no-on-night shadow-[0_0_40px_-12px_rgba(224,112,104,0.45)]"}`}>
                   <p className={`flex items-center gap-2 font-serif text-[22px] font-semibold ${verdict.correct ? "text-verdict-yes-on-night" : "text-verdict-no-on-night"}`}>
                     {verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
-                    {verdict.correct ? "The agent's call matches" : "The agent's call does not match"}
+                    {verdict.correct ? "MuseCell's call matches" : "MuseCell's call does not match"}
                   </p>
                   <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm">
-                    <dt className="text-mist">Agent's call</dt>
-                    <dd className="text-white">{verdict.agent_moa}{probability != null && <span className="text-mist"> · probability {probability.toFixed(2)} in its conclusion</span>}</dd>
+                    {verdict.call_source === "protocol" && verdict.protocol ? (
+                      <>
+                        <dt className="text-mist">Final call</dt>
+                        <dd className="text-white">{verdict.agent_moa}<span className="text-mist"> · nearest-neighbour vote over the {verdict.protocol.wells} wells the agent chose ({verdict.protocol.votes}/{verdict.protocol.wells})</span></dd>
+                        <dt className="text-mist">Scientist's call</dt>
+                        <dd className="text-white">{verdict.scientist_moa}<span className="text-mist">
+                          {probability != null && ` · probability ${probability.toFixed(2)}`} · {verdict.scientist_moa === verdict.agent_moa ? "agrees" : `dissents, ${verdict.scientist_correct ? "right" : "wrong"}`}</span></dd>
+                      </>
+                    ) : (
+                      <>
+                        <dt className="text-mist">Agent's call</dt>
+                        <dd className="text-white">{verdict.agent_moa}{probability != null && <span className="text-mist"> · probability {probability.toFixed(2)} in its conclusion</span>}</dd>
+                      </>
+                    )}
                     <dt className="text-mist">Annotated mechanism</dt>
                     <dd className="text-white">{verdict.truth_moa} <span className="text-mist">· BBBC021</span></dd>
                   </dl>

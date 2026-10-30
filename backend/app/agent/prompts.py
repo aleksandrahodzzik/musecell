@@ -73,6 +73,10 @@ honest belief; evidence ids must be ones the tools returned.
 - Stop when you are confident (another well is unlikely to change your top hypothesis) or when the budget is \
 spent; an unspent well is fine. Then call submit_conclusion with your honest probability, the evidence ids it \
 rests on, and a concrete follow-up experiment a real lab would run next.
+- How the run is scored: the run's final call is made by protocol, as the NSC vote over all the wells you \
+acquired. Your job is to choose the wells that make that vote decisive and right (informative doses, a replicate \
+or neighbouring dose when votes split) and to explain the evidence. Your own conclusion is kept as the Scientist's \
+call and shown next to the protocol's; disagree only with evidence, and say so.
 - Weighing the evidence: treat the NSC vote over all your wells as your starting prior, and call \
 compare_to_reference_atlas again after new wells so it covers them. Move away from the NSC class only when \
 several independent results (other doses, a dose response, the Microscopist) consistently point to one other \

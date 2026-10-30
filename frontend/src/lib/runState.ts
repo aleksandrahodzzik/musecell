@@ -15,6 +15,7 @@ export type Entry =
   | { kind: "review"; key: string; seq: number; ts: string; review: Review }
   | { kind: "unblinded"; key: string; seq: number; ts: string; unblinded: Unblinded }
   | { kind: "verdict"; key: string; seq: number; ts: string; verdict: Verdict }
+  | { kind: "protocol"; key: string; seq: number; ts: string; protocol: EventPayloads["protocol_call"] }
   | { kind: "report"; key: string; seq: number; ts: string; report: EventPayloads["report_ready"] }
   | { kind: "error"; key: string; seq: number; ts: string; message: string; fatal: boolean };
 
@@ -44,6 +45,7 @@ export interface RunState {
   review?: Review;
   unblinded?: Unblinded;
   verdict?: Verdict;
+  protocol?: EventPayloads["protocol_call"];
   report?: EventPayloads["report_ready"];
   cost: { usd: number; calls: number; last?: CallCost };
   callLog: (CallCost & { seq: number })[]; // every metered model call, in order (cost_updated.last)
@@ -111,6 +113,8 @@ function applyEvent(s: RunState, e: RunEvent): RunState {
       };
     case "review":
       return { ...next, review: e.data, entries: [...s.entries, { ...base, kind: "review", review: e.data }] };
+    case "protocol_call":
+      return { ...next, protocol: e.data, entries: [...s.entries, { ...base, kind: "protocol", protocol: e.data }] };
     case "unblinded":
       return { ...next, phase: "unblinded", unblinded: e.data, entries: [...s.entries, { ...base, kind: "unblinded", unblinded: e.data }] };
     case "verdict":

@@ -56,6 +56,11 @@ def show(e: RunEvent) -> None:
         print(wrap(d["critique"]))
         if d.get("requested_experiment"):
             print(wrap(f"requested: {d['requested_experiment']}"))
+    elif t == "protocol_call":
+        print(f"
+== protocol call (NSC over {d['wells']} wells): {d['moa']} ({d['votes']}/{d['wells']}) · "
+              f"Scientist {'agrees' if d['agrees'] else 'dissents: ' + str(d['scientist_moa'])}"
+              f"{' · this is the final call' if d.get('final') else ''}")
     elif t == "unblinded":
         mechs = "; ".join(m["mechanism_of_action"] for m in d["chembl_mechanisms"]) or "no curated mechanism in ChEMBL"
         print(f"\n== unblinded: {d['compound']} · PubChem CID {d['pubchem_cid']} · ChEMBL {d.get('chembl_id')}: {mechs}")

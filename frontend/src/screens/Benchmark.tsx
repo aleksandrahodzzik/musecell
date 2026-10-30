@@ -21,6 +21,7 @@ export interface ResultRow {
   space?: string; // baseline rows: "hand-crafted features" | "ResNet50 + TVN"
   nsc_on_chosen_wells?: number | null; // agent rows: NSC on exactly the wells the agent chose
   split_accuracy?: { dev?: number; test?: number };
+  scientist_accuracy?: number | null; // agent v5+: the Scientist's own call (the final call is the protocol's)
 }
 export interface Results {
   generated_at?: string;
@@ -169,21 +170,36 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
   const below = rand && a.accuracy < rand.accuracy;
   const chosen: ResultRow | undefined = a.nsc_on_chosen_wells != null
     ? { ...a, accuracy: a.nsc_on_chosen_wells, correct: Math.round(a.nsc_on_chosen_wells * (a.n ?? 0)) } : undefined;
-  const tiles: [string, ResultRow | undefined, string][] = [
+  const protocol = a.scientist_accuracy != null; // v5+: the final call is the NSC vote over the agent's wells
+  const scientist: ResultRow | undefined = protocol
+    ? { ...a, accuracy: a.scientist_accuracy!, correct: Math.round(a.scientist_accuracy! * (a.n ?? 0)) } : undefined;
+  const tiles: [string, ResultRow | undefined, string][] = protocol ? [
+    ["MuseCell", a, `final call from the ${b} wells the agent chose`],
+    ["NSC on random wells", rand, `${b} wells drawn at random`],
+    ["NSC on all wells", all, "every well of the compound"],
+    ["The Scientist alone", scientist, "its own conclusion, same runs"],
+  ] : [
     ["MuseCell agent", a, `its own call, ${b} wells per compound`],
     ["NSC on the agent's wells", chosen, `the ${b} wells the agent chose`],
     ["NSC on random wells", rand, `${b} wells drawn at random`],
     ["NSC on all wells", all, "every well of the compound"],
   ];
+  const test = a.split_accuracy?.test;
   return (
     <section aria-label="Headline result" className="dark instrument relative overflow-hidden rounded-frame p-7 lg:p-10 flex flex-col gap-8 text-haze">
       <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
       {rand && (
         <p className="relative display text-[clamp(24px,2.4vw,34px)] leading-[1.1] tracking-[-0.04em] text-white max-w-[34ch]">
-          At {b} wells the agent's own call is {below ? "below" : "at or above"} the nearest-neighbour baseline on {b} random wells
-          {chosen && rand && chosen.accuracy > rand.accuracy
-            ? `; the ${b} wells it chooses lift that baseline to ${pct(chosen.accuracy)}${all && chosen.accuracy >= all.accuracy ? ", as high as using every well" : ""}.`
-            : "."}
+          {protocol ? (
+            <>From {b} wells chosen by the agent, MuseCell is {below ? "below" : "above"} the nearest-neighbour baseline on {b} random
+              wells{all && <> and {Math.round(((all.accuracy - a.accuracy) * (a.n ?? 0)))} compound{Math.round((all.accuracy - a.accuracy) * (a.n ?? 0)) === 1 ? "" : "s"} short of using every well</>}
+              {test != null && <>; {pct(test)} on held-out compounds</>}.</>
+          ) : (
+            <>At {b} wells the agent's own call is {below ? "below" : "at or above"} the nearest-neighbour baseline on {b} random wells
+              {chosen && rand && chosen.accuracy > rand.accuracy
+                ? `; the ${b} wells it chooses lift that baseline to ${pct(chosen.accuracy)}${all && chosen.accuracy >= all.accuracy ? ", as high as using every well" : ""}.`
+                : "."}</>
+          )}
         </p>
       )}
       <div className="relative grid grid-cols-4 gap-6">

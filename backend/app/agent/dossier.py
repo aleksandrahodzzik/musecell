@@ -128,8 +128,13 @@ def build_markdown(run: AgentRun, doc: dict | None = None) -> str:
     if run.verdict:
         v = run.verdict
         md += ["", "## Verdict (computed by code)", "",
-               f"{'Correct' if v.correct else 'Incorrect'}: agent said **{v.agent_moa}**, BBBC021 annotates "
+               f"{'Correct' if v.correct else 'Incorrect'}: the call was **{v.agent_moa}**, BBBC021 annotates "
                f"**{v.truth_moa}**."]
+        if v.call_source == "protocol" and v.protocol:
+            md += ["", f"The final call is the nearest-neighbour vote over the {v.protocol['wells']} wells the agent "
+                       f"chose ({v.protocol['votes']}/{v.protocol['wells']}). The Scientist's own call was "
+                       f"**{v.scientist_moa}** ({'agrees' if v.scientist_moa == v.agent_moa else 'dissents'}; "
+                       f"{'right' if v.scientist_correct else 'wrong'})."]
     if run.reflection:
         r = run.reflection
         md += ["", "## Reflection", "", r.text]
