@@ -8,7 +8,8 @@ import type React from "react";
 import HowItWorks from "../components/HowItWorks";
 import { Reveal } from "../components/Shell";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
-import { ApiError, postJSON } from "../lib/api";
+import { ApiError, imageUrl, postJSON } from "../lib/api";
+import type { Results } from "./Benchmark";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
 import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
 import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, type Channel, type FieldPixels } from "../lib/fieldImage";
@@ -111,10 +112,11 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
     <div className="flex flex-col">
       {/* ── Hero: a dark rounded frame on the paper. The eyepiece stays top right. ───────────────────────── */}
       <section aria-labelledby="hero-h" className="dark relative mx-2.5 rounded-frame overflow-hidden instrument text-haze min-h-[calc(100vh-106px)] flex flex-col">
+        <DriftingField />
         <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(11_10_9/0.2),transparent_45%,rgb(11_10_9/0.6))]" />
-        <div className="relative flex-1 flex flex-col p-6 lg:p-9">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-8 items-start">
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(11_10_9/0.35),rgb(11_10_9/0.05)_45%,rgb(11_10_9/0.75))]" />
+        <div className="relative flex-1 flex flex-col p-5 sm:p-6 lg:p-9">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 items-start">
             <div className="flex flex-col min-w-0 pt-2">
               <p aria-hidden className="display text-haze -ml-[0.04em] whitespace-nowrap" style={{ fontSize: "clamp(72px, 12.4vw, 210px)" }}>
                 MuseCell
@@ -122,19 +124,20 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
               <h1 id="hero-h" className="display text-[clamp(28px,3.4vw,50px)] leading-[1.02] tracking-[-0.05em] mt-4 max-w-[17ch]">
                 Name the mechanism <span className="accent text-lime text-[1.12em]">before</span> you know the compound.
               </h1>
-              <p className="tag mt-6 self-start inline-flex items-center gap-2.5 rounded-full bg-white/[0.06] ring-1 ring-line px-3.5 py-2 backdrop-blur">
+              <p className="tag mt-6 self-start inline-flex items-center gap-2.5 rounded-full bg-white/[0.06] ring-1 ring-white/10 px-3.5 py-2 backdrop-blur">
                 <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${live ? "bg-lime animate-[pulse-lime_1.8s_ease-out_infinite]" : "bg-mist/60"}`} />
                 {live ? <>Live · <b className="font-medium text-lime">{sealed}</b> sealed specimens</> : "Replays on this server"}
               </p>
+              <HeadlineNumber />
             </div>
-            <aside className="pt-2"><Eyepiece /></aside>
+            <aside className="pt-2 justify-self-center lg:justify-self-auto"><Eyepiece /></aside>
           </div>
 
-          <div aria-hidden className="flex justify-between mt-auto pt-8 mb-7 text-mist/70">
+          <div aria-hidden className="hidden lg:flex justify-between mt-auto pt-8 mb-7 text-mist/70">
             {[0, 1, 2, 3].map((i) => <span key={i} className="relative h-[15px] w-[15px] before:absolute before:left-[7px] before:top-0 before:h-[15px] before:w-px before:bg-current after:absolute after:top-[7px] after:left-0 after:h-px after:w-[15px] after:bg-current" />)}
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)_auto] gap-8 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)_auto] gap-8 items-end mt-10 lg:mt-0">
             <p className="text-[clamp(18px,1.5vw,22px)] leading-[1.25] tracking-[-0.025em] font-medium max-w-[34ch]">
               An AI scientist built on Meta's models.{" "}
               <span className="text-mist">It picks which wells of a sealed BBBC021 compound to image, measures every cell,
@@ -142,12 +145,12 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
             </p>
             <ol className="text-[15px] font-medium leading-[1.6]">
               {["Blinded acquisition", "Peer review by a second model", "Unblinding against PubChem · ChEMBL", "A dossier with verified citations"].map((t, i) => (
-                <li key={t} className="flex items-baseline gap-2.5 whitespace-nowrap">
+                <li key={t} className="flex items-baseline gap-2.5 lg:whitespace-nowrap">
                   <span className="font-mono text-[11px] text-mist">{String(i + 1).padStart(2, "0")}</span>{t}
                 </li>
               ))}
             </ol>
-            <div className="flex flex-col items-end gap-2.5">
+            <div className="flex flex-col items-start lg:items-end gap-2.5">
               <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("bench")}>Choose a specimen</button>
               <button className="btn h-10 px-4" onClick={() => go("recorded")}>
                 <Play aria-hidden className="h-3.5 w-3.5" /> Watch a recorded run
@@ -159,7 +162,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
 
       {/* ── The bench: choose a slide, a budget and the models ─────────────────────────────────────────── */}
       <section id="bench" aria-labelledby="bench-h" className="scroll-mt-4 px-5 lg:px-9 pt-28 pb-6">
-        <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-12">
+        <Reveal className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-6 md:gap-12 items-end mb-12">
           <div>
             <p className="tag text-graphite mb-4">01 — The bench</p>
             <h2 id="bench-h" className="display stop text-[clamp(56px,9vw,140px)]">Start a <span className="accent">run</span></h2>
@@ -172,7 +175,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
       </section>
       <Reveal className="dark relative mx-2.5 rounded-frame overflow-hidden instrument text-haze">
         <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
-        <div className="relative grid grid-cols-[minmax(0,1fr)_340px] gap-12 p-6 lg:p-10">
+        <div className="relative grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 lg:gap-12 p-5 sm:p-6 lg:p-10">
           <div className="flex flex-col gap-7 min-w-0">
             <section aria-labelledby="specimens-h" className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
@@ -229,7 +232,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
             {startError && <ErrorNote title="The run did not start.">{startError}</ErrorNote>}
           </div>
 
-          <aside className="flex flex-col gap-4 border-l border-line pl-8">
+          <aside className="flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-line pt-6 lg:pt-0 lg:pl-8">
             <p className="tag text-mist">Who does what</p>
             {runIds && (
               <>
@@ -247,7 +250,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
 
       {/* ── Recorded runs ─────────────────────────────────────────────────────────────────────────────── */}
       <section id="recorded" aria-labelledby="recorded-h" className="scroll-mt-4 px-5 lg:px-9 pt-28 pb-6">
-        <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-12">
+        <Reveal className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-6 md:gap-12 items-end mb-12">
           <div>
             <p className="tag text-graphite mb-4">02 — Replays</p>
             <h2 id="recorded-h" className="display stop text-[clamp(56px,9vw,140px)]">Watch it <span className="accent">think</span></h2>
@@ -268,6 +271,49 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
         <p className="display whitespace-nowrap -ml-[0.04em] leading-[0.8] translate-y-[12%]" style={{ fontSize: "clamp(80px, 21vw, 360px)" }}>MuseCell</p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Behind the hero: one real BBBC021 field, heavily blurred, drifting slowly (a 60 s loop). Decorative only; stops
+ * under prefers-reduced-motion. Uses a shipped thumbnail, so it works in replay-only mode too.
+ */
+function DriftingField() {
+  const gallery = useFetch<string[]>("/api/gallery");
+  const id = gallery.data?.length ? gallery.data[Math.min(7, gallery.data.length - 1)] : null;
+  if (!id) return null;
+  return (
+    <div aria-hidden className="absolute inset-0 overflow-hidden">
+      <img src={imageUrl(id)} alt="" className="absolute -inset-[15%] h-[130%] w-[130%] max-w-none object-cover opacity-[0.5] blur-[16px] saturate-[1.3]
+                                              animate-[drift_60s_ease-in-out_infinite_alternate] motion-reduce:animate-none" />
+    </div>
+  );
+}
+
+/** The headline result on the first screen, read from eval/results.json (never typed in by hand). */
+function HeadlineNumber() {
+  const results = useFetch<Results>("/api/eval/results");
+  const rows = results.data?.rows ?? [];
+  const agent = rows.filter((r) => r.method === "agent" && r.budget != null);
+  if (!agent.length) return null;
+  const a = agent.reduce((x, y) => (y.budget! > x.budget! ? y : x));
+  const test = a.split_accuracy?.test;
+  const deep = a.atlas?.startsWith("ResNet50") ? "_deep" : "";
+  const rand = rows.find((r) => r.method === "nsc_random" + deep && r.budget === a.budget);
+  return (
+    <a href="#/benchmark" className="group mt-5 self-start flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 rounded-[18px] bg-white/[0.06] ring-1 ring-white/10 px-5 py-3.5 backdrop-blur hover:bg-white/[0.09] transition-colors">
+      <span className="display text-lime text-[44px] leading-none">{(a.accuracy * 100).toFixed(1)}%</span>
+      <span className="flex flex-col text-[13px] leading-snug">
+        <span className="text-haze font-medium">
+          right mechanism from {a.budget} wells the agent chose
+        </span>
+        <span className="text-mist">
+          {a.correct}/{a.n} compounds{test != null && <> · {(test * 100).toFixed(0)}% on held-out ones</>}
+          {rand && <> · random wells {(rand.accuracy * 100).toFixed(1)}%</>}
+        </span>
+      </span>
+      <span aria-hidden className="hidden sm:inline text-mist group-hover:text-white transition-colors">→</span>
+    </a>
   );
 }
 
@@ -323,9 +369,9 @@ function ProviderSwitch({ health, provider, setProvider }: {
   };
   return (
     <section className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
         <span id="provider-label" className="text-sm font-medium text-white">Models</span>
-        <div role="radiogroup" aria-labelledby="provider-label" className="flex items-center gap-1 rounded-full bg-night-2 border border-line p-1">
+        <div role="radiogroup" aria-labelledby="provider-label" className="flex items-center gap-1 rounded-full bg-night-2 border border-line p-1 self-start">
           {PROVIDER_OPTIONS.map((o) => {
             const on = o.provider === provider;
             const ok = usable.has(o.provider);
@@ -333,7 +379,7 @@ function ProviderSwitch({ health, provider, setProvider }: {
               <button key={o.provider} data-provider={o.provider} role="radio" aria-checked={on} tabIndex={on ? 0 : -1}
                       disabled={!ok} onClick={() => setProvider(o.provider)} onKeyDown={onKey}
                       title={ok ? undefined : why(o.provider)}
-                      className={`h-9 px-3.5 rounded-full flex flex-col items-start justify-center leading-tight transition-colors
+                      className={`h-10 sm:h-9 px-3.5 rounded-full flex flex-col items-start justify-center leading-tight whitespace-nowrap transition-colors
                         ${on ? "bg-white/[0.1] border border-white/40" : "border border-transparent hover:border-white/20"}
                         ${ok ? "" : "opacity-40 cursor-not-allowed"}`}>
                 <span className={`text-[12.5px] font-medium ${on ? "text-white" : "text-haze"}`}>{o.title}</span>
@@ -354,7 +400,7 @@ function ProviderSwitch({ health, provider, setProvider }: {
 /** Budget as wells: click a well to set the budget; −/+ keys work through the buttons. */
 function BudgetWells({ budget, setBudget }: { budget: number; setBudget: (n: number) => void }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
       <span id="budget-label" className="text-sm font-medium text-white">Budget</span>
       <div role="radiogroup" aria-labelledby="budget-label" className="flex items-center gap-1.5 rounded-full bg-night-2 border border-line px-2.5 py-2">
         {Array.from({ length: MAX_BUDGET }, (_, i) => {
@@ -385,7 +431,7 @@ function BudgetWells({ budget, setBudget }: { budget: number; setBudget: (n: num
           );
         })}
       </div>
-      <output aria-live="polite" className="text-sm text-white tabular-nums w-[60px]">{budget} wells</output>
+      <output aria-live="polite" className="text-sm text-white tabular-nums whitespace-nowrap">{budget} wells</output>
     </div>
   );
 }
@@ -435,7 +481,7 @@ function Eyepiece() {
         onPointerLeave={() => setPan({ x: 0, y: 0 })}
         disabled={ids.length < 2}
         aria-label="Look at another field"
-        className="group relative h-[360px] w-[360px] rounded-full bg-darkfield shadow-[0_0_0_1px_rgba(255,255,255,0.14),0_0_0_10px_#0E1217,0_0_0_11px_rgba(255,255,255,0.08),0_40px_80px_-20px_rgba(0,0,0,0.9)] overflow-hidden"
+        className="group relative h-[min(360px,78vw)] w-[min(360px,78vw)] rounded-full bg-darkfield shadow-[0_0_0_1px_rgba(255,255,255,0.14),0_0_0_10px_#0E1217,0_0_0_11px_rgba(255,255,255,0.08),0_40px_80px_-20px_rgba(0,0,0,0.9)] overflow-hidden"
       >
         <span aria-hidden={!px} className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-500 ease-out ${px ? "opacity-100" : "opacity-0"}`}
               style={{ transform: `translate(${pan.x * 12}%, ${pan.y * 12}%) scale(1.4)` }}>

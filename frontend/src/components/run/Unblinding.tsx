@@ -36,8 +36,8 @@ function Beat({ at, children, className }: { at: number; children: ReactNode; cl
 function Stamp({ at, children }: { at: number; children: ReactNode }) {
   const still = useReducedMotion();
   return (
-    <motion.div initial={still ? false : { opacity: 0, scale: 1.12 }} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: at, duration: 0.22, ease: [0.3, 0, 0.2, 1] }}>
+    <motion.div initial={still ? false : { opacity: 0, scale: 1.25, rotate: -4 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ delay: at, duration: 0.28, ease: [0.3, 0, 0.2, 1] }}>
       {children}
     </motion.div>
   );
@@ -47,21 +47,23 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
   const still = useReducedMotion();
 
   return (
-    <div className="h-full overflow-y-auto bg-night bg-[radial-gradient(70%_60%_at_30%_0%,rgba(255,255,255,0.07),transparent_70%)] text-haze">
-      <div className="max-w-[800px] mx-auto px-7 py-5 flex flex-col gap-4">
+    <div className="relative h-full overflow-y-auto bg-night bg-[radial-gradient(70%_60%_at_30%_0%,rgba(255,244,228,0.08),transparent_70%)] text-haze">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden"><div className="grain" /></div>
+      <div className="relative max-w-[920px] mx-auto px-9 py-9 flex flex-col gap-7">
         <div>
-          <motion.p className="text-sm text-mist" initial={still ? false : { opacity: 1 }} animate={{ opacity: 0.8 }}>
+          <motion.p className="tag text-mist" initial={still ? false : { opacity: 1 }} animate={{ opacity: 0.85 }}>
             {specimenLabel} was
           </motion.p>
           <motion.h2
-            className="font-serif text-[48px] leading-[1.05] font-semibold tracking-[-0.015em] text-white"
-            initial={still ? false : { opacity: 0, filter: "blur(10px)", letterSpacing: "0.04em" }}
-            animate={{ opacity: 1, filter: "blur(0px)", letterSpacing: "-0.015em" }}
-            transition={{ duration: 0.45, ease }}
+            className="display stop text-white mt-3 break-words"
+            style={{ fontSize: "clamp(52px, 6.4vw, 112px)" }}
+            initial={still ? false : { opacity: 0, filter: "blur(14px)", letterSpacing: "0.02em" }}
+            animate={{ opacity: 1, filter: "blur(0px)", letterSpacing: "-0.058em" }}
+            transition={{ duration: 0.6, ease }}
           >
             {u.compound}
           </motion.h2>
-          {u.identity_check && <p className="text-xs text-mist mt-1">Identity check: {u.identity_check}</p>}
+          {u.identity_check && <p className="text-xs text-mist mt-3">Identity check: {u.identity_check}</p>}
           {!u.structure_url && <p className="text-xs text-mist">No public structure to show for this compound.</p>}
         </div>
 
@@ -105,12 +107,12 @@ export default function Unblinding({ runId, specimenLabel, unblinded: u, verdict
 
             {verdict && (
               <Stamp at={1.0}>
-                <div className={`-rotate-[0.8deg] rounded-panel border-2 p-4 bg-white/[0.03] ${verdict.correct ? "border-verdict-yes-on-night shadow-[0_0_40px_-12px_rgba(95,191,143,0.45)]" : "border-verdict-no-on-night shadow-[0_0_40px_-12px_rgba(224,112,104,0.45)]"}`}>
-                  <p className={`flex items-center gap-2 font-serif text-[22px] font-semibold ${verdict.correct ? "text-verdict-yes-on-night" : "text-verdict-no-on-night"}`}>
-                    {verdict.correct ? <Check aria-hidden className="h-5 w-5" /> : <X aria-hidden className="h-5 w-5" />}
+                <div className={`-rotate-[1.2deg] rounded-[22px] border-2 p-6 bg-white/[0.035] ${verdict.correct ? "border-verdict-yes-on-night shadow-[0_0_40px_-12px_rgba(95,191,143,0.45)]" : "border-verdict-no-on-night shadow-[0_0_40px_-12px_rgba(224,112,104,0.45)]"}`}>
+                  <p className={`flex items-center gap-2.5 display text-[clamp(26px,2.4vw,36px)] tracking-[-0.045em] ${verdict.correct ? "text-verdict-yes-on-night" : "text-verdict-no-on-night"}`}>
+                    {verdict.correct ? <Check aria-hidden className="h-7 w-7" /> : <X aria-hidden className="h-7 w-7" />}
                     {verdict.correct ? "MuseCell's call matches" : "MuseCell's call does not match"}
                   </p>
-                  <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm">
+                  <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-5 gap-y-1 text-[14.5px]">
                     {verdict.call_source === "protocol" && verdict.protocol ? (
                       <>
                         <dt className="text-mist">Final call</dt>

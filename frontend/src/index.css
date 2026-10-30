@@ -72,6 +72,8 @@
 }
 
 @keyframes grain { 0%{transform:translate(0,0)} 17%{transform:translate(-6%,4%)} 33%{transform:translate(5%,-7%)} 50%{transform:translate(-3%,8%)} 67%{transform:translate(7%,2%)} 83%{transform:translate(-8%,-4%)} }
+/* The hero's blurred field drifts slowly (ChooseSpecimen DriftingField). */
+@keyframes drift { 0% { transform: translate(-3%, -2%) scale(1.04) rotate(-1deg); } 100% { transform: translate(3%, 2%) scale(1.12) rotate(1.5deg); } }
 @keyframes pulse-lime { 0% { box-shadow: 0 0 0 0 rgb(215 255 63 / .7); } 100% { box-shadow: 0 0 0 10px rgb(215 255 63 / 0); } }
 
 @media (prefers-reduced-motion: reduce) {

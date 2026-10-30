@@ -48,7 +48,7 @@ export default function HowItWorks({ ids }: { ids?: ModelIds }) {
   return (
     <>
       <section aria-labelledby="how-h" className="px-5 lg:px-9 pt-28">
-        <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-16">
+        <Reveal className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-6 md:gap-12 items-end mb-16">
           <div>
             <p className="tag text-graphite mb-4">03 — How a run works</p>
             <h2 id="how-h" className="display text-[clamp(40px,5vw,76px)] leading-[0.98] max-w-[16ch]">
@@ -61,9 +61,9 @@ export default function HowItWorks({ ids }: { ids?: ModelIds }) {
           </p>
         </Reveal>
         <div ref={track} className="relative">
-          <span aria-hidden className="absolute left-0 right-0 top-[7px] h-px bg-rule" />
-          <span aria-hidden className={`absolute left-0 right-0 top-[7px] h-px bg-ink origin-left transition-transform duration-[1600ms] ease-[cubic-bezier(.7,0,.2,1)] ${on ? "scale-x-100" : "scale-x-0"}`} />
-          <ol className="grid grid-cols-5 gap-6">
+          <span aria-hidden className="hidden md:block absolute left-0 right-0 top-[7px] h-px bg-rule" />
+          <span aria-hidden className={`hidden md:block absolute left-0 right-0 top-[7px] h-px bg-ink origin-left transition-transform duration-[1600ms] ease-[cubic-bezier(.7,0,.2,1)] ${on ? "scale-x-100" : "scale-x-0"}`} />
+          <ol className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-6">
             {steps.map((s, i) => (
               <li key={s.title} className="relative pt-11 pr-3">
                 <span aria-hidden style={{ transitionDelay: `${300 + i * 260}ms` }}
@@ -81,7 +81,7 @@ export default function HowItWorks({ ids }: { ids?: ModelIds }) {
 
       {results.data && (
         <section aria-labelledby="results-h" className="px-5 lg:px-9 pt-28">
-          <Reveal className="grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-12 items-end mb-12">
+          <Reveal className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-6 md:gap-12 items-end mb-12">
             <div>
               <p className="tag text-graphite mb-4">04 — The benchmark</p>
               <h2 id="results-h" className="display stop text-[clamp(56px,9vw,140px)]">Measured, <span className="accent">not claimed</span></h2>

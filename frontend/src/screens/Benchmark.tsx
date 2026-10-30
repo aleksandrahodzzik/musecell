@@ -202,7 +202,7 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
           )}
         </p>
       )}
-      <div className="relative grid grid-cols-4 gap-6">
+      <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-6">
         {tiles.map(([name, row, sub], i) => row && (
           <div key={i} className={`flex flex-col gap-1 ${i ? "border-l border-line pl-6" : ""}`}>
             <span className="tag text-mist">{name}</span>
