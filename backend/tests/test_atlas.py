@@ -50,3 +50,22 @@ def test_whitening_runs(atlas):
     dmso = pd.DataFrame(np.random.default_rng(0).normal(size=(30, 3)), columns=FEATURES)
     w = Atlas(atlas.reference.assign(moa_annotated_conc=True), features=FEATURES, dmso_wells=dmso, whiten=True)
     assert all(h.compound != "Z" for h in w.neighbors(pd.Series({"a": 0, "b": 1, "c": 0}), 5, exclude_compound="Z"))
+
+
+def test_deep_atlas_loads_well_vectors_and_stays_loco(tmp_path):
+    """Deep atlas (scripts/build_deep_atlas.py layout): vectors per well, d000.. columns detected, LOCO kept."""
+    from app.science.atlas import Atlas
+    rng = np.random.default_rng(0)
+    cols = [f"d{i:03d}" for i in range(6)]
+    a, b = rng.normal(size=6), rng.normal(size=6)
+    tr = pd.DataFrame([{"compound": c, "concentration_uM": 1.0, "moa": m, "moa_annotated_conc": True, "n_wells": 2,
+                        "thumbnail_field_id": f"f_{i}", **dict(zip(cols, v + rng.normal(scale=.05, size=6)))}
+                       for i, (c, m, v) in enumerate([("x", "A", a), ("y", "A", a), ("z", "B", b)])])
+    tr.to_parquet(tmp_path / "treatments.parquet", index=False)
+    pd.DataFrame([{"well_key": "P/w1", **dict(zip(cols, a))}]).to_parquet(tmp_path / "wells.parquet", index=False)
+    atlas = Atlas.load_deep(tmp_path)
+    assert atlas.space == "resnet50_tvn" and atlas.features == cols
+    vec = atlas.well_vector("P/w1")
+    assert vec.shape == (6,)
+    hit = atlas.neighbors(vec, 1, exclude_compound="x")[0]
+    assert hit.compound == "y" and hit.moa == "A"  # its own compound "x" is never returned

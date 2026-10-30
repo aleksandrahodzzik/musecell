@@ -118,6 +118,10 @@ python scripts/fetch_bbbc021.py       # prints the download plan (~10.8 GB of HT
 python scripts/fetch_bbbc021.py fetch # downloads the planned TIFFs (resumable)
 python scripts/preprocess.py
 python scripts/build_atlas.py         # segmentation + features for 3,096 fields (~30 min with 10 workers)
+# optional, for the deep atlas (agent v4; without it the app falls back to the hand-crafted atlas):
+python -m pip install -r backend/requirements-ml.txt --index-url https://download.pytorch.org/whl/cpu
+python scripts/embed_fields.py        # ResNet50 embeddings, ~40 min on 12 CPU threads
+python scripts/build_deep_atlas.py
 python -m uvicorn app.main:app --app-dir backend --port 8787
 ```
 
@@ -125,25 +129,47 @@ Then **Start blinded run** in the UI, or `python scripts/run_agent_cli.py --list
 
 ## Evaluation
 
-`scripts/evaluate.py` runs the full agent (blinded loop, review, unblinding, literature, reflection) on all 38 MoA-annotated BBBC021 compounds at 2, 4 and 6 wells, leave-one-compound-out, and compares it with the nearest-neighbour (NSC) baseline. The table below is copied from [`eval/RESULTS.md`](eval/RESULTS.md), which the script writes.
+`scripts/evaluate.py` runs the full agent (blinded loop, review, unblinding, literature, reflection) on all 38 MoA-annotated BBBC021 compounds, leave-one-compound-out, and compares it with the nearest-neighbour (NSC) protocol in two feature spaces. All numbers are from [`eval/RESULTS.md`](eval/RESULTS.md), which the script writes.
 
-| Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
-|---|---|---|---|---|---|---|---|---|
-| NSC baseline, all wells | all | 71.0% | 27/38 | – | – | – | – | – |
-| NSC baseline, random wells | 2 | 50.5% ± 6.2 | – | – | 2.00 | – | – | – |
-| NSC baseline, random wells | 4 | 57.8% ± 5.8 | – | – | 4.00 | – | – | – |
-| NSC baseline, random wells | 6 | 61.3% ± 5.0 | – | – | 6.00 | – | – | – |
-| MuseCell agent (muse-spark-1.3-contributor) | 2 | 42.1% | 16/38 | 36.8% | 2.00 | $0.107 | 203 s | 103/103 (100.0%) |
-| MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
-| MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
-| MuseCell agent, Muse Spark Open (Baseten) | 4 | 44.7% | 17/38 | 31.6% | 3.97 | $0.365 | 167 s | 111/112 (99.1%) |
-| MuseCell agent, Muse Spark Open (Baseten), agent v3 | 4 | 55.3% | 21/38 | 50.0% | 4.00 | $0.375 | 142 s | 128/129 (99.2%) |
+**Current agent (v4), Muse Spark Open on Baseten, 4 wells per compound:**
 
-**The agent is below the classical baseline,** and more wells do not help it. The error analysis in [`eval/RESULTS.md`](eval/RESULTS.md) shows where it goes wrong. Strong cytoskeletal and mitotic phenotypes are nearly always right (microtubule destabilizers 12/12, Aurora kinase inhibitors 9/9, stabilizers 8/9). Subtle classes are never right: it over-calls "Microtubule stabilizers" (35 of 114 runs, 9 true) and never calls Epithelial, Protein degradation or Cholesterol-lowering. The PI review changed a wrong call to a right one in 3 runs and a right one to wrong in 1. Every cited PMID (320/320) was one the agent had retrieved in that run.
+| | Accuracy |
+|---|---|
+| **MuseCell agent v4**: its own blinded call | **79.0% (30/38)**. Held-out test half: **17/19** |
+| NSC on **the 4 wells the agent chose** | **92.1% (35/38)** |
+| NSC on 4 random wells (same features) | 81.3% ± 4.9 |
+| NSC on all wells of the compound (same features) | 92.1% (35/38) |
 
-**Agent v3 closes most of the gap.** [`scripts/nsc_on_agent_wells.py`](scripts/nsc_on_agent_wells.py) applies the NSC protocol to exactly the wells the agent chose: at budget 4 that is right for 23/38 compounds, so the agent was picking informative wells and then losing the answer. The atlas tool had shown it a count of classes among 10 neighbours, which is weaker than the 1-NN vote, and whenever the agent overrode the vote on its own wells it was wrong. In v3 the atlas tool also returns the NSC vote over all acquired wells, the prompt explains how to weigh it, and the blinded phase names no compound. On Muse Spark Open (Baseten) at budget 4 that raised accuracy from 44.7% to **55.3% (21/38)**, within one standard deviation of NSC on 4 random wells (57.8% ± 5.8) but still below it. v3 was designed after reading the v1 runs on these same 38 compounds, and BBBC021 has no other annotated compounds, so this is not a held-out estimate (also stated in `eval/RESULTS.md`). The change is generic, with nothing compound- or class-specific. A first version (v2) was stopped after 19 runs to fix blinding hygiene; its runs stay in the log. Details: [docs/DECISIONS.md](docs/DECISIONS.md) ("Agent v2 / v3").
+What this shows:
+- **The agent is a good experimenter.** With the 4 wells it picks (out of about 24), the classical classifier is as accurate as with every well, and about 11 points (≈ 2 sd) above 4 random wells.
+- **Its own final call is not better than the classifier.** At 79.0% it sits at the random-well baseline. In 7 of 38 runs it overrode the NSC vote on its own wells, and only 1 of those overrides was right. We report this rather than hard-wire "always follow the vote", because that rule would be fitted to these same 38 compounds.
+- 0 failed runs, 0 blinding leaks in the offline re-scan, 116/116 cited PMIDs retrieved in-run.
 
-The eval ran on `muse-spark-1.3-contributor` (same model, cheaper tier; allowed because BBBC021 is public); 114 runs cost $14.60. The demo runs and the app use `muse-spark-1.3`. Every run is logged in [`eval/agent_runs.jsonl`](eval/agent_runs.jsonl); `python scripts/evaluate.py --model muse-spark-1.3-contributor --aggregate-only` rebuilds the tables and chart from it without API calls (needs the data for the baselines).
+**How it got here** (every version stays in [`eval/agent_runs.jsonl`](eval/agent_runs.jsonl)):
+
+| Agent, budget 4 | Atlas features | Accuracy | NSC baseline, 4 random wells (same features) |
+|---|---|---|---|
+| v1, `muse-spark-1.3-contributor` | hand-crafted (24 features) | 36.8% | 57.8% ± 5.8 |
+| v1, Muse Spark Open (Baseten) | hand-crafted | 44.7% | 57.8% ± 5.8 |
+| v3, Muse Spark Open | hand-crafted | 55.3% | 57.8% ± 5.8 |
+| **v4, Muse Spark Open** | **ResNet50 (ImageNet) + TVN** | **79.0%** | 81.3% ± 4.9 |
+
+- **v1 → v3** (prompt and tool changes):
+  - [`scripts/nsc_on_agent_wells.py`](scripts/nsc_on_agent_wells.py) showed that the agent picked informative wells but lost the answer.
+  - The atlas tool now also returns the NSC vote over all acquired wells, and the prompt explains how to weigh it.
+  - The blinded phase names no compound, because the blinding guard had stopped correct runs.
+  - v3 was designed after reading v1 runs on these 38 compounds, so its gain is not a held-out estimate.
+- **v3 → v4** (better measurements):
+  - The atlas searches ImageNet-pretrained ResNet50 embeddings of each stain ([`scripts/embed_fields.py`](scripts/embed_fields.py)), whitened against DMSO wells (Typical Variation Normalization, [`scripts/build_deep_atlas.py`](scripts/build_deep_atlas.py)).
+  - No MoA label is used to build them.
+  - The choice was made on a dev half of a split frozen before exploring ([`eval/split.json`](eval/split.json)) and checked once on the test half: NSC on all wells went 15/19 → 17/19, on 4 random wells 60% → 80%.
+  - The agent still sees the interpretable measured features (z-scores per feature); only the similarity search changed.
+
+Earlier full eval (v1, contributor tier, budgets 2/4/6, 114 runs): 42.1 / 36.8 / 42.1%, below the hand-crafted NSC baseline. The error analysis is in the git history of `eval/RESULTS.md`. Rebuild everything from the log without API calls (needs the data and the run logs):
+
+```powershell
+python scripts/evaluate.py --model meta-models/muse-spark-open-1026@v4 --compare muse-spark-1.3-contributor meta-models/muse-spark-open-1026 meta-models/muse-spark-open-1026@v3 --aggregate-only
+```
 
 ## Runs on Meta open weights
 
@@ -162,6 +188,8 @@ Same 38 compounds, budget 4, same tools and same PI reviewer, from [`eval/RESULT
 | Citations verified | 109/109 | 111/112 | 128/129 | – |
 
 With agent v1 on open weights the PI reviewer turned 5 wrong calls into right ones and no right call into a wrong one; with v3, 3 and 1. Both are still below the NSC baseline, and with 38 compounds a 3-compound difference is within noise (v3 caveat above: designed on these compounds). It shares the over-call of "Microtubule stabilizers" (11 of 38 calls, 3 true). Mean cost was $0.365 per run at Baseten list price plus the reviewer. That is not comparable with the contributor tier, which is priced 10–20× lower.
+
+With the deep atlas (agent v4) the same open model reaches **79.0% (30/38)**; see [Evaluation](#evaluation).
 
 One recorded demo run is on open weights: `run_2bee8860f390` (epothilone B, correct, reviewer approved, citations 5/5).
 
@@ -197,7 +225,7 @@ Compound identity and mechanisms after unblinding come from [PubChem](https://pu
 - **One cell line, one dataset.** MCF-7 cells, 38 annotated compounds in 12 MoA classes, a single public screen. Nothing here has been tested on other cell lines, stains or plates.
 - **The virtual microscope replays existing images.** "Acquiring a well" reads a well that was imaged in 2010; the agent chooses among doses and replicates that already exist and cannot order a new experiment.
 - **Crude features.** Hand-built per-cell features (intensity, shape, GLCM texture) from classical segmentation. Classical cell bodies have no independent check; SAM 3.1 was used to check nuclei only.
-- **Accuracy is below a simple baseline** (see Evaluation): agent v1 on the contributor tier and on open weights, and agent v3 (55.3% vs 57.8% on open weights, designed on the same 38 compounds). Full-price `muse-spark-1.3` and agent v3 on the Meta API were not benchmarked; the demo runs are too few to say.
+- **The agent's own call does not beat the classifier.** Agent v4 (79.0%) is at the level of NSC on 4 random wells (81.3% ± 4.9); its value is in choosing wells (NSC on its wells: 92.1%). v2–v4 were developed on these 38 compounds; only the v4 feature choice has a held-out check (test half 17/19). Full-price `muse-spark-1.3` with agent v4 was not benchmarked.
 - **Small eval.** 38 compounds is small, so differences of a few compounds are within noise. The 38 compounds are also the only annotated set, so prompts were not tuned on a held-out split.
 - **Replay without data.** In a fresh clone without `DATA_DIR`, masks, hover measurements and fields beyond the 40 shipped thumbnails are unavailable (the UI says so).
 

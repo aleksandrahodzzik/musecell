@@ -17,6 +17,10 @@ export interface ResultRow {
   mean_cost_usd?: number | null;
   mean_latency_s?: number | null;
   citation_validity?: number | null;
+  atlas?: string; // agent rows: the atlas feature space the agent searched
+  space?: string; // baseline rows: "hand-crafted features" | "ResNet50 + TVN"
+  nsc_on_chosen_wells?: number | null; // agent rows: NSC on exactly the wells the agent chose
+  split_accuracy?: { dev?: number; test?: number };
 }
 export interface Results {
   generated_at?: string;
@@ -158,27 +162,35 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
   if (!agent.length) return null;
   const b = Math.max(...agent.map((x) => x.budget!));
   const a = agent.find((x) => x.budget === b)!;
-  const rand = rows.find((x) => x.method === "nsc_random" && x.budget === b);
-  const all = rows.find((x) => x.method === "nsc_all");
+  // compare against the baseline in the agent's own atlas space (deep features from agent v4 on)
+  const suffix = a.atlas?.startsWith("ResNet50") && rows.some((x) => x.method === "nsc_random_deep") ? "_deep" : "";
+  const rand = rows.find((x) => x.method === "nsc_random" + suffix && x.budget === b);
+  const all = rows.find((x) => x.method === "nsc_all" + suffix);
   const below = rand && a.accuracy < rand.accuracy;
+  const chosen: ResultRow | undefined = a.nsc_on_chosen_wells != null
+    ? { ...a, accuracy: a.nsc_on_chosen_wells, correct: Math.round(a.nsc_on_chosen_wells * (a.n ?? 0)) } : undefined;
   const tiles: [string, ResultRow | undefined, string][] = [
-    ["MuseCell agent", a, `${b} wells per compound`],
-    ["Nearest-neighbour baseline", rand, `the same ${b} wells, drawn at random`],
-    ["Nearest-neighbour baseline", all, "all wells of the compound"],
+    ["MuseCell agent", a, `its own call, ${b} wells per compound`],
+    ["NSC on the agent's wells", chosen, `the ${b} wells the agent chose`],
+    ["NSC on random wells", rand, `${b} wells drawn at random`],
+    ["NSC on all wells", all, "every well of the compound"],
   ];
   return (
     <section aria-label="Headline result" className="dark instrument relative overflow-hidden rounded-frame p-7 lg:p-10 flex flex-col gap-8 text-haze">
       <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
       {rand && (
         <p className="relative display text-[clamp(24px,2.4vw,34px)] leading-[1.1] tracking-[-0.04em] text-white max-w-[34ch]">
-          At {b} wells the agent is {below ? "below" : "at or above"} the nearest-neighbour baseline on the same number of wells.
+          At {b} wells the agent's own call is {below ? "below" : "at or above"} the nearest-neighbour baseline on {b} random wells
+          {chosen && rand && chosen.accuracy > rand.accuracy
+            ? `; the ${b} wells it chooses lift that baseline to ${pct(chosen.accuracy)}${all && chosen.accuracy >= all.accuracy ? ", as high as using every well" : ""}.`
+            : "."}
         </p>
       )}
-      <div className="relative grid grid-cols-3 gap-6">
+      <div className="relative grid grid-cols-4 gap-6">
         {tiles.map(([name, row, sub], i) => row && (
           <div key={i} className={`flex flex-col gap-1 ${i ? "border-l border-line pl-6" : ""}`}>
             <span className="tag text-mist">{name}</span>
-            <span className={`display text-[clamp(56px,6.4vw,104px)] mt-2 ${i === 0 ? "text-lime" : "text-haze"}`}>
+            <span className={`display text-[clamp(48px,5vw,88px)] mt-2 ${i === 0 ? "text-lime" : "text-haze"}`}>
               {pct(row.accuracy)}
             </span>
             <span className="text-xs text-mist">{sub}{row.correct != null && row.n != null ? ` · ${row.correct} of ${row.n} correct` : ""}</span>

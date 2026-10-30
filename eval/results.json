@@ -1,12 +1,17 @@
 {
- "generated_at": "2026-10-30T12:12:32+00:00",
+ "generated_at": "2026-10-30T17:12:27+00:00",
  "models": {
-  "scientist": "muse-spark-1.3-contributor",
-  "microscopist": "muse-spark-1.3-contributor",
+  "scientist": "meta-models/muse-spark-open-1026",
+  "microscopist": "meta-models/muse-spark-open-1026",
   "reviewer": "muse-wonder-1.0",
   "segmentation": "classical (scikit-image)"
  },
  "comparisons": [
+  {
+   "model": "muse-spark-1.3-contributor",
+   "agent_version": "v1",
+   "label": "muse-spark-1.3-contributor"
+  },
   {
    "model": "meta-models/muse-spark-open-1026",
    "agent_version": "v1",
@@ -19,9 +24,10 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 87 deselected in 6.75s; offline re-scan of 114 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 9.12s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
   "Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.",
+  "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
   "Agent v2/v3 (the atlas tool also returns the NSC vote over the wells acquired so far, the prompt says how to weigh it, and the blinded phase names no compound) was designed after reading the v1 runs on these same 38 compounds (`scripts/nsc_on_agent_wells.py`). BBBC021 has no other annotated compounds, so v3 accuracy is not a held-out estimate. A v2 eval was stopped after 19 runs (11 correct, 2 stopped by the blinding guard) to add the naming rule; its runs stay in eval/agent_runs.jsonl.",
   "MuseCell agent (muse-spark-1.3-contributor), budget 6, s_89c9462717: run failed before a conclusion; counted as wrong: Blinding guard stopped the run: the result of describe_phenotype contained compound-identifying text.",
   "MuseCell agent (muse-spark-1.3-contributor), budget 6, s_3069b9414e: run failed before a conclusion; counted as wrong: muse-spark-1.3-contributor used all 8000 tokens (incl. 7998 reasoning) without answering. Raise max_tokens for this call.",
@@ -34,44 +40,116 @@
  "rows": [
   {
    "method": "nsc_all",
-   "label": "NSC baseline, all wells",
+   "label": "NSC baseline (hand-crafted features), all wells",
    "budget": null,
    "n": 38,
    "accuracy": 0.7105,
-   "correct": 27
+   "correct": 27,
+   "space": "hand-crafted features"
   },
   {
    "method": "nsc_random",
-   "label": "NSC baseline, random wells",
+   "label": "NSC baseline (hand-crafted features), random wells",
    "budget": 2,
    "n": 38,
    "accuracy": 0.5047,
    "sd": 0.0619,
-   "mean_wells": 2.0
+   "mean_wells": 2.0,
+   "space": "hand-crafted features"
   },
   {
    "method": "nsc_random",
-   "label": "NSC baseline, random wells",
+   "label": "NSC baseline (hand-crafted features), random wells",
    "budget": 4,
    "n": 38,
    "accuracy": 0.5776,
    "sd": 0.0584,
-   "mean_wells": 4.0
+   "mean_wells": 4.0,
+   "space": "hand-crafted features"
   },
   {
    "method": "nsc_random",
-   "label": "NSC baseline, random wells",
+   "label": "NSC baseline (hand-crafted features), random wells",
    "budget": 6,
    "n": 38,
    "accuracy": 0.6129,
    "sd": 0.05,
-   "mean_wells": 6.0
+   "mean_wells": 6.0,
+   "space": "hand-crafted features"
+  },
+  {
+   "method": "nsc_all_deep",
+   "label": "NSC baseline (ResNet50 + TVN), all wells",
+   "budget": null,
+   "n": 38,
+   "accuracy": 0.9211,
+   "correct": 35,
+   "space": "ResNet50 + TVN"
+  },
+  {
+   "method": "nsc_random_deep",
+   "label": "NSC baseline (ResNet50 + TVN), random wells",
+   "budget": 2,
+   "n": 38,
+   "accuracy": 0.7487,
+   "sd": 0.0593,
+   "mean_wells": 2.0,
+   "space": "ResNet50 + TVN"
+  },
+  {
+   "method": "nsc_random_deep",
+   "label": "NSC baseline (ResNet50 + TVN), random wells",
+   "budget": 4,
+   "n": 38,
+   "accuracy": 0.8135,
+   "sd": 0.0486,
+   "mean_wells": 4.0,
+   "space": "ResNet50 + TVN"
+  },
+  {
+   "method": "nsc_random_deep",
+   "label": "NSC baseline (ResNet50 + TVN), random wells",
+   "budget": 6,
+   "n": 38,
+   "accuracy": 0.8389,
+   "sd": 0.0426,
+   "mean_wells": 6.0,
+   "space": "ResNet50 + TVN"
   },
   {
    "method": "agent",
+   "label": "MuseCell agent, Muse Spark Open (Baseten), agent v4",
+   "model": "meta-models/muse-spark-open-1026",
+   "agent_version": "v4",
+   "atlas": "ResNet50 (ImageNet) + TVN",
+   "short": "Muse Spark Open (Baseten), agent v4",
+   "budget": 4,
+   "n": 38,
+   "accuracy": 0.7895,
+   "correct": 30,
+   "accuracy_before_review": 0.7632,
+   "mean_wells": 4.0,
+   "mean_cost_usd": 0.3601,
+   "mean_latency_s": 170.6,
+   "citation_validity": 1.0,
+   "citations": "116/116",
+   "failed": 0,
+   "reviewer_requests": 10,
+   "nsc_on_chosen_wells": 0.9211,
+   "provider": "baseten",
+   "provider_label": "Baseten",
+   "billing": "credits",
+   "split_accuracy": {
+    "dev": 0.6842,
+    "test": 0.8947
+   }
+  },
+  {
+   "method": "agent_open",
    "label": "MuseCell agent (muse-spark-1.3-contributor)",
    "model": "muse-spark-1.3-contributor",
    "agent_version": "v1",
+   "atlas": "hand-crafted features",
    "short": "muse-spark-1.3-contributor",
    "budget": 2,
    "n": 38,
@@ -84,13 +162,18 @@
    "citation_validity": 1.0,
    "citations": "103/103",
    "failed": 0,
-   "reviewer_requests": 15
+   "reviewer_requests": 15,
+   "nsc_on_chosen_wells": 0.4737,
+   "provider": "meta",
+   "provider_label": "Meta Model API",
+   "billing": "usd"
   },
   {
-   "method": "agent",
+   "method": "agent_open",
    "label": "MuseCell agent (muse-spark-1.3-contributor)",
    "model": "muse-spark-1.3-contributor",
    "agent_version": "v1",
+   "atlas": "hand-crafted features",
    "short": "muse-spark-1.3-contributor",
    "budget": 4,
    "n": 38,
@@ -103,13 +186,18 @@
    "citation_validity": 1.0,
    "citations": "109/109",
    "failed": 0,
-   "reviewer_requests": 18
+   "reviewer_requests": 18,
+   "nsc_on_chosen_wells": 0.6053,
+   "provider": "meta",
+   "provider_label": "Meta Model API",
+   "billing": "usd"
   },
   {
-   "method": "agent",
+   "method": "agent_open",
    "label": "MuseCell agent (muse-spark-1.3-contributor)",
    "model": "muse-spark-1.3-contributor",
    "agent_version": "v1",
+   "atlas": "hand-crafted features",
    "short": "muse-spark-1.3-contributor",
    "budget": 6,
    "n": 38,
@@ -122,13 +210,18 @@
    "citation_validity": 1.0,
    "citations": "108/108",
    "failed": 2,
-   "reviewer_requests": 13
+   "reviewer_requests": 13,
+   "nsc_on_chosen_wells": 0.6316,
+   "provider": "meta",
+   "provider_label": "Meta Model API",
+   "billing": "usd"
   },
   {
    "method": "agent_open",
    "label": "MuseCell agent, Muse Spark Open (Baseten)",
    "model": "meta-models/muse-spark-open-1026",
    "agent_version": "v1",
+   "atlas": "hand-crafted features",
    "short": "Muse Spark Open (Baseten)",
    "budget": 4,
    "n": 38,
@@ -142,6 +235,7 @@
    "citations": "111/112",
    "failed": 3,
    "reviewer_requests": 21,
+   "nsc_on_chosen_wells": 0.6053,
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits"
@@ -151,6 +245,7 @@
    "label": "MuseCell agent, Muse Spark Open (Baseten), agent v3",
    "model": "meta-models/muse-spark-open-1026",
    "agent_version": "v3",
+   "atlas": "hand-crafted features",
    "short": "Muse Spark Open (Baseten), agent v3",
    "budget": 4,
    "n": 38,
@@ -164,122 +259,119 @@
    "citations": "128/129",
    "failed": 1,
    "reviewer_requests": 14,
+   "nsc_on_chosen_wells": 0.6316,
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits"
   }
  ],
  "analysis": {
-  "runs": 114,
-  "total_cost_usd": 14.6,
+  "runs": 38,
+  "total_cost_usd": 13.68,
   "calls_vs_truth": {
    "Microtubule stabilizers": {
-    "called": 35,
-    "true": 9
+    "called": 7,
+    "true": 3
    },
    "Aurora kinase inhibitors": {
-    "called": 15,
-    "true": 9
-   },
-   "Microtubule destabilizers": {
-    "called": 14,
-    "true": 12
-   },
-   "DNA replication": {
-    "called": 12,
-    "true": 12
-   },
-   "Protein synthesis": {
-    "called": 11,
-    "true": 9
-   },
-   "Actin disruptors": {
-    "called": 10,
-    "true": 9
+    "called": 5,
+    "true": 3
    },
    "DNA damage": {
-    "called": 10,
-    "true": 12
+    "called": 4,
+    "true": 4
+   },
+   "Microtubule destabilizers": {
+    "called": 4,
+    "true": 4
+   },
+   "DNA replication": {
+    "called": 3,
+    "true": 4
    },
    "Eg5 inhibitors": {
-    "called": 4,
-    "true": 6
+    "called": 3,
+    "true": 2
    },
-   "(no conclusion)": {
-    "called": 2,
-    "true": 0
+   "Epithelial": {
+    "called": 3,
+    "true": 3
    },
    "Kinase inhibitors": {
+    "called": 3,
+    "true": 3
+   },
+   "Protein synthesis": {
+    "called": 3,
+    "true": 3
+   },
+   "Protein degradation": {
+    "called": 2,
+    "true": 4
+   },
+   "Actin disruptors": {
     "called": 1,
-    "true": 9
+    "true": 3
    },
    "Cholesterol-lowering": {
     "called": 0,
-    "true": 6
-   },
-   "Epithelial": {
-    "called": 0,
-    "true": 9
-   },
-   "Protein degradation": {
-    "called": 0,
-    "true": 12
+    "true": 2
    }
   },
   "per_class": {
    "Actin disruptors": {
-    "correct": 0,
-    "runs": 9
+    "correct": 1,
+    "runs": 3
    },
    "Aurora kinase inhibitors": {
-    "correct": 9,
-    "runs": 9
+    "correct": 3,
+    "runs": 3
    },
    "Cholesterol-lowering": {
     "correct": 0,
-    "runs": 6
+    "runs": 2
    },
    "DNA damage": {
-    "correct": 6,
-    "runs": 12
+    "correct": 4,
+    "runs": 4
    },
    "DNA replication": {
-    "correct": 6,
-    "runs": 12
+    "correct": 2,
+    "runs": 4
    },
    "Eg5 inhibitors": {
-    "correct": 0,
-    "runs": 6
+    "correct": 2,
+    "runs": 2
    },
    "Epithelial": {
-    "correct": 0,
-    "runs": 9
+    "correct": 3,
+    "runs": 3
    },
    "Kinase inhibitors": {
-    "correct": 1,
-    "runs": 9
+    "correct": 3,
+    "runs": 3
    },
    "Microtubule destabilizers": {
-    "correct": 12,
-    "runs": 12
+    "correct": 4,
+    "runs": 4
    },
    "Microtubule stabilizers": {
-    "correct": 8,
-    "runs": 9
+    "correct": 3,
+    "runs": 3
    },
    "Protein degradation": {
-    "correct": 0,
-    "runs": 12
+    "correct": 2,
+    "runs": 4
    },
    "Protein synthesis": {
-    "correct": 4,
-    "runs": 9
+    "correct": 3,
+    "runs": 3
    }
   },
   "review": {
-   "request_experiment": 46,
-   "approve": 67,
-   "wrong_to_right": 3,
+   "request_experiment": 10,
+   "approve": 28,
+   "wrong_to_right": 2,
    "right_to_wrong": 1
   }
  }

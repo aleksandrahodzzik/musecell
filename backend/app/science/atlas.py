@@ -3,6 +3,10 @@
 Similarity is cosine on DMSO-normalised (robust z) profiles, optionally after
 PCA whitening fitted on DMSO well profiles. `neighbors` always excludes the
 query compound (leave-one-compound-out), so a compound can never match itself.
+
+Two feature spaces (Settings.atlas_features): "handcrafted" (the 24 measured features) and "resnet50_tvn"
+(ImageNet ResNet50 embeddings + TVN, scripts/build_deep_atlas.py). A deep atlas carries one vector per well
+(`well_vector`), because a well's deep profile is not a measurement the catalog holds.
 """
 
 from __future__ import annotations
@@ -45,6 +49,22 @@ class Atlas:
             scale = s / np.sqrt(max(len(x) - 1, 1))
             self._proj = vt.T / np.maximum(scale, WHITEN_EPS)
         self._matrix = self._embed(ref[features].to_numpy(dtype=float))
+        self.space = "handcrafted"
+        self._wells: pd.DataFrame | None = None  # deep atlas only: well_key -> vector
+
+    @classmethod
+    def load_deep(cls, deep_dir: Path) -> Atlas:
+        """Deep-feature atlas (no whitening here: TVN is already applied by build_deep_atlas.py)."""
+        treatments = pd.read_parquet(deep_dir / "treatments.parquet")
+        features = [c for c in treatments.columns if c.startswith("d") and c[1:].isdigit()]
+        atlas = cls(treatments, features=features)
+        atlas.space = "resnet50_tvn"
+        atlas._wells = pd.read_parquet(deep_dir / "wells.parquet").set_index("well_key")[features]
+        return atlas
+
+    def well_vector(self, well_key: str) -> np.ndarray | None:
+        """The well's vector in this atlas's space, or None for the hand-crafted atlas (use the catalog profile)."""
+        return None if self._wells is None else self._wells.loc[well_key].to_numpy(dtype=float)
 
     @classmethod
     def load(cls, atlas_dir: Path | None = None, whiten: bool = False) -> Atlas:

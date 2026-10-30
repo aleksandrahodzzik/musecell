@@ -327,3 +327,25 @@ The owner supplied an MIT-licensed landing template (fictional art expo) as the 
 - **Start screen:** a dark rounded hero frame (film grain, giant wordmark, italic-lime "before", live pill) with the **eyepiece kept top right**; sections "Start a run." (controls in a dark frame), "Watch it think." (recorded runs, now always listed), "From sealed slide to verified dossier." (timeline whose line draws in), "Measured, not claimed." (benchmark headline); a giant closing wordmark. Pill buttons whose lime dot floods the button on hover. Reveals use IntersectionObserver + CSS, not GSAP/Lenis; all motion is off under prefers-reduced-motion.
 - **Run view** sits in a rounded dark frame on the paper; header and footer are light. Benchmark page title restyled.
 - Checked at 1440 and 1024 px with Playwright (0 console errors). `docs/screens/` and `docs/hero.gif` still show the darkfield design until they are re-recorded.
+
+## Deep atlas and agent v4 (2026-10-30)
+
+Owner: improve the agent, spend only the free credits ($150 Meta, $100 Baseten). Spent in total after the v4 eval (cost ledger): Meta ≈ $33.5 of $150 (real USD), Baseten ≈ $34.3 of $100 (list price, from credits).
+
+### Frozen split first
+`scripts/make_split.py` → `eval/split.json` (committed **before** any v4 exploration, seed 20261030): 19 dev / 19 test compounds, stratified by MoA. From here on changes are explored on dev only; test is looked at once.
+
+### Dev exploration (offline, no API)
+- Well-choice rules × vote rules (top doses, top 2×2, spread, cell-count-aware; majority, similarity-sum, strong-half, strongest, median, per-dose median, k = 3, max-sim) at 2/3/4/6 wells: no rule beat random wells by more than ±1 compound of 19. Even NSC on all wells was 12/19 on dev → the hand-crafted features were the ceiling, not the agent's prompt.
+- Deep features: `scripts/embed_fields.py` (torchvision ResNet50 IMAGENET1K_V2, each stain PNG separately, 512 px long side, global average pool → 3 × 2048 per field; CPU, ~40 min for 3,096 fields; optional deps in `backend/requirements-ml.txt`). Variants on dev (NSC all wells / 4 random wells): hand-crafted 12/19, 10.5; ResNet50 per-plate DMSO-centred 16/19, 13.6; + per-feature z 14/19, 10.6; **+ TVN (DMSO whitening, 99 % variance, 212 components) 18/19, 15.6** → chosen.
+- **Held-out test check, once:** hand-crafted 15/19, 11.4 → ResNet50 + TVN **17/19, 15.2**. On all 38: NSC all wells 71.1 % → **92.1 %**, 4 random wells 57.8 → **81.3 %**.
+- Unlike Phase 2's DMSO whitening of the 24 hand-crafted features (worse, not used), TVN on 6,144 image features helps a lot; no MoA label is used to build it.
+
+### Wiring (agent v4)
+- `scripts/build_deep_atlas.py` → `DATA_DIR/processed/atlas_resnet50_tvn/` (well vectors, treatment medians with the hand-crafted atlas's annotation/thumbnail columns, meta). `Atlas.load_deep`, `Atlas.well_vector`; tools call `atlas_query()` so `compare_to_reference_atlas` and the NSC vote search the deep space. The agent still reads the measured robust-z features (acquire_well, dose_response, Microscopist grounding); only similarity changed. `Settings.atlas_features = resnet50_tvn` (default) falls back to hand-crafted if the deep atlas is not built; `model_ids.atlas` records the space.
+- `evaluate.py` reports both NSC baselines (`nsc_*` hand-crafted, `nsc_*_deep`), `nsc_on_chosen_wells` per agent row, and dev/test accuracy for agents after the split. The UI headline compares the agent with the baseline in its own space and shows NSC on the agent's wells.
+
+### Result — v4, Muse Spark Open (Baseten), 38 compounds, budget 4
+**79.0 % (30/38)** (dev 13/19, **held-out test 17/19**), before review 76.3 %, 0 failed runs, 0 leak hits, citations 116/116, mean 171 s, nominal $0.36/run. NSC on 4 random wells (deep) 81.3 % ± 4.9 → the agent's own call is at the baseline, not above it. **NSC on the 4 wells the agent chose: 92.1 % (35/38)** = NSC on all wells; ≈ +11 points (≈ 2 sd) over random wells → the agent's experiment choice is the measurable contribution. It followed the NSC vote on its wells in 31/38 calls; 7 overrides, 1 right. Not turned into a rule (would be fitted to these compounds); reported instead.
+
+Daily cap raised per process (`DAILY_COST_CAP_USD=70`) because Baseten credits count toward it; `backend/.env` unchanged.

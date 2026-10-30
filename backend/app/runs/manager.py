@@ -27,6 +27,7 @@ from app.runs.replay import replay, replay_info
 from app.runs.store import RUNS_DIR, RunBus, recorded_path
 
 SEGMENTATION_LABEL = {"classical": "classical (scikit-image)", "sam": "sam-3.1"}
+ATLAS_LABEL = {"handcrafted": "hand-crafted features", "resnet50_tvn": "ResNet50 (ImageNet) + TVN"}
 
 
 class RunRequestError(ValueError):
@@ -44,6 +45,7 @@ class RunManager:
         self.llm: LLMClient | None = None
         self.data_error: str | None = None
         self.llm_error: str | None = None
+        self.atlas_note: str | None = None
         self.providers: list[str] = [self.settings.provider]  # providers a live run may use; startup verifies
         self.provider_notes: dict[str, str] = {}  # why an optional provider is not offered
         self.pubchem = PubChemClient(self.settings.cache_dir)
@@ -59,6 +61,11 @@ class RunManager:
         try:
             self.catalog = SpecimenCatalog.load(self.settings)
             self.atlas = Atlas.load(self.settings.atlas_dir)
+            if self.settings.atlas_features == "resnet50_tvn":
+                if (self.settings.deep_atlas_dir / "treatments.parquet").exists():
+                    self.atlas = Atlas.load_deep(self.settings.deep_atlas_dir)
+                else:  # not built on this machine: keep the hand-crafted atlas, and say so in model_ids
+                    self.atlas_note = "deep atlas not built; using hand-crafted features"
             self.moa_classes = load_moa_classes(self.settings.moa_csv)
             self.reference = load_reference(self.settings.atlas_dir)
             _ = self.catalog.specimens
@@ -111,6 +118,7 @@ class RunManager:
         roles = s.role_models
         return {"scientist": roles["scientist"], "microscopist": roles["microscopist"], "reviewer": roles["reviewer"],
                 "segmentation": SEGMENTATION_LABEL[s.nuclei_segmenter], "provider": s.provider,
+                "atlas": ATLAS_LABEL[self.atlas.space if self.atlas is not None else s.atlas_features],
                 "agent": AGENT_VERSION}
 
     def provider_list(self) -> list[dict]:

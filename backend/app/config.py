@@ -17,6 +17,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 ROOT = BACKEND_DIR.parent
 
 Segmenter = Literal["classical", "sam"]
+AtlasFeatures = Literal["handcrafted", "resnet50_tvn"]
 Provider = Literal["meta", "baseten", "fireworks", "together"]
 
 # USD per image (spec §4).
@@ -103,6 +104,9 @@ class Settings(BaseSettings):
     data_dir: str = "~/musecell-data"
 
     # Which segmenter produces each object type (Phase-2 bake-off, docs/DECISIONS.md).
+    # Feature space of the reference atlas (similarity search only; the agent always sees the measured features).
+    # resnet50_tvn falls back to handcrafted when the deep atlas has not been built (docs/DECISIONS.md, "Deep atlas").
+    atlas_features: AtlasFeatures = "resnet50_tvn"
     nuclei_segmenter: Segmenter = "classical"
     cell_segmenter: Segmenter = "classical"
 
@@ -143,6 +147,10 @@ class Settings(BaseSettings):
     @property
     def atlas_dir(self) -> Path:
         return self.data_path / "processed" / "atlas"
+
+    @property
+    def deep_atlas_dir(self) -> Path:
+        return self.data_path / "processed" / "atlas_resnet50_tvn"
 
     @property
     def moa_csv(self) -> Path:

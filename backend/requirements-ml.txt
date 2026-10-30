@@ -1,0 +1,4 @@
+# Optional: only to rebuild deep-feature embeddings (scripts/embed_fields.py). The app and replay mode do not need it.
+# CPU wheels: pip install -r backend/requirements-ml.txt --index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0
+torchvision==0.29.2

@@ -15,6 +15,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable
 
+import numpy as np
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -379,6 +380,15 @@ async def describe_phenotype(ctx: ToolContext, a: DescribePhenotypeArgs) -> Evid
                         [image_id(f) for f in field_ids + controls])
 
 
+def atlas_query(ctx: ToolContext, wells: list[Well]):
+    """Median profile of the wells in the atlas's feature space: deep vectors when the atlas has them, otherwise
+    the measured robust-z profile from the catalog."""
+    vecs = [ctx.atlas.well_vector(w.well_key) for w in wells]
+    if vecs[0] is not None:
+        return np.median(np.stack(vecs), axis=0)
+    return pd.concat([ctx.catalog.profile(w.well_key) for w in wells], axis=1).median(axis=1)
+
+
 def nsc_vote(ctx: ToolContext) -> dict:
     """The published NSC protocol on the wells acquired so far: each well's single nearest other-compound
     reference treatment (1-NN, cosine), then a majority vote (ties: summed similarity). A k-neighbour count per
@@ -387,7 +397,7 @@ def nsc_vote(ctx: ToolContext) -> dict:
     per_well, votes = [], {}
     for wid in ctx.run.acquired_well_ids:
         w = ctx.acquired_well(wid)
-        h = ctx.atlas.neighbors(ctx.catalog.profile(w.well_key), 1, exclude_compound=ctx.specimen.compound)[0]
+        h = ctx.atlas.neighbors(atlas_query(ctx, [w]), 1, exclude_compound=ctx.specimen.compound)[0]
         # no reference compound name here: the vote needs only the class (v3: fewer names for the agent to repeat)
         per_well.append({"well_id": wid, "concentration_uM": w.concentration_uM, "nearest_moa": h.moa,
                          "similarity": round(h.similarity, 3)})
@@ -402,8 +412,7 @@ def nsc_vote(ctx: ToolContext) -> dict:
 
 async def compare_to_reference_atlas(ctx: ToolContext, a: CompareAtlasArgs) -> Evidence:
     wells = [ctx.acquired_well(w) for w in dict.fromkeys(a.well_ids)]
-    query = pd.concat([ctx.catalog.profile(w.well_key) for w in wells], axis=1).median(axis=1)
-    hits = ctx.atlas.neighbors(query, a.k, exclude_compound=ctx.specimen.compound)
+    hits = ctx.atlas.neighbors(atlas_query(ctx, wells), a.k, exclude_compound=ctx.specimen.compound)
     neighbors = [{**_round(h.model_dump(exclude={"thumbnail_field_id"})),
                   "image_id": image_id(h.thumbnail_field_id)} for h in hits]
     by_moa: dict[str, list[float]] = {}
@@ -412,7 +421,9 @@ async def compare_to_reference_atlas(ctx: ToolContext, a: CompareAtlasArgs) -> E
     moa_summary = sorted(({"moa": m, "neighbors": len(s), "mean_similarity": round(sum(s) / len(s), 3)}
                           for m, s in by_moa.items()), key=lambda r: (-r["neighbors"], -r["mean_similarity"]))
     nsc = nsc_vote(ctx)
-    data = {"well_ids": [w.well_id for w in wells], "k": a.k, "similarity": "cosine on robust-z profiles",
+    space = ("cosine on ResNet50 + TVN image embeddings" if ctx.atlas.space == "resnet50_tvn"
+             else "cosine on robust-z profiles")
+    data = {"well_ids": [w.well_id for w in wells], "k": a.k, "similarity": space,
             "excluded": "the specimen's own compound (leave-one-compound-out)",
             "nsc": nsc, "neighbors": neighbors, "moa_summary": moa_summary}
     summary = (f"NSC vote over {nsc['wells']} acquired well(s): {nsc['moa']} ({nsc['votes']}/{nsc['wells']}); "

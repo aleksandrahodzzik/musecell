@@ -47,7 +47,7 @@ from app.config import OPEN_WEIGHTS_MODEL, PRICES, PROVIDERS, Settings, provider
 from app.llm import cost_of  # noqa: E402
 from app.runs.manager import RunManager  # noqa: E402
 from app.runs.store import RunBus  # noqa: E402
-from app.science.atlas import compound_level, nsc_baseline  # noqa: E402
+from app.science.atlas import Atlas, compound_level, nsc_baseline  # noqa: E402
 
 EVAL = ROOT / "eval"
 RUNS_LOG = EVAL / "agent_runs.jsonl"
@@ -100,13 +100,16 @@ def nsc_all_wells(atlas, compounds: set[str]) -> float:
     return float((comp["moa"] == comp["predicted"]).mean())
 
 
-def nsc_random_wells(manager: RunManager, specimens: list[Specimen], k: int, draws: int, seed: int) -> dict:
+def nsc_random_wells(manager: RunManager, specimens: list[Specimen], k: int, draws: int, seed: int,
+                     atlas: Atlas) -> dict:
     """1-NN per randomly drawn well, majority vote (ties: summed similarity); accuracy per draw."""
-    atlas, catalog = manager.atlas, manager.catalog
+    catalog = manager.catalog
     nn: dict[str, tuple[str, float]] = {}
     for sp in specimens:
         for w in sp.wells:
-            hit = atlas.neighbors(catalog.profile(w.well_key), 1, exclude_compound=sp.compound)[0]
+            vec = atlas.well_vector(w.well_key)
+            hit = atlas.neighbors(catalog.profile(w.well_key) if vec is None else vec, 1,
+                                  exclude_compound=sp.compound)[0]
             nn[w.well_key] = (hit.moa, hit.similarity)
     rng = random.Random(seed)
     accs = []
@@ -253,6 +256,31 @@ def leak_tests() -> str:
     return (proc.stdout.strip().splitlines() or ["(no output)"])[-1]
 
 
+def nsc_on_chosen_wells(manager: RunManager, records: list[dict]) -> None:
+    """Adds `nsc_chosen` (bool) to each record whose run log is on disk: the NSC protocol (1-NN per well, majority
+    vote) applied to exactly the wells the agent acquired, in the atlas space that agent searched. This separates
+    the agent's experiment choice from its final call (scripts/nsc_on_agent_wells.py has the full breakdown)."""
+    handcrafted = Atlas.load(manager.settings.atlas_dir)
+    deep = manager.atlas if manager.atlas is not None and manager.atlas.space == "resnet50_tvn" else None
+    wells = {w.well_id: (sp, w) for sp in manager.catalog.specimens.values() for w in sp.wells}
+    for r in records:
+        path = EVAL_RUNS_DIR / f"{r.get('run_id')}.json"
+        if not path.exists():
+            continue
+        acquired = [wells[w] for w in json.loads(path.read_text(encoding="utf-8"))["acquired_well_ids"] if w in wells]
+        if not acquired:
+            r["nsc_chosen"] = False
+            continue
+        atlas = deep if deep is not None and r["models"].get("atlas", "").startswith("ResNet50") else handcrafted
+        votes: dict[str, list[float]] = {}
+        for sp, w in acquired:
+            vec = atlas.well_vector(w.well_key)
+            hit = atlas.neighbors(manager.catalog.profile(w.well_key) if vec is None else vec, 1,
+                                  exclude_compound=sp.compound)[0]
+            votes.setdefault(hit.moa, []).append(hit.similarity)
+        r["nsc_chosen"] = max(votes, key=lambda m: (len(votes[m]), sum(votes[m]))) == r["truth_moa"]
+
+
 def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: str,
                method: str = "agent", ver: str = "v1") -> tuple[list[dict], list[str]]:
     ids = {sp.specimen_id for sp in specimens}
@@ -269,6 +297,7 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
         removed = sum(r.get("citations_removed", 0) for r in rs)
         rows.append({
             "method": method, "label": label, "model": model, "agent_version": ver,
+            "atlas": rs[0]["models"].get("atlas", "hand-crafted features"),
             "short": short_label(model, ver), "budget": b, "n": len(rs),
             "accuracy": round(sum(r["correct"] for r in rs) / len(rs), 4), "correct": sum(r["correct"] for r in rs),
             "accuracy_before_review": round(sum(r["first_correct"] for r in rs) / len(rs), 4),
@@ -278,6 +307,9 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
             "citation_validity": round((cited - removed) / cited, 4) if cited else None,
             "citations": f"{cited - removed}/{cited}", "failed": len(rs) - len(ok),
             "reviewer_requests": sum(r.get("review") == "request_experiment" for r in rs),
+            # the NSC protocol on exactly the wells this agent chose (its own atlas space); None without run logs
+            "nsc_on_chosen_wells": (round(sum(r["nsc_chosen"] for r in rs) / len(rs), 4)
+                                    if all("nsc_chosen" in r for r in rs) else None),
         })
         if len(rs) < len(specimens):
             notes.append(f"{label}, budget {b}: {len(rs)} of {len(specimens)} specimens have a recorded run.")
@@ -332,23 +364,28 @@ def comparison_markdown(res: dict) -> list[str]:
     lines = []
     for b in sorted({r["budget"] for r in compare}):
         cols = [r for r in res["rows"] if r["method"] in ("agent", "agent_open") and r["budget"] == b]
-        rand = next((r for r in res["rows"] if r["method"] == "nsc_random" and r["budget"] == b), None)
+        bases = [r for m in ("nsc_random", "nsc_random_deep") for r in res["rows"]
+                 if r["method"] == m and r["budget"] == b]
         heads = [r.get("short") or COMPARE_LABELS.get(r["model"], r["model"]) for r in cols]
-        lines += [f"## Open weights vs Meta API, budget {b}", "",
+        lines += [f"## Agents side by side, budget {b}", "",
                   f"Same {res['n_compounds']} compounds, same tools, same PI reviewer (`muse-wonder-1.0`, Meta API); "
-                  "only the Scientist + Microscopist + reflection model differs.", "",
-                  "| | " + " | ".join(heads) + " | NSC baseline, random wells |",
-                  "|---|" + "---|" * (len(cols) + 1)]
+                  "the columns differ in the Scientist + Microscopist model, the agent version and the atlas features.",
+                  "", "| | " + " | ".join(heads) + "".join(f" | NSC baseline ({r['space']}), random wells" for r in bases)
+                  + " |", "|---|" + "---|" * (len(cols) + len(bases))]
 
-        def line(name, fn, base="–"):
-            return f"| {name} | " + " | ".join(fn(r) for r in cols) + f" | {base} |"
+        def line(name, fn, base=None):
+            base = base or (lambda r: "–")
+            return f"| {name} | " + " | ".join(fn(r) for r in cols + []) + "".join(f" | {base(r)}" for r in bases) + " |"
 
         lines += [
             line("Scientist model", lambda r: f"`{r['model']}`"),
             line("Provider", lambda r: r.get("provider_label", "Meta Model API")),
+            line("Atlas features", lambda r: r.get("atlas", "hand-crafted features"), lambda r: r["space"]),
             line("Accuracy", lambda r: f"{100 * r['accuracy']:.1f}% ({r['correct']}/{r['n']})",
-                 f"{100 * rand['accuracy']:.1f}% ± {100 * rand['sd']:.1f}" if rand else "–"),
+                 lambda r: f"{100 * r['accuracy']:.1f}% ± {100 * r['sd']:.1f}"),
             line("Before review", lambda r: f"{100 * r['accuracy_before_review']:.1f}%"),
+            line("NSC on the wells the agent chose", lambda r: "–" if r.get("nsc_on_chosen_wells") is None
+                 else f"{100 * r['nsc_on_chosen_wells']:.1f}%"),
             line("Failed runs", lambda r: str(r["failed"])),
             line("Mean cost / run", lambda r: "–" if r["mean_cost_usd"] is None else
                  f"${r['mean_cost_usd']:.3f}" + (" (incl. credits)" if r.get("billing") == "credits" else "")),
@@ -407,7 +444,7 @@ def plot(res: dict, path: Path) -> None:
 
     ink, graphite, paper = "#17202A", "#5B6672", "#F6F8F9"
     styles = [(ink, "-", 2.0), (graphite, (0, (5, 3)), 1.5), (graphite, (0, (1.5, 2.5)), 1.5),
-              (ink, (0, (4, 1.5, 1, 1.5)), 1.5)]
+              (ink, (0, (4, 1.5, 1, 1.5)), 1.5), (graphite, (0, (8, 2, 1, 2)), 1.5)]
     fig, ax = plt.subplots(figsize=(7.2, 4.0), dpi=150, facecolor=paper)
     ax.set_facecolor(paper)
     series: dict[str, list[dict]] = {}
@@ -416,7 +453,8 @@ def plot(res: dict, path: Path) -> None:
     budgets = sorted({r["budget"] for r in res["rows"] if r["budget"] is not None})
     xmax = max(budgets) + 0.4
     for label, pts in series.items():  # the agent is the primary line; baselines are graphite references
-        color, dash, width = styles[{"agent": 0, "nsc_random": 1, "agent_open": 3}.get(pts[0]["method"], 2)]
+        color, dash, width = styles[{"agent": 0, "nsc_random": 1, "agent_open": 3,
+                                     "nsc_random_deep": 4}.get(pts[0]["method"], 2)]
         if pts[0]["budget"] is None:
             ax.axhline(pts[0]["accuracy"], color=color, linestyle=(0, (2, 3)), linewidth=1.25, label=label)
             ax.text(xmax, pts[0]["accuracy"], f" {label}", va="center", fontsize=8, color=color)
@@ -496,14 +534,22 @@ async def main() -> int:
         compounds = {sp.compound for sp in specimens}
         print(f"specimens: {len(specimens)} ({len({sp.moa for sp in specimens})} MoA classes)")
 
-        rows = [{"method": "nsc_all", "label": "NSC baseline, all wells", "budget": None, "n": len(specimens),
-                 "accuracy": round(nsc_all_wells(manager.atlas, compounds), 4)}]
-        rows[0]["correct"] = round(rows[0]["accuracy"] * len(specimens))
-        for b in sorted(set(BUDGETS) | set(budgets)):  # the table keeps every budget, whatever this call runs
-            r = nsc_random_wells(manager, specimens, b, args.draws, args.seed)
-            rows.append({"method": "nsc_random", "label": "NSC baseline, random wells", "budget": b,
-                         "n": len(specimens), "accuracy": round(r["accuracy"], 4), "sd": round(r["sd"], 4),
-                         "mean_wells": round(r["mean_wells"], 2)})
+        # Baselines in both feature spaces: hand-crafted (what agents v1-v3 searched) and, when the deep atlas is
+        # built, ResNet50 + TVN (what v4 searches). Method names keep the hand-crafted rows as before.
+        spaces = [("", "hand-crafted features", Atlas.load(manager.settings.atlas_dir))]
+        if manager.atlas is not None and manager.atlas.space == "resnet50_tvn":
+            spaces.append(("_deep", "ResNet50 + TVN", manager.atlas))
+        rows = []
+        for suffix, space, atlas in spaces:
+            acc = nsc_all_wells(atlas, compounds)
+            rows.append({"method": "nsc_all" + suffix, "label": f"NSC baseline ({space}), all wells", "budget": None,
+                         "n": len(specimens), "accuracy": round(acc, 4), "correct": round(acc * len(specimens)),
+                         "space": space})
+            for b in sorted(set(BUDGETS) | set(budgets)):  # the table keeps every budget, whatever this call runs
+                r = nsc_random_wells(manager, specimens, b, args.draws, args.seed, atlas)
+                rows.append({"method": "nsc_random" + suffix, "label": f"NSC baseline ({space}), random wells",
+                             "budget": b, "n": len(specimens), "accuracy": round(r["accuracy"], 4),
+                             "sd": round(r["sd"], 4), "mean_wells": round(r["mean_wells"], 2), "space": space})
         for r in rows:
             print(f"  {r['label']:<30} budget {str(r['budget'] or 'all'):>3}  accuracy {r['accuracy']:.3f}"
                   + (f" ± {r['sd']:.3f}" if r.get("sd") else ""))
@@ -531,7 +577,11 @@ async def main() -> int:
             await run_agents(manager, specimens, budgets, args.concurrency, run_model)
 
         records = load_log()
+        nsc_on_chosen_wells(manager, records)
         a_rows, notes = agent_rows(records, specimens, BUDGETS, main_model, "agent", main_ver)
+        for r in a_rows:  # the main agent may run on another provider too (open weights)
+            r.update(provider=provider_of(main_model), provider_label=PROVIDERS[provider_of(main_model)].label,
+                     billing=PRICES[main_model].billing)
         for m, ver in compare:
             c_rows, c_notes = agent_rows(records, specimens, sorted(set(BUDGETS) | set(budgets)), m, "agent_open", ver)
             provider = provider_of(m)
@@ -553,8 +603,22 @@ async def main() -> int:
         hits = sum(r.get("leak_hits", 0) for r in used)
         leak = (f"pytest leak/blinding tests: {leak_tests()}; offline re-scan of {len(used)} eval run logs "
                 f"(events before unblinding): {hits} hits")
-        if contributor:
-            notes.insert(0, f"Eval runs used `{main_model}` (same model, cheaper tier that lets Meta train on "
+        split_path = EVAL / "split.json"
+        if split_path.exists():  # agents designed after the split was frozen: report dev and held-out test separately
+            split = json.loads(split_path.read_text(encoding="utf-8"))
+            for row in a_rows:
+                if row.get("agent_version", "v1") in ("v1", "v2", "v3", "v3.1"):
+                    continue
+                rs = [r for r in records if r["models"]["scientist"] == row["model"]
+                      and version_of(r) == row["agent_version"] and r["budget"] == row["budget"]]
+                part = {k: [r for r in rs if r["specimen_id"] in set(split[k])] for k in ("dev", "test")}
+                row["split_accuracy"] = {k: round(sum(r["correct"] for r in v) / len(v), 4) for k, v in part.items() if v}
+                notes.insert(0, f"{row['label']}, budget {row['budget']}: chosen on the dev half of a split frozen "
+                                f"before it was explored (eval/split.json); dev {sum(r['correct'] for r in part['dev'])}"
+                                f"/{len(part['dev'])}, held-out test {sum(r['correct'] for r in part['test'])}"
+                                f"/{len(part['test'])}.")
+        if contributor or any(m.endswith("-contributor") for m, _ in compare):
+            notes.insert(0, f"Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on "
                             "prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.")
         notes.append("The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses "
                      "treatment profiles (median over replicates), the published NSC protocol.")

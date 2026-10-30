@@ -22,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 from app.runs.manager import RunManager  # noqa: E402
+from app.science.atlas import Atlas  # noqa: E402
 
 
 async def main() -> int:
@@ -31,7 +32,10 @@ async def main() -> int:
     if manager.catalog is None:
         print(manager.data_error)
         return 1
-    atlas, catalog = manager.atlas, manager.catalog
+    catalog = manager.catalog
+    # each run is scored in the space its agent searched: hand-crafted for v1-v3, the deep atlas from v4 on
+    handcrafted = Atlas.load(manager.settings.atlas_dir)
+    deep = manager.atlas if manager.atlas is not None and manager.atlas.space == "resnet50_tvn" else None
     wells = {w.well_id: (sp, w) for sp in catalog.specimens.values() for w in sp.wells}
     stats: dict[tuple, Counter] = defaultdict(Counter)
     for line in (ROOT / "eval" / "agent_runs.jsonl").read_text(encoding="utf-8").splitlines():
@@ -45,9 +49,12 @@ async def main() -> int:
         s["agent_right"] += r["correct"]
         if not acquired:
             continue
+        atlas = deep if (r["models"].get("atlas", "").startswith("ResNet50") and deep is not None) else handcrafted
         votes: dict[str, list[float]] = defaultdict(list)
         for sp, w in acquired:
-            hit = atlas.neighbors(catalog.profile(w.well_key), 1, exclude_compound=sp.compound)[0]
+            vec = atlas.well_vector(w.well_key)
+            hit = atlas.neighbors(catalog.profile(w.well_key) if vec is None else vec, 1,
+                                  exclude_compound=sp.compound)[0]
             votes[hit.moa].append(hit.similarity)
         nsc = max(votes, key=lambda m: (len(votes[m]), sum(votes[m])))
         s["nsc_right"] += nsc == r["truth_moa"]
