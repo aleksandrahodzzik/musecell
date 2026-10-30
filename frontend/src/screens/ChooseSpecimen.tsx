@@ -12,7 +12,7 @@ import { ApiError, imageUrl, postJSON } from "../lib/api";
 import type { Results } from "./Benchmark";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
 import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
-import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, type Channel, type FieldPixels } from "../lib/fieldImage";
+import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, setCompositeOnly, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
 import type { Health, ModelIds, RecordedRun, SpecimenCard } from "../lib/types";
 import { useFetch } from "../lib/useFetch";
@@ -106,6 +106,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
   const chosen = specimens.data?.find((s) => s.specimen_id === selected);
   const runIds = health?.providers?.find((p) => p.provider === provider)?.model_ids ?? health?.model_ids;
   const sealed = specimens.data?.length ?? 0;
+  const demo = !!health && !live; // replay-only server, e.g. the public demo: no key, no data
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
@@ -130,7 +131,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
               </p>
               <HeadlineNumber />
             </div>
-            <aside className="pt-2 justify-self-center lg:justify-self-auto"><Eyepiece /></aside>
+            <aside className="pt-2 justify-self-center lg:justify-self-auto"><Eyepiece health={health} /></aside>
           </div>
 
           <div aria-hidden className="hidden lg:flex justify-between mt-auto pt-8 mb-7 text-mist/70">
@@ -151,10 +152,19 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
               ))}
             </ol>
             <div className="flex flex-col items-start lg:items-end gap-2.5">
-              <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("bench")}>Choose a specimen</button>
-              <button className="btn h-10 px-4" onClick={() => go("recorded")}>
-                <Play aria-hidden className="h-3.5 w-3.5" /> Watch a recorded run
-              </button>
+              {demo ? (
+                <>
+                  <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("recorded")}>Watch a recorded run</button>
+                  <a className="btn h-10 px-4" href="#/benchmark">See the benchmark</a>
+                </>
+              ) : (
+                <>
+                  <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("bench")}>Choose a specimen</button>
+                  <button className="btn h-10 px-4" onClick={() => go("recorded")}>
+                    <Play aria-hidden className="h-3.5 w-3.5" /> Watch a recorded run
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -177,6 +187,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
         <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
         <div className="relative grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 lg:gap-12 p-5 sm:p-6 lg:p-10">
           <div className="flex flex-col gap-7 min-w-0">
+            {demo ? <DemoNotice reasons={offReasons} onWatch={() => go("recorded")} /> : (<>
             <section aria-labelledby="specimens-h" className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <h3 id="specimens-h" className="tag text-mist">
@@ -230,6 +241,7 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
               </ErrorNote>
             )}
             {startError && <ErrorNote title="The run did not start.">{startError}</ErrorNote>}
+            </>)}
           </div>
 
           <aside className="flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-line pt-6 lg:pt-0 lg:pl-8">
@@ -313,6 +325,35 @@ function DriftingField() {
                 ["--rot" as string]: `${c.rot}deg`,
               }} />
       ))}
+    </div>
+  );
+}
+
+const REPO_URL = "https://github.com/aleksandrahodzzik/musecell";
+
+/** On a replay-only server (the public demo) the bench explains itself instead of showing setup errors. */
+function DemoNotice({ reasons, onWatch }: { reasons: string[]; onWatch: () => void }) {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="tag text-lime">Public demo</p>
+      <h3 className="display text-[clamp(28px,3vw,44px)] leading-[1.05] tracking-[-0.045em] text-white max-w-[22ch]">
+        This demo replays real live runs. Nothing here spends credits.
+      </h3>
+      <p className="text-[15px] leading-relaxed text-mist max-w-[62ch]">
+        Every replay is a recorded run of the real agent, with the same events, measurements, model calls and costs, and
+        labelled as a replay. To run the agent live on a sealed specimen you need your own Meta Model API key and the
+        BBBC021 subset; the README quickstart walks through it.
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <button className="btn-primary h-12 pl-5 pr-11 text-[15px]" onClick={onWatch}>Watch a recorded run</button>
+        <a className="btn h-12 px-5 text-[15px]" href={`${REPO_URL}#quickstart`} target="_blank" rel="noreferrer">Run it yourself</a>
+      </div>
+      {!!reasons.length && (
+        <details className="text-[12.5px] text-mist">
+          <summary className="cursor-pointer hover:text-haze">Why live runs are off here</summary>
+          <div className="mt-2 flex flex-col gap-1">{reasons.map((r) => <p key={r}>{r}</p>)}</div>
+        </details>
+      )}
     </div>
   );
 }
@@ -467,7 +508,7 @@ function BudgetWells({ budget, setBudget }: { budget: number; setBudget: (n: num
  * A real field from the recorded runs, seen through an eyepiece with a reticle. Move the pointer to pan across the
  * field, switch the three stains on and off, or click for another field.
  */
-function Eyepiece() {
+function Eyepiece({ health }: { health?: Health }) {
   const gallery = useFetch<string[]>("/api/gallery");
   const ids = gallery.data ?? [];
   const startAt = useMemo(() => Math.floor(Math.random() * 1000), []);
@@ -480,12 +521,13 @@ function Eyepiece() {
   const fieldId = id?.replace(".composite", "");
 
   useEffect(() => {
-    if (!fieldId) return;
+    if (!fieldId || !health) return; // wait for /api/health: it says whether channel images exist on this server
+    setCompositeOnly(!health.data);
     let live = true;
     setPx(null);
     loadPixels(fieldId).then((p) => live && setPx(p)).catch(() => live && setPx(null));
     return () => { live = false; };
-  }, [fieldId]);
+  }, [fieldId, health]);
 
   useEffect(() => {
     const c = canvas.current;

@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Footer, Nav, Page } from "./components/Shell";
 import { StainTintFilter } from "./components/StainTint";
 import { ErrorNote } from "./components/States";
+import { setCompositeOnly } from "./lib/fieldImage";
 import { useRoute } from "./lib/router";
 import type { Health, RecordedRun, SpecimenCard } from "./lib/types";
 import { useFetch } from "./lib/useFetch";
@@ -23,6 +24,8 @@ export default function App() {
     specimens.data?.forEach((s) => (out[s.specimen_id] = s.label));
     return out;
   }, [specimens.data, recorded.data]);
+
+  useEffect(() => { if (health.data) setCompositeOnly(!health.data.data); }, [health.data]);
 
   const liveNote = health.data ? (health.data.live_runs ? "Live runs available" : "Replays only on this server") : undefined;
 

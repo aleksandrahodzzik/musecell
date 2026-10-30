@@ -55,14 +55,20 @@ function pixelsOf(img: HTMLImageElement): ImageData {
   return ctx.getImageData(0, 0, c.width, c.height);
 }
 
+// Without the BBBC021 data (replay-only demo) only composites are shipped: skip the channel requests (no 404s).
+let compositeOnly = false;
+export const setCompositeOnly = (v: boolean) => { compositeOnly = v; };
+
 async function fetchPixels(fieldId: string): Promise<FieldPixels> {
   try {
+    if (compositeOnly) throw new Error("composites only");
     const imgs = await Promise.all(CHANNELS.map((ch) => loadImage(imageUrl(`${fieldId}.${ch}`))));
     const data = imgs.map(pixelsOf);
     const channels = {} as Record<Channel, Uint8ClampedArray>;
     CHANNELS.forEach((ch, i) => (channels[ch] = byteOf(data[i], 0)));
     return { width: data[0].width, height: data[0].height, channels, fromComposite: false };
   } catch {
+    compositeOnly = true; // one miss means this server ships composites only: do not ask for channels again
     const composite = pixelsOf(await loadImage(imageUrl(`${fieldId}.composite`)));
     const channels = {} as Record<Channel, Uint8ClampedArray>;
     CHANNELS.forEach((ch) => (channels[ch] = byteOf(composite, COMPOSITE_BYTE[ch])));
@@ -119,6 +125,7 @@ export const STAIN_MATRIX = (() => {
 })();
 
 async function fetchSegmentation(fieldId: string): Promise<FieldSegmentation | null> {
+  if (compositeOnly) return null; // masks need the BBBC021 data, which a replay-only server does not have
   const [tRes, lRes] = await Promise.all([fetch(`/api/fields/${fieldId}/cells`), fetch(`/api/fields/${fieldId}/labels`)]);
   if (!tRes.ok || !lRes.ok) return null;
   const table = (await tRes.json()) as CellTable;

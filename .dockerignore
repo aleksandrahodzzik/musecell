@@ -1,0 +1,16 @@
+# Whitelist: nothing enters the image unless listed below. Keeps backend/.env, _legacy/ (old key), runs/, data and
+# caches out of every build, whatever else appears in the working tree.
+*
+!backend/app/
+!backend/requirements.txt
+!frontend/
+frontend/node_modules/
+frontend/dist/
+!demo/
+!eval/
+!LICENSE
+!DATA_LICENSE.md
+**/__pycache__/
+**/*.pyc
+**/.env
+**/*.env

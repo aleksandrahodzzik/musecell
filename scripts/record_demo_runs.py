@@ -177,6 +177,12 @@ async def main() -> int:
                 return 1
         copy_runs(run_ids)
         copy_thumbnails(manager, run_ids)
+        # "Specimen N" labels for a replay-only server, which has no catalog (opaque ids only, nothing identifying)
+        ids = {json.loads((DEMO_RUNS / f"{r}.jsonl").read_text(encoding="utf-8").splitlines()[0])["data"]["specimen_id"]
+               for r in run_ids}
+        labels = {s["specimen_id"]: s["label"] for s in manager.specimen_list() if s["specimen_id"] in ids}
+        (DEMO_RUNS.parent / "specimen_labels.json").write_text(json.dumps(labels, indent=1, sort_keys=True),
+                                                               encoding="utf-8")
         return 0
     finally:
         await manager.aclose()

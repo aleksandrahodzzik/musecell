@@ -29,6 +29,7 @@ IMAGE_ID = re.compile(r"^(f_[0-9a-f]{6,64})\.(composite|dna|tubulin|actin)$")
 FIELD_ID = re.compile(r"^f_[0-9a-f]{6,64}$")
 EVAL_FILES = {"results": ROOT / "eval" / "results.json", "baseline": ROOT / "eval" / "baseline.json"}
 DEMO_THUMBS = ROOT / "demo" / "thumbnails"
+DEMO_LABELS = ROOT / "demo" / "specimen_labels.json"  # opaque specimen id -> "Specimen N" (no compound, dose or MoA)
 FRONTEND_DIST = ROOT / "frontend" / "dist"
 
 
@@ -157,6 +158,8 @@ async def recorded(request: Request) -> list[dict]:
     """Finished recorded runs that can be replayed; no compound, MoA or verdict."""
     m = mgr(request)
     labels = {s["specimen_id"]: s["label"] for s in m.specimen_list()}
+    if not labels and DEMO_LABELS.exists():  # replay-only server: the labels shipped with the demo runs
+        labels = json.loads(DEMO_LABELS.read_text(encoding="utf-8"))
     return list_recorded([(DEMO_RUNS_DIR, "demo"), (m.runs_dir, "local")], labels)
 
 
