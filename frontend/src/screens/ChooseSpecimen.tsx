@@ -12,7 +12,7 @@ import { ApiError, imageUrl, postJSON } from "../lib/api";
 import type { Results } from "./Benchmark";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
 import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
-import { CHANNELS, CHANNEL_LABEL, compose, loadPixels, setCompositeOnly, type Channel, type FieldPixels } from "../lib/fieldImage";
+import { CHANNELS, CHANNEL_LABEL, compose, loadPreviewPixels, setCompositeOnly, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
 import { STATIC } from "../lib/staticDemo";
 import type { Health, ModelIds, RecordedRun, SpecimenCard } from "../lib/types";
@@ -520,19 +520,28 @@ function Eyepiece({ health }: { health?: Health }) {
   const [k, setK] = useState(0);
   const [enabled, setEnabled] = useState<Record<Channel, boolean>>({ dna: true, tubulin: true, actin: true });
   const [px, setPx] = useState<FieldPixels | null>(null);
+  const [loading, setLoading] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const canvas = useRef<HTMLCanvasElement>(null);
-  const id = ids.length ? ids[(startAt + k) % ids.length] : null;
-  const fieldId = id?.replace(".composite", "");
+  const fieldAt = (i: number) => (ids.length ? ids[(startAt + i) % ids.length].replace(".composite", "") : undefined);
+  const fieldId = fieldAt(k);
 
+  // /api/health says whether channel images exist on this server; the run microscope reads this flag later
+  useEffect(() => { if (health) setCompositeOnly(!health.data); }, [health]);
+
+  // The eyepiece shows a small composite (one request, <= 720 px). The current field stays on screen until the
+  // next one is decoded, and the next two are prefetched, so a click changes the field at once.
   useEffect(() => {
-    if (!fieldId || !health) return; // wait for /api/health: it says whether channel images exist on this server
-    setCompositeOnly(!health.data);
+    if (!fieldId) return;
     let live = true;
-    setPx(null);
-    loadPixels(fieldId).then((p) => live && setPx(p)).catch(() => live && setPx(null));
+    setLoading(true);
+    loadPreviewPixels(fieldId)
+      .then((p) => { if (live) { setPx(p); setLoading(false); } })
+      .catch(() => { if (live) setLoading(false); })
+      .finally(() => { [1, 2].forEach((d) => { const f = fieldAt(k + d); if (f) loadPreviewPixels(f).catch(() => {}); }); });
     return () => { live = false; };
-  }, [fieldId, health]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldId]);
 
   useEffect(() => {
     const c = canvas.current;
@@ -557,7 +566,7 @@ function Eyepiece({ health }: { health?: Health }) {
         aria-label="Look at another field"
         className="group relative h-[min(360px,78vw)] w-[min(360px,78vw)] rounded-full bg-darkfield shadow-[0_0_0_1px_rgba(255,255,255,0.14),0_0_0_10px_#0E1217,0_0_0_11px_rgba(255,255,255,0.08),0_40px_80px_-20px_rgba(0,0,0,0.9)] overflow-hidden"
       >
-        <span aria-hidden={!px} className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-500 ease-out ${px ? "opacity-100" : "opacity-0"}`}
+        <span aria-hidden={!px} className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-300 ease-out ${px ? (loading ? "opacity-70" : "opacity-100") : "opacity-0"}`}
               style={{ transform: `translate(${pan.x * 12}%, ${pan.y * 12}%) scale(1.4)` }}>
           <canvas ref={canvas} role="img" aria-label="A field of MCF-7 cells from BBBC021 with the selected stains"
                   className="h-full w-auto max-w-none" />

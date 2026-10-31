@@ -82,6 +82,33 @@ function byteOf(img: ImageData, offset: number): Uint8ClampedArray {
   return out;
 }
 
+const previewCache = new Map<string, Promise<FieldPixels>>();
+
+/**
+ * A small, fast version of a field for previews (the start-screen eyepiece): one composite request instead of three
+ * channel images, downscaled to at most `maxSide` px, so loading, prefetching and stain toggles stay instant.
+ */
+export function loadPreviewPixels(fieldId: string, maxSide = 720): Promise<FieldPixels> {
+  let p = previewCache.get(fieldId);
+  if (!p) {
+    p = loadImage(imageUrl(`${fieldId}.composite`)).then((img) => {
+      const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * s);
+      c.height = Math.round(img.naturalHeight * s);
+      const ctx = c.getContext("2d", { willReadFrequently: true })!;
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const data = ctx.getImageData(0, 0, c.width, c.height);
+      const channels = {} as Record<Channel, Uint8ClampedArray>;
+      CHANNELS.forEach((ch) => (channels[ch] = byteOf(data, COMPOSITE_BYTE[ch])));
+      return { width: c.width, height: c.height, channels, fromComposite: true };
+    });
+    p.catch(() => previewCache.delete(fieldId));
+    previewCache.set(fieldId, p);
+  }
+  return p;
+}
+
 export function loadPixels(fieldId: string): Promise<FieldPixels> {
   let p = pixelCache.get(fieldId);
   if (!p) {
