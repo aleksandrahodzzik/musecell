@@ -48,6 +48,7 @@ from app.llm import cost_of  # noqa: E402
 from app.runs.manager import RunManager  # noqa: E402
 from app.runs.store import RunBus  # noqa: E402
 from app.science.atlas import Atlas, compound_level, nsc_baseline  # noqa: E402
+from well_choice import load_agent_wells, markdown as well_choice_markdown, well_choice_report  # noqa: E402
 
 EVAL = ROOT / "eval"
 RUNS_LOG = EVAL / "agent_runs.jsonl"
@@ -333,6 +334,9 @@ def analysis(records: list[dict]) -> dict:
     """Where the agent's calls go wrong, over all budgets: calls per class vs truth, per-class accuracy, review."""
     truth = Counter(r["truth_moa"] for r in records)
     called = Counter(r.get("agent_moa") or "(no conclusion)" for r in records)
+    def after(r: dict) -> bool:
+        return bool(r.get("scientist_correct") if r.get("call_source") == "protocol" else r["correct"])
+
     per_class = {m: {"correct": sum(r["correct"] for r in records if r["truth_moa"] == m), "runs": n}
                  for m, n in sorted(truth.items())}
     return {
@@ -342,8 +346,10 @@ def analysis(records: list[dict]) -> dict:
         "per_class": per_class,
         "review": {"request_experiment": sum(r.get("review") == "request_experiment" for r in records),
                    "approve": sum(r.get("review") == "approve" for r in records),
-                   "wrong_to_right": sum(r["correct"] and not r["first_correct"] for r in records),
-                   "right_to_wrong": sum(r["first_correct"] and not r["correct"] for r in records)},
+                   # the review acts on the Scientist's conclusion; from v5 the final call is the protocol's, so
+                   # the review's effect is first conclusion -> Scientist's final conclusion, not -> final call
+                   "wrong_to_right": sum(after(r) and not r["first_correct"] for r in records),
+                   "right_to_wrong": sum(r["first_correct"] and not after(r) for r in records)},
     }
 
 
@@ -356,8 +362,8 @@ def analysis_markdown(a: dict) -> list[str]:
         correct = f"{pc['correct']}/{pc['runs']}" if pc else "–"
         lines.append(f"| {m} | {c['called']} | {c['true']} | {correct} |")
     rv = a["review"]
-    lines += ["", f"PI review: {rv['request_experiment']} requests for another experiment, {rv['approve']} approvals; "
-              f"the final call changed from wrong to right in {rv['wrong_to_right']} runs and from right to wrong in "
+    lines += ["", f"PI review (it acts on the Scientist's conclusion): {rv['request_experiment']} requests for another experiment, {rv['approve']} approvals; "
+              f"the Scientist's call changed from wrong to right in {rv['wrong_to_right']} runs and from right to wrong in "
               f"{rv['right_to_wrong']}.", ""]
     return lines
 
@@ -435,9 +441,14 @@ def write_markdown(res: dict, path: Path) -> None:
         lines.append(f"| {r['label']} | {budget} | {acc} | {correct} | {pct(r.get('accuracy_before_review'))} | "
                      f"{num(r.get('mean_wells'), '.2f')} | {cost} | {lat} | {cites} |")
     lines += ["", "± = standard deviation over random well draws. \"Before review\" = the agent's first conclusion, "
-              "before the PI reviewer's critique and any requested experiment.", "",
+              "before the PI reviewer's critique and any requested experiment (from agent v5 the final call is the NSC "
+              "vote over the agent's wells, so the gap to \"Accuracy\" is not the review's effect). ± is the spread of "
+              "the baseline over draws, not a confidence interval for the agent; the agent's intervals are in the "
+              "well-choice section below.", "",
               "![Accuracy against wells per compound](accuracy_vs_budget.png)", ""]
     lines += comparison_markdown(res)
+    if res.get("well_choice"):
+        lines += well_choice_markdown(res["well_choice"], res["well_choice"]["agent_label"])
     if res.get("analysis"):
         lines += analysis_markdown(res["analysis"])
     if res.get("notes"):
@@ -626,16 +637,28 @@ async def main() -> int:
                                 f"/{len(part['dev'])}, held-out test {sum(r['correct'] for r in part['test'])}"
                                 f"/{len(part['test'])}.")
         if contributor or any(m.endswith("-contributor") for m, _ in compare):
-            notes.insert(0, f"Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on "
-                            "prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.")
+            notes.insert(0, "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that "
+                            "lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse "
+                            "Spark Open ran on Baseten. The live app defaults to full-price `muse-spark-1.3`, which was "
+                            "not benchmarked with agent v4/v5.")
         notes.append("The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses "
                      "treatment profiles (median over replicates), the published NSC protocol.")
+        well_choice = None
+        main_row = next((r for r in a_rows if r["method"] == "agent" and r.get("scientist_accuracy") is not None), None)
+        if main_row is not None and manager.atlas is not None:  # v5+: the agent's lever is the choice of wells
+            b = main_row["budget"]
+            rs = [r for r in used if r["budget"] == b]
+            well_choice = well_choice_report(
+                manager.atlas, manager.catalog, specimens, {r["specimen_id"]: bool(r["correct"]) for r in rs},
+                load_agent_wells(EVAL_RUNS_DIR, rs),
+                json.loads(split_path.read_text(encoding="utf-8")) if split_path.exists() else None, b)
+            well_choice["agent_label"] = main_row["label"]
         res = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "models": {"scientist": main_model, "microscopist": main_model, "reviewer": args.reviewer_model,
                           "segmentation": manager.model_ids()["segmentation"]},
                "comparisons": [{"model": m, "agent_version": v, "label": short_label(m, v)} for m, v in compare],
                "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows,
-               "analysis": analysis(used) if used else None}
+               "analysis": analysis(used) if used else None, "well_choice": well_choice}
         (EVAL / "results.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
         write_markdown(res, EVAL / "RESULTS.md")
         plot(res, EVAL / "accuracy_vs_budget.png")

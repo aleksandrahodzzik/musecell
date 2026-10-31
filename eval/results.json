@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-30T17:49:40+00:00",
+ "generated_at": "2026-10-31T19:09:02+00:00",
  "models": {
   "scientist": "meta-models/muse-spark-open-1026",
   "microscopist": "meta-models/muse-spark-open-1026",
@@ -29,9 +29,9 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 8.14s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 8.29s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
-  "Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.",
+  "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. The live app defaults to full-price `muse-spark-1.3`, which was not benchmarked with agent v4/v5.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v5, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 17/19, held-out test 17/19.",
   "Agent v2/v3 (the atlas tool also returns the NSC vote over the wells acquired so far, the prompt says how to weigh it, and the blinded phase names no compound) was designed after reading the v1 runs on these same 38 compounds (`scripts/nsc_on_agent_wells.py`). BBBC021 has no other annotated compounds, so v3 accuracy is not a held-out estimate. A v2 eval was stopped after 19 runs (11 correct, 2 stopped by the blinding guard) to add the naming rule; its runs stay in eval/agent_runs.jsonl.",
@@ -412,8 +412,282 @@
   "review": {
    "request_experiment": 2,
    "approve": 36,
-   "wrong_to_right": 4,
+   "wrong_to_right": 0,
    "right_to_wrong": 0
   }
+ },
+ "well_choice": {
+  "budget": 4,
+  "n": 38,
+  "draws": 2000,
+  "resamples": 10000,
+  "seed": 6,
+  "vote": "app.agent.tools.well_vote (the protocol call's own function)",
+  "rows": [
+   {
+    "name": "agent (wells chosen by the Scientist)",
+    "all": {
+     "correct": 34.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 17.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 17.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "random wells (expected)",
+    "all": {
+     "correct": 30.86,
+     "n": 38
+    },
+    "dev": {
+     "correct": 15.56,
+     "n": 19
+    },
+    "test": {
+     "correct": 15.3,
+     "n": 19
+    }
+   },
+   {
+    "name": "top doses",
+    "all": {
+     "correct": 34.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 16.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 18.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "top 2 doses x replicates",
+    "all": {
+     "correct": 28.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 16.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 12.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "dose spread",
+    "all": {
+     "correct": 31.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 16.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 15.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "top doses, cell count z >= -2",
+    "all": {
+     "correct": 32.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 15.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 17.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "strongest wells (embedding norm)",
+    "all": {
+     "correct": 27.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 14.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 13.0,
+     "n": 19
+    }
+   }
+  ],
+  "differences": [
+   {
+    "vs": "random wells (expected)",
+    "best_rule": false,
+    "all": {
+     "mean": 0.0826,
+     "ci95": [
+      -0.0019,
+      0.1694
+     ]
+    },
+    "dev": {
+     "mean": 0.0759,
+     "ci95": [
+      -0.0654,
+      0.2123
+     ]
+    },
+    "test": {
+     "mean": 0.0894,
+     "ci95": [
+      -0.0069,
+      0.2036
+     ]
+    }
+   },
+   {
+    "vs": "top doses",
+    "best_rule": true,
+    "all": {
+     "mean": 0.0,
+     "ci95": [
+      -0.1053,
+      0.1053
+     ]
+    },
+    "dev": {
+     "mean": 0.0526,
+     "ci95": [
+      -0.1053,
+      0.2105
+     ]
+    },
+    "test": {
+     "mean": -0.0526,
+     "ci95": [
+      -0.1579,
+      0.0
+     ]
+    }
+   },
+   {
+    "vs": "top 2 doses x replicates",
+    "best_rule": false,
+    "all": {
+     "mean": 0.1579,
+     "ci95": [
+      0.0526,
+      0.2895
+     ]
+    },
+    "dev": {
+     "mean": 0.0526,
+     "ci95": [
+      0.0,
+      0.1579
+     ]
+    },
+    "test": {
+     "mean": 0.2632,
+     "ci95": [
+      0.0526,
+      0.4737
+     ]
+    }
+   },
+   {
+    "vs": "dose spread",
+    "best_rule": false,
+    "all": {
+     "mean": 0.0789,
+     "ci95": [
+      -0.0789,
+      0.2368
+     ]
+    },
+    "dev": {
+     "mean": 0.0526,
+     "ci95": [
+      -0.1579,
+      0.2632
+     ]
+    },
+    "test": {
+     "mean": 0.1053,
+     "ci95": [
+      -0.1053,
+      0.3158
+     ]
+    }
+   },
+   {
+    "vs": "top doses, cell count z >= -2",
+    "best_rule": false,
+    "all": {
+     "mean": 0.0526,
+     "ci95": [
+      -0.0789,
+      0.1842
+     ]
+    },
+    "dev": {
+     "mean": 0.1053,
+     "ci95": [
+      -0.1053,
+      0.3158
+     ]
+    },
+    "test": {
+     "mean": 0.0,
+     "ci95": [
+      -0.1579,
+      0.1579
+     ]
+    }
+   },
+   {
+    "vs": "strongest wells (embedding norm)",
+    "best_rule": false,
+    "all": {
+     "mean": 0.1842,
+     "ci95": [
+      0.0789,
+      0.3158
+     ]
+    },
+    "dev": {
+     "mean": 0.1579,
+     "ci95": [
+      0.0,
+      0.3158
+     ]
+    },
+    "test": {
+     "mean": 0.2105,
+     "ci95": [
+      0.0526,
+      0.4211
+     ]
+    }
+   }
+  ],
+  "best_rule": "top doses",
+  "agent_wells_in_top_doses": {
+   "wells": 114,
+   "of": 152,
+   "top_doses": "the 4 highest of 8 doses"
+  },
+  "agent_label": "MuseCell agent, Muse Spark Open (Baseten), agent v5"
  }
 }

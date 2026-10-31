@@ -1,11 +1,11 @@
 # MuseCell evaluation
 
-Generated 2026-10-30T17:49:40+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
+Generated 2026-10-31T19:09:02+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
 
 - Compounds: 38 MoA-annotated BBBC021 compounds, leave-one-compound-out (the atlas never contains the compound under test).
 - Metric: compound-level MoA accuracy (one call per compound).
 - Models: scientist `meta-models/muse-spark-open-1026`, microscopist `meta-models/muse-spark-open-1026`, reviewer `muse-wonder-1.0`, segmentation `classical (scikit-image)`.
-- Blinding-leak test: pytest leak/blinding tests: 13 passed, 88 deselected in 8.14s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
+- Blinding-leak test: pytest leak/blinding tests: 13 passed, 88 deselected in 8.29s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
 
 | Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
 |---|---|---|---|---|---|---|---|---|
@@ -25,7 +25,7 @@ Generated 2026-10-30T17:49:40+00:00 by `scripts/evaluate.py`. Numbers are writte
 | MuseCell agent (muse-spark-1.3-contributor) | 4 | 36.8% | 14/38 | 36.8% | 3.92 | $0.135 | 208 s | 109/109 (100.0%) |
 | MuseCell agent (muse-spark-1.3-contributor) | 6 | 42.1% | 16/38 | 42.1% | 5.61 | $0.143 | 239 s | 108/108 (100.0%) |
 
-± = standard deviation over random well draws. "Before review" = the agent's first conclusion, before the PI reviewer's critique and any requested experiment.
+± = standard deviation over random well draws. "Before review" = the agent's first conclusion, before the PI reviewer's critique and any requested experiment (from agent v5 the final call is the NSC vote over the agent's wells, so the gap to "Accuracy" is not the review's effect). ± is the spread of the baseline over draws, not a confidence interval for the agent; the agent's intervals are in the well-choice section below.
 
 ![Accuracy against wells per compound](accuracy_vs_budget.png)
 
@@ -92,6 +92,35 @@ Same 38 compounds, same tools, same PI reviewer (`muse-wonder-1.0`, Meta API); t
 
 Cost on open weights is nominal: Baseten list price ($1.25 / $4.25 per 1M tokens) for the Scientist/Microscopist tokens, paid from hackathon credits, plus the reviewer at Meta API prices.
 
+## Does the agent choose wells better than a fixed rule? (budget 4)
+
+MuseCell agent, Muse Spark Open (Baseten), agent v5: the final call is the NSC vote over the wells the Scientist chose, so its only lever is which wells to image. Each rule below picks wells without labels and is scored by the protocol call's own vote function (`app.agent.tools.well_vote`), in the same atlas space, on the same {rep['n']} compounds. Rules that read measurements look at every well, which the agent cannot do without spending its budget.
+
+| Well choice | All | Dev half | Held-out test half |
+|---|---|---|---|
+| agent (wells chosen by the Scientist) | 34/38 | 17/19 | 17/19 |
+| random wells (expected) | 30.9/38 | 15.6/19 | 15.3/19 |
+| top doses | 34/38 | 16/19 | 18/19 |
+| top 2 doses x replicates | 28/38 | 16/19 | 12/19 |
+| dose spread | 31/38 | 16/19 | 15/19 |
+| top doses, cell count z >= -2 | 32/38 | 15/19 | 17/19 |
+| strongest wells (embedding norm) | 27/38 | 14/19 | 13/19 |
+
+Agent minus each alternative, percentage points, mean over compounds with a paired bootstrap 95% interval (10,000 resamples of compounds):
+
+| Agent minus | All | Dev | Test |
+|---|---|---|---|
+| random wells (expected) | +8.3 [-0.2, +16.9] | +7.6 [-6.5, +21.2] | +8.9 [-0.7, +20.4] |
+| top doses (best rule, picked after seeing all compounds) | +0.0 [-10.5, +10.5] | +5.3 [-10.5, +21.1] | -5.3 [-15.8, +0.0] |
+| top 2 doses x replicates | +15.8 [+5.3, +28.9] | +5.3 [+0.0, +15.8] | +26.3 [+5.3, +47.4] |
+| dose spread | +7.9 [-7.9, +23.7] | +5.3 [-15.8, +26.3] | +10.5 [-10.5, +31.6] |
+| top doses, cell count z >= -2 | +5.3 [-7.9, +18.4] | +10.5 [-10.5, +31.6] | +0.0 [-15.8, +15.8] |
+| strongest wells (embedding norm) | +18.4 [+7.9, +31.6] | +15.8 [+0.0, +31.6] | +21.1 [+5.3, +42.1] |
+
+Of the 152 wells the Scientist chose, 114 were among the 4 highest of 8 doses.
+
+Reading: on these 38 compounds the agent's well choice is not distinguishable from the best fixed rule ("top doses"); against random wells the interval is [-0.2, +16.9] points. What the agent adds beyond a rule is the blinded, audited record: why each well, the reviewer's critique, the explanation, and a dossier with verified citations.
+
 ## Where the agent goes wrong
 
 All 38 agent runs pooled over budgets (total API cost $11.40).
@@ -111,11 +140,11 @@ All 38 agent runs pooled over budgets (total API cost $11.40).
 | Actin disruptors | 2 | 3 | 2/3 |
 | DNA replication | 2 | 4 | 2/4 |
 
-PI review: 2 requests for another experiment, 36 approvals; the final call changed from wrong to right in 4 runs and from right to wrong in 0.
+PI review (it acts on the Scientist's conclusion): 2 requests for another experiment, 36 approvals; the Scientist's call changed from wrong to right in 0 runs and from right to wrong in 0.
 
 ## Notes
 
-- Eval runs used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). The live app uses `muse-spark-1.3`.
+- The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. The live app defaults to full-price `muse-spark-1.3`, which was not benchmarked with agent v4/v5.
 - MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.
 - MuseCell agent, Muse Spark Open (Baseten), agent v5, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 17/19, held-out test 17/19.
 - Agent v2/v3 (the atlas tool also returns the NSC vote over the wells acquired so far, the prompt says how to weigh it, and the blinded phase names no compound) was designed after reading the v1 runs on these same 38 compounds (`scripts/nsc_on_agent_wells.py`). BBBC021 has no other annotated compounds, so v3 accuracy is not a held-out estimate. A v2 eval was stopped after 19 runs (11 correct, 2 stopped by the blinding guard) to add the naming rule; its runs stay in eval/agent_runs.jsonl.
