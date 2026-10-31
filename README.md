@@ -13,7 +13,7 @@
 
 ![A recorded blinded run replayed at 6×: the agent acquires wells, the hypothesis board converges, the PI reviewer asks for one more experiment, then the compound is unblinded and the call is checked](docs/hero.gif)
 
-<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist concludes "Eg5 inhibitors"; the reviewer asks for one more experiment; the vote over its 4 wells splits 2/1/1 and calls "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
+<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist first concludes "Actin disruptors"; the reviewer asks for one more well; after it the Scientist switches to "Eg5 inhibitors"; the vote over its 4 wells splits 2/1/1 and stays on "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
 
 ## Why this matters
 
