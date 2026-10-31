@@ -29,7 +29,7 @@ function NavLink({ to, label, active }: { to: Route; label: string; active: bool
 
 export function Nav({ route, liveNote, live }: { route: Route; liveNote?: string; live?: boolean }) {
   return (
-    <header className="no-print h-16 shrink-0 flex items-center gap-8 px-5 lg:px-9 bg-paper text-ink">
+    <header className="no-print h-16 shrink-0 flex items-center gap-5 sm:gap-8 px-5 lg:px-9 bg-paper text-ink">
       <a href="#/" className="flex items-center gap-2" aria-label="MuseCell, start page">
         <Mark className="h-6 w-6" />
         <span className="display text-[24px] leading-none">MuseCell</span>
@@ -46,7 +46,7 @@ export function Nav({ route, liveNote, live }: { route: Route; liveNote?: string
           </span>
         )}
         {route.name !== "home" && (
-          <a href="#/" className="btn-primary h-10">Start a run</a>
+          <a href="#/" className="btn-primary h-10 hidden sm:inline-flex">Start a run</a>
         )}
       </div>
     </header>

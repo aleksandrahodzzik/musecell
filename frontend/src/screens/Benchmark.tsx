@@ -108,7 +108,7 @@ function BaselineView({ b }: { b: Baseline }) {
           <p className="label mt-1">treatment level · {Math.round(c.treatment_accuracy * c.n_treatments)} of {c.n_treatments}</p>
         </div>
       </div>
-      <table className="text-sm max-w-[560px]">
+      <div className="overflow-x-auto"><table className="text-sm max-w-[560px]">
         <caption className="text-left label pb-1">Treatment-level accuracy per mechanism class</caption>
         <thead className="text-xs text-graphite"><tr><th className="text-left font-normal">Class</th><th className="text-right font-normal">Treatments</th><th className="text-right font-normal">Accuracy</th><th className="w-[140px]" /></tr></thead>
         <tbody>
@@ -121,7 +121,7 @@ function BaselineView({ b }: { b: Baseline }) {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table></div>
     </div>
   );
 }
@@ -136,7 +136,7 @@ function ResultsView({ r }: { r: Results }) {
         {r.blinding_leak_test && <> · blinding-leak test: {r.blinding_leak_test}</>}
       </p>
       <AccuracyChart rows={r.rows} />
-      <table className="text-sm w-full">
+      <div className="overflow-x-auto"><table className="text-sm w-full">
         <thead className="text-xs text-graphite">
           <tr>
             <th className="text-left font-normal">Method</th><th className="text-right font-normal">Budget</th>
@@ -159,7 +159,7 @@ function ResultsView({ r }: { r: Results }) {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table></div>
       {r.notes?.map((n, i) => <p key={i} className="text-sm text-graphite">{n}</p>)}
     </div>
   );
