@@ -639,8 +639,8 @@ async def main() -> int:
         if contributor or any(m.endswith("-contributor") for m, _ in compare):
             notes.insert(0, "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that "
                             "lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse "
-                            "Spark Open ran on Baseten. The live app defaults to full-price `muse-spark-1.3`, which was "
-                            "not benchmarked with agent v4/v5.")
+                            "Spark Open ran on Baseten. Full-price `muse-spark-1.3` (the live app's default) was "
+                            "benchmarked with agent v5 only.")
         notes.append("The random-well baseline votes over 1-NN calls of single wells; the all-wells baseline uses "
                      "treatment profiles (median over replicates), the published NSC protocol.")
         well_choice = None

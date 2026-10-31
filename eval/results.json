@@ -1,12 +1,17 @@
 {
- "generated_at": "2026-10-31T19:09:02+00:00",
+ "generated_at": "2026-10-31T19:52:16+00:00",
  "models": {
-  "scientist": "meta-models/muse-spark-open-1026",
-  "microscopist": "meta-models/muse-spark-open-1026",
+  "scientist": "muse-spark-1.3",
+  "microscopist": "muse-spark-1.3",
   "reviewer": "muse-wonder-1.0",
   "segmentation": "classical (scikit-image)"
  },
  "comparisons": [
+  {
+   "model": "meta-models/muse-spark-open-1026",
+   "agent_version": "v5",
+   "label": "Muse Spark Open (Baseten), agent v5"
+  },
   {
    "model": "meta-models/muse-spark-open-1026",
    "agent_version": "v4",
@@ -29,11 +34,12 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 8.29s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 7.02s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
-  "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. The live app defaults to full-price `muse-spark-1.3`, which was not benchmarked with agent v4/v5.",
+  "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. Full-price `muse-spark-1.3` (the live app's default) was benchmarked with agent v5 only.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v5, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 17/19, held-out test 17/19.",
+  "MuseCell agent, muse-spark-1.3, agent v5, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 16/19, held-out test 18/19.",
   "Agent v2/v3 (the atlas tool also returns the NSC vote over the wells acquired so far, the prompt says how to weigh it, and the blinded phase names no compound) was designed after reading the v1 runs on these same 38 compounds (`scripts/nsc_on_agent_wells.py`). BBBC021 has no other annotated compounds, so v3 accuracy is not a held-out estimate. A v2 eval was stopped after 19 runs (11 correct, 2 stopped by the blinding guard) to add the naming rule; its runs stay in eval/agent_runs.jsonl.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v3, budget 4, s_89c9462717: run failed before a conclusion; counted as wrong: Blinding guard stopped the run: a 'review' event contained compound-identifying text.",
   "MuseCell agent, Muse Spark Open (Baseten), budget 4, s_14844eef0c: run failed before a conclusion; counted as wrong: meta-models/muse-spark-open-1026 used all 8000 tokens (incl. 7997 reasoning) without answering. Raise max_tokens for this call.",
@@ -124,6 +130,35 @@
   },
   {
    "method": "agent",
+   "label": "MuseCell agent, muse-spark-1.3, agent v5",
+   "model": "muse-spark-1.3",
+   "agent_version": "v5",
+   "atlas": "ResNet50 (ImageNet) + TVN",
+   "short": "muse-spark-1.3, agent v5",
+   "budget": 4,
+   "n": 38,
+   "accuracy": 0.8947,
+   "correct": 34,
+   "accuracy_before_review": 0.8158,
+   "mean_wells": 4.0,
+   "mean_cost_usd": 0.2917,
+   "mean_latency_s": 93.5,
+   "citation_validity": 1.0,
+   "citations": "110/110",
+   "failed": 0,
+   "reviewer_requests": 4,
+   "scientist_accuracy": 0.8158,
+   "nsc_on_chosen_wells": 0.8947,
+   "provider": "meta",
+   "provider_label": "Meta Model API",
+   "billing": "usd",
+   "split_accuracy": {
+    "dev": 0.8421,
+    "test": 0.9474
+   }
+  },
+  {
+   "method": "agent_open",
    "label": "MuseCell agent, Muse Spark Open (Baseten), agent v5",
    "model": "meta-models/muse-spark-open-1026",
    "agent_version": "v5",
@@ -308,13 +343,13 @@
  ],
  "analysis": {
   "runs": 38,
-  "total_cost_usd": 11.4,
+  "total_cost_usd": 11.09,
   "calls_vs_truth": {
-   "Protein degradation": {
+   "DNA damage": {
     "called": 5,
     "true": 4
    },
-   "Aurora kinase inhibitors": {
+   "Actin disruptors": {
     "called": 4,
     "true": 3
    },
@@ -322,17 +357,17 @@
     "called": 4,
     "true": 4
    },
+   "Aurora kinase inhibitors": {
+    "called": 3,
+    "true": 3
+   },
    "Cholesterol-lowering": {
     "called": 3,
     "true": 2
    },
-   "DNA damage": {
+   "DNA replication": {
     "called": 3,
     "true": 4
-   },
-   "Eg5 inhibitors": {
-    "called": 3,
-    "true": 2
    },
    "Epithelial": {
     "called": 3,
@@ -350,18 +385,18 @@
     "called": 3,
     "true": 3
    },
-   "Actin disruptors": {
+   "Eg5 inhibitors": {
     "called": 2,
-    "true": 3
+    "true": 2
    },
-   "DNA replication": {
+   "Protein degradation": {
     "called": 2,
     "true": 4
    }
   },
   "per_class": {
    "Actin disruptors": {
-    "correct": 2,
+    "correct": 3,
     "runs": 3
    },
    "Aurora kinase inhibitors": {
@@ -373,7 +408,7 @@
     "runs": 2
    },
    "DNA damage": {
-    "correct": 3,
+    "correct": 4,
     "runs": 4
    },
    "DNA replication": {
@@ -401,7 +436,7 @@
     "runs": 3
    },
    "Protein degradation": {
-    "correct": 4,
+    "correct": 2,
     "runs": 4
    },
    "Protein synthesis": {
@@ -410,8 +445,8 @@
    }
   },
   "review": {
-   "request_experiment": 2,
-   "approve": 36,
+   "request_experiment": 4,
+   "approve": 34,
    "wrong_to_right": 0,
    "right_to_wrong": 0
   }
@@ -431,11 +466,11 @@
      "n": 38
     },
     "dev": {
-     "correct": 17.0,
+     "correct": 16.0,
      "n": 19
     },
     "test": {
-     "correct": 17.0,
+     "correct": 18.0,
      "n": 19
     }
    },
@@ -537,22 +572,22 @@
     "all": {
      "mean": 0.0826,
      "ci95": [
-      -0.0019,
-      0.1694
+      -0.0073,
+      0.1691
      ]
     },
     "dev": {
-     "mean": 0.0759,
+     "mean": 0.0232,
      "ci95": [
-      -0.0654,
-      0.2123
+      -0.1209,
+      0.1476
      ]
     },
     "test": {
-     "mean": 0.0894,
+     "mean": 0.1421,
      "ci95": [
-      -0.0069,
-      0.2036
+      0.0486,
+      0.2589
      ]
     }
    },
@@ -562,21 +597,21 @@
     "all": {
      "mean": 0.0,
      "ci95": [
-      -0.1053,
-      0.1053
+      0.0,
+      0.0
      ]
     },
     "dev": {
-     "mean": 0.0526,
+     "mean": 0.0,
      "ci95": [
-      -0.1053,
-      0.2105
+      0.0,
+      0.0
      ]
     },
     "test": {
-     "mean": -0.0526,
+     "mean": 0.0,
      "ci95": [
-      -0.1579,
+      0.0,
       0.0
      ]
     }
@@ -587,22 +622,22 @@
     "all": {
      "mean": 0.1579,
      "ci95": [
-      0.0526,
-      0.2895
+      0.0,
+      0.3158
      ]
     },
     "dev": {
-     "mean": 0.0526,
+     "mean": 0.0,
      "ci95": [
-      0.0,
-      0.1579
+      -0.2105,
+      0.2105
      ]
     },
     "test": {
-     "mean": 0.2632,
+     "mean": 0.3158,
      "ci95": [
-      0.0526,
-      0.4737
+      0.1053,
+      0.5263
      ]
     }
    },
@@ -612,21 +647,21 @@
     "all": {
      "mean": 0.0789,
      "ci95": [
-      -0.0789,
-      0.2368
+      -0.0263,
+      0.1849
      ]
     },
     "dev": {
-     "mean": 0.0526,
+     "mean": 0.0,
      "ci95": [
       -0.1579,
-      0.2632
+      0.1579
      ]
     },
     "test": {
-     "mean": 0.1053,
+     "mean": 0.1579,
      "ci95": [
-      -0.1053,
+      0.0,
       0.3158
      ]
     }
@@ -637,21 +672,21 @@
     "all": {
      "mean": 0.0526,
      "ci95": [
-      -0.0789,
-      0.1842
+      -0.0526,
+      0.1579
      ]
     },
     "dev": {
-     "mean": 0.1053,
+     "mean": 0.0526,
      "ci95": [
       -0.1053,
-      0.3158
+      0.2105
      ]
     },
     "test": {
-     "mean": 0.0,
+     "mean": 0.0526,
      "ci95": [
-      -0.1579,
+      0.0,
       0.1579
      ]
     }
@@ -667,27 +702,28 @@
      ]
     },
     "dev": {
-     "mean": 0.1579,
+     "mean": 0.1053,
      "ci95": [
       0.0,
-      0.3158
+      0.2632
      ]
     },
     "test": {
-     "mean": 0.2105,
+     "mean": 0.2632,
      "ci95": [
-      0.0526,
-      0.4211
+      0.1053,
+      0.4737
      ]
     }
    }
   ],
   "best_rule": "top doses",
+  "same_outcome_as_best_rule": 38,
   "agent_wells_in_top_doses": {
-   "wells": 114,
+   "wells": 140,
    "of": 152,
    "top_doses": "the 4 highest of 8 doses"
   },
-  "agent_label": "MuseCell agent, Muse Spark Open (Baseten), agent v5"
+  "agent_label": "MuseCell agent, muse-spark-1.3, agent v5"
  }
 }

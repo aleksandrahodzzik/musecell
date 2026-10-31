@@ -143,6 +143,8 @@ def well_choice_report(atlas, catalog, specimens: list[Specimen], agent_correct:
     return {"budget": budget, "n": len(sps), "draws": draws, "resamples": resamples, "seed": seed,
             "vote": "app.agent.tools.well_vote (the protocol call's own function)", "rows": rows,
             "differences": diffs, "best_rule": best,
+            # compounds where the agent and the best rule are both right or both wrong
+            "same_outcome_as_best_rule": int((agent == scores[best]).sum()),
             "agent_wells_in_top_doses": {"wells": in_top, "of": len(chosen),
                                          "top_doses": f"the {budget} highest of 8 doses"}}
 
@@ -168,7 +170,7 @@ def markdown(rep: dict, agent_label: str) -> list[str]:
     lines = [f"## Does the agent choose wells better than a fixed rule? (budget {rep['budget']})", "",
              f"{agent_label}: the final call is the NSC vote over the wells the Scientist chose, so its only lever is "
              "which wells to image. Each rule below picks wells without labels and is scored by the protocol call's own "
-             "vote function (`app.agent.tools.well_vote`), in the same atlas space, on the same {rep['n']} compounds. Rules that read "
+             f"vote function (`app.agent.tools.well_vote`), in the same atlas space, on the same {rep['n']} compounds. Rules that read "
              "measurements look at every well, which the agent cannot do without spending its budget.", "",
              "| Well choice | " + " | ".join({"all": "All", "dev": "Dev half", "test": "Held-out test half"}[p]
                                             for p in parts) + " |", "|---|" + "---|" * len(parts)]
@@ -188,9 +190,13 @@ def markdown(rep: dict, agent_label: str) -> list[str]:
     verdict = ("the agent is better than the best fixed rule" if lo > 0 else
                "the best fixed rule is better than the agent" if hi < 0 else
                "the agent's well choice is not distinguishable from the best fixed rule")
+    verdict += f" (\"{rep['best_rule']}\")"
     rnd = next(d for d in rep["differences"] if d["vs"].startswith("random"))
+    same = rep.get("same_outcome_as_best_rule")
+    if same == rep["n"]:
+        verdict += f"; it is right or wrong on exactly the same compounds as the rule (all {rep['n']})"
     lines += ["", f"Of the {t['of']} wells the Scientist chose, {t['wells']} were among {t['top_doses']}.", "",
-              f"Reading: on these {rep['n']} compounds {verdict} (\"{rep['best_rule']}\"); against random wells the "
+              f"Reading: on these {rep['n']} compounds {verdict}; against random wells the "
               f"interval is [{pp(rnd['all']['ci95'][0])}, {pp(rnd['all']['ci95'][1])}] points. What the agent adds "
               "beyond a rule is the blinded, audited record: why each well, the reviewer's critique, the explanation, "
               "and a dossier with verified citations.", ""]
