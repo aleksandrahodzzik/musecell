@@ -1,0 +1,2738 @@
+{
+ "run_id": "run_9afbd903a2d2",
+ "mode": "blinded",
+ "phase": "finished",
+ "specimen_id": "s_07f98c80cd",
+ "budget_total": 4,
+ "budget_used": 4,
+ "acquired_well_ids": [
+  "w_bdc02a8567",
+  "w_b617e84d8d",
+  "w_e741eff746",
+  "w_3bb1a5e523"
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "tool": "list_available_experiments",
+   "args": {
+    "rationale": "Need dose list and budget to plan discriminating wells."
+   },
+   "rationale": "Need dose list and budget to plan discriminating wells.",
+   "evidence_id": "e1",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:02.705202Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 2,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 7,
+    "rationale": "High dose should show maximal phenotype and cell loss if cytotoxic.",
+    "replicate": 1
+   },
+   "rationale": "High dose should show maximal phenotype and cell loss if cytotoxic.",
+   "evidence_id": "e2",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:07.377339Z",
+   "seconds": 0.044
+  },
+  {
+   "step": 3,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 4,
+    "rationale": "Mid dose to capture onset of phenotype before full toxicity.",
+    "replicate": 1
+   },
+   "rationale": "Mid dose to capture onset of phenotype before full toxicity.",
+   "evidence_id": "e3",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:07.454517Z",
+   "seconds": 0.066
+  },
+  {
+   "step": 4,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Nearest reference treatments will separate antimitotic classes.",
+    "well_ids": [
+     "w_bdc02a8567",
+     "w_b617e84d8d"
+    ]
+   },
+   "rationale": "Nearest reference treatments will separate antimitotic classes.",
+   "evidence_id": "e4",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:11.381018Z",
+   "seconds": 0.007
+  },
+  {
+   "step": 5,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_885d2daccecf",
+     "f_739857e982c0"
+    ],
+    "rationale": "Visual check for mitotic figures vs multinucleation and cytoskeleton."
+   },
+   "rationale": "Visual check for mitotic figures vs multinucleation and cytoskeleton.",
+   "evidence_id": "e5",
+   "error": null,
+   "cost_usd": 0.022170750000000003,
+   "started_at": "2026-10-31T19:34:31.057019Z",
+   "seconds": 19.658
+  },
+  {
+   "step": 6,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e5"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.35,
+      "supporting_evidence_ids": [
+       "e4",
+       "e2",
+       "e3"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e4"
+      ],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.3,
+      "supporting_evidence_ids": [
+       "e4",
+       "e5",
+       "e2"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e4"
+      ],
+      "moa": "Microtubule destabilizers",
+      "probability": 0.2,
+      "supporting_evidence_ids": [
+       "e5",
+       "e2",
+       "e3"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e4"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e2"
+      ]
+     }
+    ],
+    "rationale": "NSC says actin but similarity low and microscopist favors antimitotic; keeping both."
+   },
+   "rationale": "NSC says actin but similarity low and microscopist favors antimitotic; keeping both.",
+   "evidence_id": "e6",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:42.504260Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 7,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 5,
+    "rationale": "1 uM between strong 0.3 and 10 uM tests reproducibility and NSC stability.",
+    "replicate": 1
+   },
+   "rationale": "1 uM between strong 0.3 and 10 uM tests reproducibility and NSC stability.",
+   "evidence_id": "e7",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:42.530212Z",
+   "seconds": 0.019
+  },
+  {
+   "step": 8,
+   "tool": "acquire_well",
+   "args": {
+    "concentration_index": 3,
+    "rationale": "0.1 uM just below onset at 0.3 uM defines dose threshold for mitotic arrest.",
+    "replicate": 1
+   },
+   "rationale": "0.1 uM just below onset at 0.3 uM defines dose threshold for mitotic arrest.",
+   "evidence_id": "e8",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:42.622491Z",
+   "seconds": 0.077
+  },
+  {
+   "step": 9,
+   "tool": "compare_to_reference_atlas",
+   "args": {
+    "k": 10,
+    "rationale": "Refresh NSC vote over all four wells for final protocol call.",
+    "well_ids": [
+     "w_bdc02a8567",
+     "w_b617e84d8d",
+     "w_e741eff746",
+     "w_3bb1a5e523"
+    ]
+   },
+   "rationale": "Refresh NSC vote over all four wells for final protocol call.",
+   "evidence_id": "e9",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:47.124670Z",
+   "seconds": 0.006
+  },
+  {
+   "step": 10,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_mitotic_like",
+    "rationale": "Mitotic fraction dose trend distinguishes antimitotic classes."
+   },
+   "rationale": "Mitotic fraction dose trend distinguishes antimitotic classes.",
+   "evidence_id": "e10",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:47.152668Z",
+   "seconds": 0.01
+  },
+  {
+   "step": 11,
+   "tool": "dose_response",
+   "args": {
+    "feature": "tub_mean",
+    "rationale": "Tubulin intensity trend separates stabilizers from destabilizers."
+   },
+   "rationale": "Tubulin intensity trend separates stabilizers from destabilizers.",
+   "evidence_id": "e11",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:34:47.166237Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 12,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e5",
+       "e10"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.25,
+      "supporting_evidence_ids": [
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.45,
+      "supporting_evidence_ids": [
+       "e9",
+       "e5",
+       "e10",
+       "e11"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e11"
+      ],
+      "moa": "Microtubule destabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e9"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e11"
+      ]
+     }
+    ],
+    "rationale": "Four wells show dose mitotic arrest; atlas split with low similarity, microscopist antimitotic."
+   },
+   "rationale": "Four wells show dose mitotic arrest; atlas split with low similarity, microscopist antimitotic.",
+   "evidence_id": "e12",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:35:01.256339Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 13,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e9",
+     "e2",
+     "e7",
+     "e10",
+     "e5"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Stain for phospho-histone H3 plus pericentrin/alpha-tubulin to test monopolar vs bipolar arrest and actin phalloidin fiber integrity, comparing reference of leading class versus reference Eg5 and microtubule classes across 0.1-10 uM.",
+    "probability": 0.42,
+    "rationale": "NSC prior is leading class though split and low similarity; dose mitotic arrest retained.",
+    "top_moa": "Actin disruptors"
+   },
+   "rationale": "NSC prior is leading class though split and low similarity; dose mitotic arrest retained.",
+   "evidence_id": "e13",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:35:08.534082Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 14,
+   "tool": "describe_phenotype",
+   "args": {
+    "field_ids": [
+     "f_c57086ec2821",
+     "f_9f2d12986772"
+    ],
+    "rationale": "Requested dose 5 rep 1 already acquired as w_e741eff746; visual re-analysis since budget spent."
+   },
+   "rationale": "Requested dose 5 rep 1 already acquired as w_e741eff746; visual re-analysis since budget spent.",
+   "evidence_id": "e14",
+   "error": null,
+   "cost_usd": 0.021954500000000043,
+   "started_at": "2026-10-31T19:36:32.800427Z",
+   "seconds": 18.556
+  },
+  {
+   "step": 15,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_multinucleate_proxy",
+    "rationale": "Multinucleation trend helps separate actin/cytokinesis failure from pure mitotic arrest."
+   },
+   "rationale": "Multinucleation trend helps separate actin/cytokinesis failure from pure mitotic arrest.",
+   "evidence_id": "e15",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:32.839716Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 16,
+   "tool": "dose_response",
+   "args": {
+    "feature": "act_mean",
+    "rationale": "Actin intensity trend tests actin-loss expectation versus rounding-driven increase."
+   },
+   "rationale": "Actin intensity trend tests actin-loss expectation versus rounding-driven increase.",
+   "evidence_id": "e16",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:32.853610Z",
+   "seconds": 0.01
+  },
+  {
+   "step": 17,
+   "tool": "dose_response",
+   "args": {
+    "feature": "cell_area",
+    "rationale": "Cell shrinkage trend tests rounding arrest versus spreading phenotypes."
+   },
+   "rationale": "Cell shrinkage trend tests rounding arrest versus spreading phenotypes.",
+   "evidence_id": "e17",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:46.376545Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 18,
+   "tool": "dose_response",
+   "args": {
+    "feature": "frac_large_nucleus",
+    "rationale": "Large-nucleus trend separates endoreduplication from monopolar arrest."
+   },
+   "rationale": "Large-nucleus trend separates endoreduplication from monopolar arrest.",
+   "evidence_id": "e18",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:46.387328Z",
+   "seconds": 0.009
+  },
+  {
+   "step": 19,
+   "tool": "update_hypotheses",
+   "args": {
+    "hypotheses": [
+     {
+      "contradicting_evidence_ids": [
+       "e5",
+       "e14",
+       "e10",
+       "e16"
+      ],
+      "moa": "Actin disruptors",
+      "probability": 0.12,
+      "supporting_evidence_ids": [
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [],
+      "moa": "Eg5 inhibitors",
+      "probability": 0.52,
+      "supporting_evidence_ids": [
+       "e9",
+       "e5",
+       "e14",
+       "e10",
+       "e15"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e11",
+       "e14"
+      ],
+      "moa": "Microtubule destabilizers",
+      "probability": 0.1,
+      "supporting_evidence_ids": [
+       "e5",
+       "e9"
+      ]
+     },
+     {
+      "contradicting_evidence_ids": [
+       "e9"
+      ],
+      "moa": "Microtubule stabilizers",
+      "probability": 0.26,
+      "supporting_evidence_ids": [
+       "e5",
+       "e14",
+       "e11"
+      ]
+     }
+    ],
+    "rationale": "Requested dose 5 re-examined via free tools; budget spent so no new well; antimitotic signal consistent."
+   },
+   "rationale": "Requested dose 5 re-examined via free tools; budget spent so no new well; antimitotic signal consistent.",
+   "evidence_id": "e19",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:48.225475Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 20,
+   "tool": "submit_conclusion",
+   "args": {
+    "key_evidence_ids": [
+     "e9",
+     "e5",
+     "e14",
+     "e10",
+     "e11"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 plus pericentrin/tubulin spindle imaging across 0.1-10 uM to test monopolar versus bipolar arrest and actin fiber integrity versus reference Eg5 and stabilizer class controls.",
+    "probability": 0.52,
+    "rationale": "Requested dose 5 rep1 already acquired; budget spent, no new well. NSC split 2/4 low sim; microscopist plus dose arrest favor Eg5 but stabilizer monopolar distinction remains uncertain.",
+    "top_moa": "Eg5 inhibitors"
+   },
+   "rationale": "Requested dose 5 rep1 already acquired; budget spent, no new well. NSC split 2/4 low sim; microscopist plus dose arrest favor Eg5 but stabilizer monopolar distinction remains uncertain.",
+   "evidence_id": "e20",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:57.047609Z",
+   "seconds": 0.0
+  },
+  {
+   "step": 21,
+   "tool": "lookup_compound",
+   "args": {
+    "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+    "name": "cytochalasin D"
+   },
+   "rationale": "Protocol step after the review: identify the unblinded specimen in PubChem and ChEMBL.",
+   "evidence_id": "e21",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:57.067674Z",
+   "seconds": 0.003
+  },
+  {
+   "step": 22,
+   "tool": "search_literature",
+   "args": {
+    "max_results": 5,
+    "query": "cytochalasin D actin polymerization mechanism",
+    "rationale": "Need papers on true MoA of unblinded compound for reflection."
+   },
+   "rationale": "Need papers on true MoA of unblinded compound for reflection.",
+   "evidence_id": "e22",
+   "error": null,
+   "cost_usd": 0.0,
+   "started_at": "2026-10-31T19:36:59.130682Z",
+   "seconds": 0.002
+  }
+ ],
+ "hypotheses": [
+  {
+   "moa": "Eg5 inhibitors",
+   "probability": 0.52,
+   "supporting_evidence_ids": [
+    "e9",
+    "e5",
+    "e14",
+    "e10",
+    "e15"
+   ],
+   "contradicting_evidence_ids": []
+  },
+  {
+   "moa": "Microtubule stabilizers",
+   "probability": 0.26,
+   "supporting_evidence_ids": [
+    "e5",
+    "e14",
+    "e11"
+   ],
+   "contradicting_evidence_ids": [
+    "e9"
+   ]
+  },
+  {
+   "moa": "Actin disruptors",
+   "probability": 0.12,
+   "supporting_evidence_ids": [
+    "e9"
+   ],
+   "contradicting_evidence_ids": [
+    "e5",
+    "e14",
+    "e10",
+    "e16"
+   ]
+  },
+  {
+   "moa": "Microtubule destabilizers",
+   "probability": 0.1,
+   "supporting_evidence_ids": [
+    "e5",
+    "e9"
+   ],
+   "contradicting_evidence_ids": [
+    "e11",
+    "e14"
+   ]
+  }
+ ],
+ "hypothesis_history": [
+  {
+   "step": 6,
+   "hypotheses": [
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.35,
+     "supporting_evidence_ids": [
+      "e4",
+      "e2",
+      "e3"
+     ],
+     "contradicting_evidence_ids": [
+      "e5"
+     ]
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.3,
+     "supporting_evidence_ids": [
+      "e4",
+      "e5",
+      "e2"
+     ],
+     "contradicting_evidence_ids": [
+      "e4"
+     ]
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.2,
+     "supporting_evidence_ids": [
+      "e5",
+      "e2",
+      "e3"
+     ],
+     "contradicting_evidence_ids": [
+      "e4"
+     ]
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.15,
+     "supporting_evidence_ids": [
+      "e5",
+      "e2"
+     ],
+     "contradicting_evidence_ids": [
+      "e4"
+     ]
+    }
+   ]
+  },
+  {
+   "step": 12,
+   "hypotheses": [
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.45,
+     "supporting_evidence_ids": [
+      "e9",
+      "e5",
+      "e10",
+      "e11"
+     ],
+     "contradicting_evidence_ids": []
+    },
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.25,
+     "supporting_evidence_ids": [
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e5",
+      "e10"
+     ]
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.15,
+     "supporting_evidence_ids": [
+      "e5",
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e11"
+     ]
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.15,
+     "supporting_evidence_ids": [
+      "e5",
+      "e11"
+     ],
+     "contradicting_evidence_ids": [
+      "e9"
+     ]
+    }
+   ]
+  },
+  {
+   "step": 19,
+   "hypotheses": [
+    {
+     "moa": "Eg5 inhibitors",
+     "probability": 0.52,
+     "supporting_evidence_ids": [
+      "e9",
+      "e5",
+      "e14",
+      "e10",
+      "e15"
+     ],
+     "contradicting_evidence_ids": []
+    },
+    {
+     "moa": "Microtubule stabilizers",
+     "probability": 0.26,
+     "supporting_evidence_ids": [
+      "e5",
+      "e14",
+      "e11"
+     ],
+     "contradicting_evidence_ids": [
+      "e9"
+     ]
+    },
+    {
+     "moa": "Actin disruptors",
+     "probability": 0.12,
+     "supporting_evidence_ids": [
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e5",
+      "e14",
+      "e10",
+      "e16"
+     ]
+    },
+    {
+     "moa": "Microtubule destabilizers",
+     "probability": 0.1,
+     "supporting_evidence_ids": [
+      "e5",
+      "e9"
+     ],
+     "contradicting_evidence_ids": [
+      "e11",
+      "e14"
+     ]
+    }
+   ]
+  }
+ ],
+ "evidence": [
+  {
+   "evidence_id": "e1",
+   "kind": "experiments",
+   "tool": "list_available_experiments",
+   "summary": "8 doses (0.003-10 µM); 4 of 4 wells left",
+   "data": {
+    "specimen_id": "s_07f98c80cd",
+    "doses": [
+     {
+      "concentration_index": 0,
+      "concentration_uM": 0.003,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 1,
+      "concentration_uM": 0.01,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 2,
+      "concentration_uM": 0.03,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 3,
+      "concentration_uM": 0.1,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 4,
+      "concentration_uM": 0.3,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 5,
+      "concentration_uM": 1.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 6,
+      "concentration_uM": 3.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     },
+     {
+      "concentration_index": 7,
+      "concentration_uM": 10.0,
+      "replicates": 3,
+      "acquired_replicates": []
+     }
+    ],
+    "budget_total": 4,
+    "budget_used": 0,
+    "budget_left": 4,
+    "acquired_wells": []
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:34:02.705202Z"
+  },
+  {
+   "evidence_id": "e2",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_bdc02a8567 (dose 7, 10 µM, rep 1): 112 cells measured; tub_glcm_contrast z=+185.2, act_std z=+179.3, act_glcm_contrast z=+138.0",
+   "data": {
+    "well_id": "w_bdc02a8567",
+    "concentration_index": 7,
+    "concentration_uM": 10.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_885d2daccecf",
+     "f_739857e982c0"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 112,
+     "fields": [
+      {
+       "field_id": "f_885d2daccecf",
+       "nuclei": 74,
+       "touching_border": 7
+      },
+      {
+       "field_id": "f_739857e982c0",
+       "nuclei": 51,
+       "touching_border": 6
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": -13.07,
+     "nuc_dna_integrated": 2.33,
+     "nuc_dna_mean": 27.73,
+     "nuc_eccentricity": 2.64,
+     "nuc_solidity": -40.3,
+     "nuc_form_factor": -2.9,
+     "nuc_major_axis": -25.91,
+     "cell_area": -17.2,
+     "cell_nuc_area_ratio": -9.99,
+     "cell_roundness": 20.24,
+     "cell_eccentricity": -14.51,
+     "cell_solidity": 13.11,
+     "cell_major_axis": -20.82,
+     "tub_mean": 30.8,
+     "tub_std": 13.21,
+     "tub_glcm_contrast": 185.22,
+     "act_mean": 47.4,
+     "act_std": 179.31,
+     "act_glcm_contrast": 137.96,
+     "act_tub_ratio": -0.38,
+     "cell_count": -4.95,
+     "frac_mitotic_like": 91.6,
+     "frac_large_nucleus": -1.52,
+     "frac_multinucleate_proxy": 3.29
+    },
+    "top_deviations": [
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 185.219,
+      "direction": "up",
+      "value": 0.016,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_std",
+      "z": 179.311,
+      "direction": "up",
+      "value": 0.992,
+      "dmso_median": 0.082
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 137.956,
+      "direction": "up",
+      "value": 0.018,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "frac_mitotic_like",
+      "z": 91.601,
+      "direction": "up",
+      "value": 0.39,
+      "dmso_median": 0.015
+     },
+     {
+      "feature": "act_mean",
+      "z": 47.4,
+      "direction": "up",
+      "value": 1.076,
+      "dmso_median": 0.28
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -40.296,
+      "direction": "down",
+      "value": 0.962,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "tub_mean",
+      "z": 30.798,
+      "direction": "up",
+      "value": 0.996,
+      "dmso_median": 0.246
+     },
+     {
+      "feature": "nuc_dna_mean",
+      "z": 27.734,
+      "direction": "up",
+      "value": 0.834,
+      "dmso_median": 0.488
+     }
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b",
+     "f_0005420a690a"
+    ],
+    "budget_left": 3
+   },
+   "image_ids": [
+    "f_885d2daccecf.composite",
+    "f_739857e982c0.composite"
+   ],
+   "created_at": "2026-10-31T19:34:07.377339Z"
+  },
+  {
+   "evidence_id": "e3",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_b617e84d8d (dose 4, 0.3 µM, rep 1): 346 cells measured; act_std z=+66.9, act_glcm_contrast z=+50.3, tub_glcm_contrast z=+38.5",
+   "data": {
+    "well_id": "w_b617e84d8d",
+    "concentration_index": 4,
+    "concentration_uM": 0.3,
+    "replicate": 1,
+    "field_ids": [
+     "f_824d288ff7cb",
+     "f_00a6c56d9bdf",
+     "f_d1d777fc1172",
+     "f_c68de933f512"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 346,
+     "fields": [
+      {
+       "field_id": "f_824d288ff7cb",
+       "nuclei": 112,
+       "touching_border": 16
+      },
+      {
+       "field_id": "f_00a6c56d9bdf",
+       "nuclei": 95,
+       "touching_border": 12
+      },
+      {
+       "field_id": "f_d1d777fc1172",
+       "nuclei": 81,
+       "touching_border": 12
+      },
+      {
+       "field_id": "f_c68de933f512",
+       "nuclei": 106,
+       "touching_border": 8
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": -8.47,
+     "nuc_dna_integrated": 0.58,
+     "nuc_dna_mean": 10.88,
+     "nuc_eccentricity": -0.81,
+     "nuc_solidity": -34.15,
+     "nuc_form_factor": -4.57,
+     "nuc_major_axis": -17.32,
+     "cell_area": -12.98,
+     "cell_nuc_area_ratio": -7.66,
+     "cell_roundness": 14.41,
+     "cell_eccentricity": -17.0,
+     "cell_solidity": 9.33,
+     "cell_major_axis": -14.73,
+     "tub_mean": 18.42,
+     "tub_std": 8.54,
+     "tub_glcm_contrast": 38.55,
+     "act_mean": 34.6,
+     "act_std": 66.94,
+     "act_glcm_contrast": 50.3,
+     "act_tub_ratio": 2.27,
+     "cell_count": -3.47,
+     "frac_mitotic_like": 20.15,
+     "frac_large_nucleus": -0.72,
+     "frac_multinucleate_proxy": 7.05
+    },
+    "top_deviations": [
+     {
+      "feature": "act_std",
+      "z": 66.942,
+      "direction": "up",
+      "value": 0.422,
+      "dmso_median": 0.082
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 50.304,
+      "direction": "up",
+      "value": 0.008,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 38.546,
+      "direction": "up",
+      "value": 0.005,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_mean",
+      "z": 34.602,
+      "direction": "up",
+      "value": 0.861,
+      "dmso_median": 0.28
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -34.148,
+      "direction": "down",
+      "value": 0.964,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "frac_mitotic_like",
+      "z": 20.147,
+      "direction": "up",
+      "value": 0.098,
+      "dmso_median": 0.015
+     },
+     {
+      "feature": "tub_mean",
+      "z": 18.424,
+      "direction": "up",
+      "value": 0.695,
+      "dmso_median": 0.246
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": -17.317,
+      "direction": "down",
+      "value": 31.153,
+      "dmso_median": 36.818
+     }
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b",
+     "f_0005420a690a"
+    ],
+    "budget_left": 2
+   },
+   "image_ids": [
+    "f_824d288ff7cb.composite",
+    "f_00a6c56d9bdf.composite",
+    "f_d1d777fc1172.composite",
+    "f_c68de933f512.composite"
+   ],
+   "created_at": "2026-10-31T19:34:07.454517Z"
+  },
+  {
+   "evidence_id": "e4",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "NSC vote over 2 acquired well(s): Actin disruptors (2/2); k-neighbour classes: Eg5 inhibitors (5/10), Actin disruptors (3/10), Microtubule destabilizers (2/10)",
+   "data": {
+    "well_ids": [
+     "w_bdc02a8567",
+     "w_b617e84d8d"
+    ],
+    "k": 10,
+    "similarity": "cosine on ResNet50 + TVN image embeddings",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "nsc": {
+     "wells": 2,
+     "moa": "Actin disruptors",
+     "votes": 2,
+     "per_well": [
+      {
+       "well_id": "w_bdc02a8567",
+       "concentration_uM": 10.0,
+       "nearest_moa": "Actin disruptors",
+       "similarity": 0.594
+      },
+      {
+       "well_id": "w_b617e84d8d",
+       "concentration_uM": 0.3,
+       "nearest_moa": "Actin disruptors",
+       "similarity": 0.63
+      }
+     ],
+     "tally": [
+      {
+       "moa": "Actin disruptors",
+       "votes": 2,
+       "summed_similarity": 1.225
+      }
+     ],
+     "protocol": "1-NN per acquired well, majority vote (NSC, Ljosa et al. 2013)"
+    },
+    "neighbors": [
+     {
+      "compound": "cytochalasin B",
+      "concentration_uM": 30.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.617,
+      "image_id": "f_1538fc1b6382.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 1.0,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.602,
+      "image_id": "f_8d7d1e13d8d7.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.003,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.563,
+      "image_id": "f_5ada1c0c556d.composite"
+     },
+     {
+      "compound": "vincristine",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule destabilizers",
+      "similarity": 0.561,
+      "image_id": "f_0072fc6616f9.composite"
+     },
+     {
+      "compound": "latrunculin B",
+      "concentration_uM": 3.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.558,
+      "image_id": "f_3a20f6e4bc71.composite"
+     },
+     {
+      "compound": "cytochalasin B",
+      "concentration_uM": 10.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.558,
+      "image_id": "f_d624846c3132.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.001,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.526,
+      "image_id": "f_8c741cdee138.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.3,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.521,
+      "image_id": "f_d9cc770561aa.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.1,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.517,
+      "image_id": "f_695986d62434.composite"
+     },
+     {
+      "compound": "vincristine",
+      "concentration_uM": 0.03,
+      "moa": "Microtubule destabilizers",
+      "similarity": 0.515,
+      "image_id": "f_a1de3dcad3cd.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Eg5 inhibitors",
+      "neighbors": 5,
+      "mean_similarity": 0.546
+     },
+     {
+      "moa": "Actin disruptors",
+      "neighbors": 3,
+      "mean_similarity": 0.578
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "neighbors": 2,
+      "mean_similarity": 0.538
+     }
+    ]
+   },
+   "image_ids": [
+    "f_1538fc1b6382.composite",
+    "f_8d7d1e13d8d7.composite",
+    "f_5ada1c0c556d.composite",
+    "f_0072fc6616f9.composite",
+    "f_3a20f6e4bc71.composite",
+    "f_d624846c3132.composite",
+    "f_8c741cdee138.composite",
+    "f_d9cc770561aa.composite",
+    "f_695986d62434.composite",
+    "f_a1de3dcad3cd.composite"
+   ],
+   "created_at": "2026-10-31T19:34:11.381018Z"
+  },
+  {
+   "evidence_id": "e5",
+   "kind": "phenotype",
+   "tool": "describe_phenotype",
+   "summary": "Microscopist on 2 field(s): density lower vs DMSO; 5 observations; candidates: Microtubule stabilizers, Microtubule destabilizers, Eg5 inhibitors",
+   "data": {
+    "field_ids": [
+     "f_885d2daccecf",
+     "f_739857e982c0"
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b"
+    ],
+    "model": "muse-spark-1.3",
+    "images": "composite + channels",
+    "report": {
+     "candidate_mechanisms": [
+      {
+       "moa": "Microtubule stabilizers",
+       "why": "Rounded shrunken cells with condensed bright DNA, saturated tubulin masses and 39% mitotic-like fraction match antimitotic arrest; strongly increased tub_mean favors stabilization/bundling."
+      },
+      {
+       "moa": "Microtubule destabilizers",
+       "why": "Same rounded mitotic arrest with loss of spread microtubule network and condensed DNA can also occur with depolymerization; cannot exclude from low-resolution texture alone."
+      },
+      {
+       "moa": "Eg5 inhibitors",
+       "why": "Monopolar mitotic arrest also gives small rounded cells with condensed DNA and bright spindle tubulin; rosettes not resolved so remains alternative."
+      }
+     ],
+     "cell_density": "lower",
+     "notable_cells": [
+      {
+       "field_id": "f_885d2daccecf",
+       "why": "Rounded yellow doublet with condensed DNA and saturated tubulin+actin typical of mitotic-like arrest.",
+       "x": 370,
+       "y": 185
+      },
+      {
+       "field_id": "f_739857e982c0",
+       "why": "Clumped bright yellow cells with small condensed DNA illustrating mitotic-like mass.",
+       "x": 672,
+       "y": 275
+      }
+     ],
+     "observations": [
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "Nuclei smaller, brighter and more irregular/condensed vs DMSO uniform oval dim nuclei; agrees with increased nuc_dna_mean z=27.7 and decreased nuc_solidity z=-40.3."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "tubulin",
+       "finding": "Tubulin much brighter forming solid rounded masses instead of DMSO diffuse filamentous network, with high texture; agrees with increased tub_mean z=30.8 and tub_glcm_contrast z=185.2."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "actin",
+       "finding": "Actin much brighter forming solid rounded masses instead of DMSO spread cortical/fiber staining, highly variable; agrees with increased act_mean z=47.4, act_std z=179.3 and act_glcm_contrast z=138.0."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "composite",
+       "finding": "High proportion of small rounded yellow cells from colocalized bright tubulin+actin around condensed DNA vs rare in DMSO; agrees with frac_mitotic_like 0.39 vs 0.015 z=91.6."
+      },
+      {
+       "agrees_with_measurements": false,
+       "channel": "tubulin",
+       "finding": "Thin green tubulin-positive projections/bridges between some rounded cells persist; no provided feature measures this, so not covered by measurements."
+      }
+     ],
+     "uncertainty": "Light microscopy alone cannot definitively separate microtubule stabilizer vs destabilizer vs Eg5 monopolar arrest; all give rounded condensed mitotic phenotype."
+    }
+   },
+   "image_ids": [
+    "f_885d2daccecf.composite",
+    "f_739857e982c0.composite",
+    "f_e0d2afc3b07b.composite"
+   ],
+   "created_at": "2026-10-31T19:34:31.057019Z"
+  },
+  {
+   "evidence_id": "e6",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Actin disruptors 0.35, Eg5 inhibitors 0.30, Microtubule destabilizers 0.20, Microtubule stabilizers 0.15",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Actin disruptors",
+      "probability": 0.35,
+      "supporting_evidence_ids": [
+       "e4",
+       "e2",
+       "e3"
+      ],
+      "contradicting_evidence_ids": [
+       "e5"
+      ]
+     },
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.3,
+      "supporting_evidence_ids": [
+       "e4",
+       "e5",
+       "e2"
+      ],
+      "contradicting_evidence_ids": [
+       "e4"
+      ]
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.2,
+      "supporting_evidence_ids": [
+       "e5",
+       "e2",
+       "e3"
+      ],
+      "contradicting_evidence_ids": [
+       "e4"
+      ]
+     },
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e2"
+      ],
+      "contradicting_evidence_ids": [
+       "e4"
+      ]
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:34:42.504260Z"
+  },
+  {
+   "evidence_id": "e7",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_e741eff746 (dose 5, 1 µM, rep 1): 201 cells measured; act_std z=+139.0, tub_glcm_contrast z=+138.7, act_glcm_contrast z=+104.4",
+   "data": {
+    "well_id": "w_e741eff746",
+    "concentration_index": 5,
+    "concentration_uM": 1.0,
+    "replicate": 1,
+    "field_ids": [
+     "f_c57086ec2821",
+     "f_9f2d12986772"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 201,
+     "fields": [
+      {
+       "field_id": "f_c57086ec2821",
+       "nuclei": 111,
+       "touching_border": 6
+      },
+      {
+       "field_id": "f_9f2d12986772",
+       "nuclei": 103,
+       "touching_border": 7
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": -17.03,
+     "nuc_dna_integrated": -3.68,
+     "nuc_dna_mean": 14.75,
+     "nuc_eccentricity": 0.49,
+     "nuc_solidity": -43.72,
+     "nuc_form_factor": -2.42,
+     "nuc_major_axis": -30.14,
+     "cell_area": -16.8,
+     "cell_nuc_area_ratio": -9.19,
+     "cell_roundness": 16.09,
+     "cell_eccentricity": -14.12,
+     "cell_solidity": 11.98,
+     "cell_major_axis": -19.2,
+     "tub_mean": 28.11,
+     "tub_std": 11.53,
+     "tub_glcm_contrast": 138.66,
+     "act_mean": 59.71,
+     "act_std": 138.96,
+     "act_glcm_contrast": 104.35,
+     "act_tub_ratio": 4.16,
+     "cell_count": -3.13,
+     "frac_mitotic_like": 46.17,
+     "frac_large_nucleus": -0.28,
+     "frac_multinucleate_proxy": 5.27
+    },
+    "top_deviations": [
+     {
+      "feature": "act_std",
+      "z": 138.964,
+      "direction": "up",
+      "value": 0.788,
+      "dmso_median": 0.082
+     },
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 138.662,
+      "direction": "up",
+      "value": 0.012,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 104.351,
+      "direction": "up",
+      "value": 0.014,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_mean",
+      "z": 59.709,
+      "direction": "up",
+      "value": 1.283,
+      "dmso_median": 0.28
+     },
+     {
+      "feature": "frac_mitotic_like",
+      "z": 46.172,
+      "direction": "up",
+      "value": 0.204,
+      "dmso_median": 0.015
+     },
+     {
+      "feature": "nuc_solidity",
+      "z": -43.722,
+      "direction": "down",
+      "value": 0.962,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "nuc_major_axis",
+      "z": -30.139,
+      "direction": "down",
+      "value": 26.958,
+      "dmso_median": 36.818
+     },
+     {
+      "feature": "tub_mean",
+      "z": 28.108,
+      "direction": "up",
+      "value": 0.931,
+      "dmso_median": 0.246
+     }
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b",
+     "f_0005420a690a"
+    ],
+    "budget_left": 1
+   },
+   "image_ids": [
+    "f_c57086ec2821.composite",
+    "f_9f2d12986772.composite"
+   ],
+   "created_at": "2026-10-31T19:34:42.530212Z"
+  },
+  {
+   "evidence_id": "e8",
+   "kind": "well",
+   "tool": "acquire_well",
+   "summary": "Well w_3bb1a5e523 (dose 3, 0.1 µM, rep 1): 190 cells measured; nuc_solidity z=-78.3, act_glcm_contrast z=+30.2, act_std z=+25.9",
+   "data": {
+    "well_id": "w_3bb1a5e523",
+    "concentration_index": 3,
+    "concentration_uM": 0.1,
+    "replicate": 1,
+    "field_ids": [
+     "f_e7a99671e482",
+     "f_708ef4214f67"
+    ],
+    "segmentation": {
+     "nuclei_method": "classical",
+     "cells_method": "classical",
+     "cells_measured": 190,
+     "fields": [
+      {
+       "field_id": "f_e7a99671e482",
+       "nuclei": 104,
+       "touching_border": 13
+      },
+      {
+       "field_id": "f_708ef4214f67",
+       "nuclei": 117,
+       "touching_border": 18
+      }
+     ]
+    },
+    "profile_z": {
+     "nuc_area": -5.27,
+     "nuc_dna_integrated": 2.75,
+     "nuc_dna_mean": 14.29,
+     "nuc_eccentricity": 3.24,
+     "nuc_solidity": -78.27,
+     "nuc_form_factor": -16.91,
+     "nuc_major_axis": -8.0,
+     "cell_area": -10.57,
+     "cell_nuc_area_ratio": -7.79,
+     "cell_roundness": 5.15,
+     "cell_eccentricity": -4.55,
+     "cell_solidity": 4.99,
+     "cell_major_axis": -9.85,
+     "tub_mean": 7.82,
+     "tub_std": 3.7,
+     "tub_glcm_contrast": 16.41,
+     "act_mean": 12.94,
+     "act_std": 25.91,
+     "act_glcm_contrast": 30.25,
+     "act_tub_ratio": 0.88,
+     "cell_count": -2.98,
+     "frac_mitotic_like": 15.74,
+     "frac_large_nucleus": 10.93,
+     "frac_multinucleate_proxy": 9.86
+    },
+    "top_deviations": [
+     {
+      "feature": "nuc_solidity",
+      "z": -78.269,
+      "direction": "down",
+      "value": 0.953,
+      "dmso_median": 0.973
+     },
+     {
+      "feature": "act_glcm_contrast",
+      "z": 30.246,
+      "direction": "up",
+      "value": 0.005,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "act_std",
+      "z": 25.912,
+      "direction": "up",
+      "value": 0.213,
+      "dmso_median": 0.082
+     },
+     {
+      "feature": "nuc_form_factor",
+      "z": -16.911,
+      "direction": "down",
+      "value": 0.837,
+      "dmso_median": 0.913
+     },
+     {
+      "feature": "tub_glcm_contrast",
+      "z": 16.414,
+      "direction": "up",
+      "value": 0.003,
+      "dmso_median": 0.002
+     },
+     {
+      "feature": "frac_mitotic_like",
+      "z": 15.739,
+      "direction": "up",
+      "value": 0.08,
+      "dmso_median": 0.015
+     },
+     {
+      "feature": "nuc_dna_mean",
+      "z": 14.29,
+      "direction": "up",
+      "value": 0.666,
+      "dmso_median": 0.488
+     },
+     {
+      "feature": "act_mean",
+      "z": 12.942,
+      "direction": "up",
+      "value": 0.498,
+      "dmso_median": 0.28
+     }
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b",
+     "f_0005420a690a"
+    ],
+    "budget_left": 0
+   },
+   "image_ids": [
+    "f_e7a99671e482.composite",
+    "f_708ef4214f67.composite"
+   ],
+   "created_at": "2026-10-31T19:34:42.622491Z"
+  },
+  {
+   "evidence_id": "e9",
+   "kind": "atlas",
+   "tool": "compare_to_reference_atlas",
+   "summary": "NSC vote over 4 acquired well(s): Actin disruptors (2/4); k-neighbour classes: Eg5 inhibitors (5/10), Actin disruptors (3/10), Microtubule destabilizers (2/10)",
+   "data": {
+    "well_ids": [
+     "w_bdc02a8567",
+     "w_b617e84d8d",
+     "w_e741eff746",
+     "w_3bb1a5e523"
+    ],
+    "k": 10,
+    "similarity": "cosine on ResNet50 + TVN image embeddings",
+    "excluded": "the specimen's own compound (leave-one-compound-out)",
+    "nsc": {
+     "wells": 4,
+     "moa": "Actin disruptors",
+     "votes": 2,
+     "per_well": [
+      {
+       "well_id": "w_bdc02a8567",
+       "concentration_uM": 10.0,
+       "nearest_moa": "Actin disruptors",
+       "similarity": 0.594
+      },
+      {
+       "well_id": "w_b617e84d8d",
+       "concentration_uM": 0.3,
+       "nearest_moa": "Actin disruptors",
+       "similarity": 0.63
+      },
+      {
+       "well_id": "w_e741eff746",
+       "concentration_uM": 1.0,
+       "nearest_moa": "Eg5 inhibitors",
+       "similarity": 0.599
+      },
+      {
+       "well_id": "w_3bb1a5e523",
+       "concentration_uM": 0.1,
+       "nearest_moa": "Protein synthesis",
+       "similarity": 0.599
+      }
+     ],
+     "tally": [
+      {
+       "moa": "Actin disruptors",
+       "votes": 2,
+       "summed_similarity": 1.225
+      },
+      {
+       "moa": "Eg5 inhibitors",
+       "votes": 1,
+       "summed_similarity": 0.599
+      },
+      {
+       "moa": "Protein synthesis",
+       "votes": 1,
+       "summed_similarity": 0.599
+      }
+     ],
+     "protocol": "1-NN per acquired well, majority vote (NSC, Ljosa et al. 2013)"
+    },
+    "neighbors": [
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 1.0,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.604,
+      "image_id": "f_8d7d1e13d8d7.composite"
+     },
+     {
+      "compound": "cytochalasin B",
+      "concentration_uM": 30.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.592,
+      "image_id": "f_1538fc1b6382.composite"
+     },
+     {
+      "compound": "latrunculin B",
+      "concentration_uM": 3.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.588,
+      "image_id": "f_3a20f6e4bc71.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.003,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.586,
+      "image_id": "f_5ada1c0c556d.composite"
+     },
+     {
+      "compound": "vincristine",
+      "concentration_uM": 0.3,
+      "moa": "Microtubule destabilizers",
+      "similarity": 0.583,
+      "image_id": "f_0072fc6616f9.composite"
+     },
+     {
+      "compound": "cytochalasin B",
+      "concentration_uM": 10.0,
+      "moa": "Actin disruptors",
+      "similarity": 0.577,
+      "image_id": "f_d624846c3132.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.001,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.553,
+      "image_id": "f_8c741cdee138.composite"
+     },
+     {
+      "compound": "vincristine",
+      "concentration_uM": 0.03,
+      "moa": "Microtubule destabilizers",
+      "similarity": 0.543,
+      "image_id": "f_a1de3dcad3cd.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.3,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.539,
+      "image_id": "f_d9cc770561aa.composite"
+     },
+     {
+      "compound": "AZ-C",
+      "concentration_uM": 0.01,
+      "moa": "Eg5 inhibitors",
+      "similarity": 0.538,
+      "image_id": "f_97f6fbef49d7.composite"
+     }
+    ],
+    "moa_summary": [
+     {
+      "moa": "Eg5 inhibitors",
+      "neighbors": 5,
+      "mean_similarity": 0.564
+     },
+     {
+      "moa": "Actin disruptors",
+      "neighbors": 3,
+      "mean_similarity": 0.585
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "neighbors": 2,
+      "mean_similarity": 0.563
+     }
+    ]
+   },
+   "image_ids": [
+    "f_8d7d1e13d8d7.composite",
+    "f_1538fc1b6382.composite",
+    "f_3a20f6e4bc71.composite",
+    "f_5ada1c0c556d.composite",
+    "f_0072fc6616f9.composite",
+    "f_d624846c3132.composite",
+    "f_8c741cdee138.composite",
+    "f_a1de3dcad3cd.composite",
+    "f_d9cc770561aa.composite",
+    "f_97f6fbef49d7.composite"
+   ],
+   "created_at": "2026-10-31T19:34:47.124670Z"
+  },
+  {
+   "evidence_id": "e10",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_mitotic_like over 4 wells, 4 doses: Spearman rho=+1.00 (p=0)",
+   "data": {
+    "feature": "frac_mitotic_like",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 15.7385,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": 20.147,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 46.1719,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 91.6012,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 1.0,
+    "p_value": 0.0,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:34:47.152668Z"
+  },
+  {
+   "evidence_id": "e11",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of tub_mean over 4 wells, 4 doses: Spearman rho=+1.00 (p=0)",
+   "data": {
+    "feature": "tub_mean",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 7.818,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": 18.4241,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 28.108,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 30.7981,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 1.0,
+    "p_value": 0.0,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:34:47.166237Z"
+  },
+  {
+   "evidence_id": "e12",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Eg5 inhibitors 0.45, Actin disruptors 0.25, Microtubule destabilizers 0.15, Microtubule stabilizers 0.15",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.45,
+      "supporting_evidence_ids": [
+       "e9",
+       "e5",
+       "e10",
+       "e11"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "Actin disruptors",
+      "probability": 0.25,
+      "supporting_evidence_ids": [
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e5",
+       "e10"
+      ]
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e11"
+      ]
+     },
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.15,
+      "supporting_evidence_ids": [
+       "e5",
+       "e11"
+      ],
+      "contradicting_evidence_ids": [
+       "e9"
+      ]
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:35:01.256339Z"
+  },
+  {
+   "evidence_id": "e13",
+   "kind": "conclusion",
+   "tool": "submit_conclusion",
+   "summary": "Conclusion: Actin disruptors (p=0.42)",
+   "data": {
+    "top_moa": "Actin disruptors",
+    "probability": 0.42,
+    "key_evidence_ids": [
+     "e9",
+     "e2",
+     "e7",
+     "e10",
+     "e5"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Stain for phospho-histone H3 plus pericentrin/alpha-tubulin to test monopolar vs bipolar arrest and actin phalloidin fiber integrity, comparing reference of leading class versus reference Eg5 and microtubule classes across 0.1-10 uM.",
+    "rationale": "NSC prior is leading class though split and low similarity; dose mitotic arrest retained."
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:35:08.534082Z"
+  },
+  {
+   "evidence_id": "e14",
+   "kind": "phenotype",
+   "tool": "describe_phenotype",
+   "summary": "Microscopist on 2 field(s): density lower vs DMSO; 8 observations; candidates: Microtubule stabilizers, Eg5 inhibitors",
+   "data": {
+    "field_ids": [
+     "f_c57086ec2821",
+     "f_9f2d12986772"
+    ],
+    "dmso_field_ids": [
+     "f_e0d2afc3b07b"
+    ],
+    "model": "muse-spark-1.3",
+    "images": "composite + channels",
+    "report": {
+     "candidate_mechanisms": [
+      {
+       "moa": "Microtubule stabilizers",
+       "why": "Rounded-up cells, loss of spread interphase microtubule network, small condensed nuclei, 20% mitotic-like vs 1.5% DMSO with increased tub_mean, consistent with mitotic arrest by stabilized microtubules."
+      },
+      {
+       "moa": "Eg5 inhibitors",
+       "why": "Monopolar/mitotic arrest also produces rounded cells with condensed nuclei and high mitotic fraction; cannot exclude from morphology alone."
+      }
+     ],
+     "cell_density": "lower",
+     "notable_cells": [
+      {
+       "field_id": "f_c57086ec2821",
+       "why": "Large bright rounded cell with intense diffuse tubulin/actin and condensed DNA, example of mitotic-like rounding.",
+       "x": 258,
+       "y": 472
+      },
+      {
+       "field_id": "f_9f2d12986772",
+       "why": "Rounded cell with elongated actin-rich tail, example of loss of normal spreading with retained bright cytoskeleton.",
+       "x": 295,
+       "y": 760
+      }
+     ],
+     "observations": [
+      {
+       "agrees_with_measurements": false,
+       "channel": "composite",
+       "finding": "Treated fields have many fewer cells than dense spread DMSO monolayer; treated cells are small rounded intensely yellow (green+red overlap) vs flat epithelial DMSO. No cell-count z provided."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "Nuclei smaller than DMSO ovals, agrees with nuc_major_axis decrease to 26.9 vs 36.8 dmso median z=-30.1."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "More small bright condensed/paired mitotic-like nuclei than DMSO, agrees with frac_mitotic_like 0.204 vs 0.015 z=46.2."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "dna",
+       "finding": "Nuclei appear clumped/irregular vs smooth DMSO ovals, agrees with nuc_solidity decrease z=-43.7."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "tubulin",
+       "finding": "Tubulin much brighter diffuse solid with no filamentous interphase network vs DMSO, agrees with tub_mean increase z=28.1."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "tubulin",
+       "finding": "Tubulin texture blotchy high-contrast vs smooth DMSO, agrees with tub_glcm_contrast increase z=138.7."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "actin",
+       "finding": "Actin much brighter solid in rounded cells vs DMSO stress-fiber/cortical pattern, agrees with act_mean increase z=59.7."
+      },
+      {
+       "agrees_with_measurements": true,
+       "channel": "actin",
+       "finding": "Actin highly variable/clumped high-contrast vs DMSO, agrees with act_std increase z=139.0 and act_glcm_contrast increase z=104.4."
+      }
+     ],
+     "uncertainty": "Single 24h timepoint; bright actin/tubulin partly reflects volume concentration in rounded cells, so cannot separate direct cytoskeletal stabilization from secondary mitotic rounding. Stabilizer vs Eg5/Aurora mitotic arresters overlap morphologically."
+    }
+   },
+   "image_ids": [
+    "f_c57086ec2821.composite",
+    "f_9f2d12986772.composite",
+    "f_e0d2afc3b07b.composite"
+   ],
+   "created_at": "2026-10-31T19:36:32.798416Z"
+  },
+  {
+   "evidence_id": "e15",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_multinucleate_proxy over 4 wells, 4 doses: Spearman rho=-1.00 (p=0)",
+   "data": {
+    "feature": "frac_multinucleate_proxy",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 9.8578,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": 7.0499,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 5.2705,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 3.2949,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -1.0,
+    "p_value": 0.0,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:32.839716Z"
+  },
+  {
+   "evidence_id": "e16",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of act_mean over 4 wells, 4 doses: Spearman rho=+0.80 (p=0.2)",
+   "data": {
+    "feature": "act_mean",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 12.9425,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": 34.6023,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": 59.7088,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": 47.3999,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": 0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:32.853610Z"
+  },
+  {
+   "evidence_id": "e17",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of cell_area over 4 wells, 4 doses: Spearman rho=-1.00 (p=0)",
+   "data": {
+    "feature": "cell_area",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": -10.5665,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": -12.978,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -16.7981,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": -17.201,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -1.0,
+    "p_value": 0.0,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:46.376545Z"
+  },
+  {
+   "evidence_id": "e18",
+   "kind": "dose_response",
+   "tool": "dose_response",
+   "summary": "Dose response of frac_large_nucleus over 4 wells, 4 doses: Spearman rho=-0.80 (p=0.2)",
+   "data": {
+    "feature": "frac_large_nucleus",
+    "points": [
+     {
+      "concentration_uM": 0.1,
+      "median": 10.9335,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 0.3,
+      "median": -0.7165,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 1.0,
+      "median": -0.2811,
+      "n_wells": 1
+     },
+     {
+      "concentration_uM": 10.0,
+      "median": -1.5192,
+      "n_wells": 1
+     }
+    ],
+    "spearman_rho": -0.8,
+    "p_value": 0.2,
+    "n_wells": 4,
+    "note": null
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:46.387328Z"
+  },
+  {
+   "evidence_id": "e19",
+   "kind": "hypotheses",
+   "tool": "update_hypotheses",
+   "summary": "Hypotheses: Eg5 inhibitors 0.52, Microtubule stabilizers 0.26, Actin disruptors 0.12, Microtubule destabilizers 0.10",
+   "data": {
+    "hypotheses": [
+     {
+      "moa": "Eg5 inhibitors",
+      "probability": 0.52,
+      "supporting_evidence_ids": [
+       "e9",
+       "e5",
+       "e14",
+       "e10",
+       "e15"
+      ],
+      "contradicting_evidence_ids": []
+     },
+     {
+      "moa": "Microtubule stabilizers",
+      "probability": 0.26,
+      "supporting_evidence_ids": [
+       "e5",
+       "e14",
+       "e11"
+      ],
+      "contradicting_evidence_ids": [
+       "e9"
+      ]
+     },
+     {
+      "moa": "Actin disruptors",
+      "probability": 0.12,
+      "supporting_evidence_ids": [
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e5",
+       "e14",
+       "e10",
+       "e16"
+      ]
+     },
+     {
+      "moa": "Microtubule destabilizers",
+      "probability": 0.1,
+      "supporting_evidence_ids": [
+       "e5",
+       "e9"
+      ],
+      "contradicting_evidence_ids": [
+       "e11",
+       "e14"
+      ]
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:48.225475Z"
+  },
+  {
+   "evidence_id": "e20",
+   "kind": "conclusion",
+   "tool": "submit_conclusion",
+   "summary": "Conclusion: Eg5 inhibitors (p=0.52)",
+   "data": {
+    "top_moa": "Eg5 inhibitors",
+    "probability": 0.52,
+    "key_evidence_ids": [
+     "e9",
+     "e5",
+     "e14",
+     "e10",
+     "e11"
+    ],
+    "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 plus pericentrin/tubulin spindle imaging across 0.1-10 uM to test monopolar versus bipolar arrest and actin fiber integrity versus reference Eg5 and stabilizer class controls.",
+    "rationale": "Requested dose 5 rep1 already acquired; budget spent, no new well. NSC split 2/4 low sim; microscopist plus dose arrest favor Eg5 but stabilizer monopolar distinction remains uncertain."
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:57.047609Z"
+  },
+  {
+   "evidence_id": "e21",
+   "kind": "compound",
+   "tool": "lookup_compound",
+   "summary": "cytochalasin D: PubChem CID 5458428; ChEMBL CHEMBL260287; mechanisms: none curated (name only (the BBBC021 structure is not in PubChem))",
+   "data": {
+    "name": "cytochalasin D",
+    "identity_check": "name only (the BBBC021 structure is not in PubChem)",
+    "pubchem": {
+     "cid": 5458428,
+     "title": "Cytochalasin D",
+     "iupac_name": "[(1R,2R,3E,5R,7S,9E,11R,12S,14S,15R,16S)-16-benzyl-5,12-dihydroxy-5,7,14-trimethyl-13-methylidene-6,18-dioxo-17-azatricyclo[9.7.0.01,15]octadeca-3,9-dien-2-yl] acetate",
+     "smiles": "C[C@H]1C/C=C/[C@H]2[C@@H](C(=C)[C@H]([C@@H]3[C@@]2([C@@H](/C=C/[C@@](C1=O)(C)O)OC(=O)C)C(=O)N[C@H]3CC4=CC=CC=C4)C)O",
+     "inchikey": "SDZRWUKZFQQKKV-JHADDHBZSA-N",
+     "molecular_formula": "C30H37NO6",
+     "molecular_weight": 507.6,
+     "structure_png_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5458428/PNG",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5458428",
+     "synonyms": [
+      "cytochalasin D",
+      "22144-77-0",
+      "Cytohalasin D",
+      "Lygosporin A",
+      "SY9F0FZ3TO",
+      "(-)-CYTOCHALASIN D",
+      "(11)Cytochalasa-6(12),13,19-triene-1,17-dione, 21-(acetyloxy)-7,18-dihydroxy-16,18-dimethyl-10-phenyl-, (7S,13E,16S,18R,19E,21R)-",
+      "NSC-209835",
+      "1H-Cycloundec(d)isoindole-1,11(2H)-dione, 15-(acetyloxy)-3,3a,4,5,6,6a,9,10,12,15-decahydro-6,12-dihydroxy-4,10,12-trimethyl-5-methylene-3-(phenylmethyl)-, (3S,3aR,4S,6S,6aR,7E,10S,12R,13E,15R,15aR)-",
+      "1H-Cycloundec(d)isoindole-1,11(2H)-dione, 3-benzyl-3,3-alpha4,5,6,6-alpha,9,10,12,15-decahydro-6,12,15-trihydroxy-4,10,12-trimethyl-5-methylene-, 15-acetate"
+     ]
+    },
+    "chembl": {
+     "molecule_chembl_id": "CHEMBL260287",
+     "pref_name": "CYTOCHALASIN D",
+     "matched_by": "pref_name",
+     "max_phase": null,
+     "mechanisms": [],
+     "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL260287"
+    }
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:57.067674Z"
+  },
+  {
+   "evidence_id": "e22",
+   "kind": "literature",
+   "tool": "search_literature",
+   "summary": "PubMed 'cytochalasin D actin polymerization mechanism': 724 hits, 5 returned",
+   "data": {
+    "query": "cytochalasin D actin polymerization mechanism",
+    "total_count": 724,
+    "articles": [
+     {
+      "pmid": "3023337",
+      "title": "Actin polymerization. The mechanism of action of cytochalasin D.",
+      "journal": "J Biol Chem",
+      "year": 1986,
+      "authors": [
+       "Goddette DW",
+       "Frieden C"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/3023337/"
+     },
+     {
+      "pmid": "40658853",
+      "title": "Microscopic and structural observations of actin filament capping and severing by cytochalasin D.",
+      "journal": "Proc Natl Acad Sci U S A",
+      "year": 2025,
+      "authors": [
+       "Mitani T",
+       "Takeda S",
+       "Oda T",
+       "Narita A",
+       "Maéda Y",
+       "Honda H"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40658853/"
+     },
+     {
+      "pmid": "14623892",
+      "title": "Mechanism of actin polymerization in cellular ATP depletion.",
+      "journal": "J Biol Chem",
+      "year": 2004,
+      "authors": [
+       "Atkinson SJ",
+       "Hosford MA",
+       "Molitoris BA"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/14623892/"
+     },
+     {
+      "pmid": "22728040",
+      "title": "Cytochalasin D acts as an inhibitor of the actin-cofilin interaction.",
+      "journal": "Biochem Biophys Res Commun",
+      "year": 2012,
+      "authors": [
+       "Shoji K",
+       "Ohashi K",
+       "Sampei K",
+       "Oikawa M",
+       "Mizuno K"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22728040/"
+     },
+     {
+      "pmid": "3782101",
+      "title": "The kinetics of cytochalasin D binding to monomeric actin.",
+      "journal": "J Biol Chem",
+      "year": 1986,
+      "authors": [
+       "Goddette DW",
+       "Frieden C"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/3782101/"
+     }
+    ]
+   },
+   "image_ids": [],
+   "created_at": "2026-10-31T19:36:59.130682Z"
+  }
+ ],
+ "allowed_pmids": [
+  "3023337",
+  "40658853",
+  "14623892",
+  "22728040",
+  "3782101"
+ ],
+ "conclusion": {
+  "top_moa": "Eg5 inhibitors",
+  "probability": 0.52,
+  "key_evidence_ids": [
+   "e9",
+   "e5",
+   "e14",
+   "e10",
+   "e11"
+  ],
+  "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 plus pericentrin/tubulin spindle imaging across 0.1-10 uM to test monopolar versus bipolar arrest and actin fiber integrity versus reference Eg5 and stabilizer class controls.",
+  "rationale": "Requested dose 5 rep1 already acquired; budget spent, no new well. NSC split 2/4 low sim; microscopist plus dose arrest favor Eg5 but stabilizer monopolar distinction remains uncertain."
+ },
+ "conclusion_history": [
+  {
+   "top_moa": "Actin disruptors",
+   "probability": 0.42,
+   "key_evidence_ids": [
+    "e9",
+    "e2",
+    "e7",
+    "e10",
+    "e5"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Stain for phospho-histone H3 plus pericentrin/alpha-tubulin to test monopolar vs bipolar arrest and actin phalloidin fiber integrity, comparing reference of leading class versus reference Eg5 and microtubule classes across 0.1-10 uM.",
+   "rationale": "NSC prior is leading class though split and low similarity; dose mitotic arrest retained."
+  },
+  {
+   "top_moa": "Eg5 inhibitors",
+   "probability": 0.52,
+   "key_evidence_ids": [
+    "e9",
+    "e5",
+    "e14",
+    "e10",
+    "e11"
+   ],
+   "next_experiment_if_this_were_a_real_lab": "Phospho-histone H3 plus pericentrin/tubulin spindle imaging across 0.1-10 uM to test monopolar versus bipolar arrest and actin fiber integrity versus reference Eg5 and stabilizer class controls.",
+   "rationale": "Requested dose 5 rep1 already acquired; budget spent, no new well. NSC split 2/4 low sim; microscopist plus dose arrest favor Eg5 but stabilizer monopolar distinction remains uncertain."
+  }
+ ],
+ "review": {
+  "verdict": "request_experiment",
+  "critique": "Clean profile schema: short labels, class means, and percentages. Eg5 fragments 12/20 = 60% and stabilizers 5/21 = 24% shown. Directly enables the stabilizer exclusion argument.",
+  "requested_experiment": "ACQUIRE dose index 5 rep 1 (no more wells needed after)"
+ },
+ "unblinding": {
+  "compound": "cytochalasin D",
+  "pubchem_cid": 5458428,
+  "structure_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5458428/PNG",
+  "chembl_mechanisms": [],
+  "identity_check": "name only (the BBBC021 structure is not in PubChem)"
+ },
+ "verdict": {
+  "correct": true,
+  "truth_moa": "Actin disruptors",
+  "agent_moa": "Actin disruptors",
+  "call_source": "protocol",
+  "scientist_moa": "Eg5 inhibitors",
+  "scientist_correct": false,
+  "protocol": {
+   "wells": 4,
+   "moa": "Actin disruptors",
+   "votes": 2,
+   "per_well": [
+    {
+     "well_id": "w_bdc02a8567",
+     "concentration_uM": 10.0,
+     "nearest_moa": "Actin disruptors",
+     "similarity": 0.594
+    },
+    {
+     "well_id": "w_b617e84d8d",
+     "concentration_uM": 0.3,
+     "nearest_moa": "Actin disruptors",
+     "similarity": 0.63
+    },
+    {
+     "well_id": "w_e741eff746",
+     "concentration_uM": 1.0,
+     "nearest_moa": "Eg5 inhibitors",
+     "similarity": 0.599
+    },
+    {
+     "well_id": "w_3bb1a5e523",
+     "concentration_uM": 0.1,
+     "nearest_moa": "Protein synthesis",
+     "similarity": 0.599
+    }
+   ],
+   "tally": [
+    {
+     "moa": "Actin disruptors",
+     "votes": 2,
+     "summed_similarity": 1.225
+    },
+    {
+     "moa": "Eg5 inhibitors",
+     "votes": 1,
+     "summed_similarity": 0.599
+    },
+    {
+     "moa": "Protein synthesis",
+     "votes": 1,
+     "summed_similarity": 0.599
+    }
+   ],
+   "protocol": "1-NN per acquired well, majority vote (NSC, Ljosa et al. 2013)"
+  }
+ },
+ "reflection": {
+  "text": "Early evidence was right: 10 uM well w_bdc02a8567 with act_std z=+179.3 and act_glcm_contrast z=+138.0 and 0.3 uM well with act_std z=+66.9 gave NSC 2/2 Actin disruptors, and protocol majority 2/4 remained Actin disruptors. That direct actin texture mass reflects the true cytochalasin D mechanism of capping filaments to block polymerization (PMID 3023337) and capping/severing observed structurally (PMID 40658853).\n\nI overturned that correct lead because two describe_phenotype calls listed only Microtubule stabilizers/destabilizers/Eg5 inhibitors and never actin, k-neighbours were 5/10 Eg5 inhibitors, and dose_response showed frac_mitotic_like rho=+1.00, tub_mean rho=+1.00 and cell_area rho=-1.00. I misread rounding/shrinkage and high tub_glcm_contrast z=+185.2 as monopolar mitotic arrest rather than contracted actin-collapsed cells scoring mitotic-like, and misread act_mean rho=+0.80 and falling multinucleate proxy as against cytokinesis failure.\n\nAcquisition choice cemented the error: with only 4 wells spent on 10, 0.3, 1 and 0.1 uM, the 1 uM well called Eg5 inhibitors and 0.1 uM called Protein synthesis at similarity ~0.599, diluting the vote and lowering confidence. I should have weighted extreme act_std z>100 and summed similarity 1.225 for actin over generic mitotic proxies and required a phalloidin fiber check, consistent with actin-cofilin inhibition by cytochalasin D (PMID 22728040), before switching final call to Eg5 inhibitors p=0.52.",
+  "what_was_right": [
+   "High-dose act_std z=+179.3 and act_glcm_contrast z=+138.0 in e2 plus mid-dose act_std z=+66.9 in e3 flagged strong actin cytoskeleton disruption",
+   "Early NSC vote 2/2 Actin disruptors in e4 correctly captured the leading class",
+   "First submit_conclusion Actin disruptors p=0.42 matched unblinded protocol majority 2/4 with summed similarity 1.225"
+  ],
+  "what_was_wrong": [
+   "Over-weighted describe_phenotype e5 and e14 which proposed only microtubule/Eg5 candidates and omitted actin, despite low-density rounded cells also seen in actin collapse",
+   "Interpreted dose_response frac_mitotic_like rho=+1.00 in e10 and tub_mean rho=+1.00 in e11 as Eg5-specific arrest rather than actin-contraction artifact raising texture contrast",
+   "Interpreted cell_area rho=-1.00 in e17 and lower density as Eg5 rounding instead of actin-disruptor shrinkage/detachment",
+   "Let k-neighbour Eg5 5/10 in e4/e9 outweigh NSC leading vote and low-similarity warning, leading to final wrong Eg5 inhibitors p=0.52 in e20"
+  ],
+  "citations": [
+   {
+    "pmid": "3023337",
+    "claim": "Cytochalasin D blocks actin polymerization by capping filament ends."
+   },
+   {
+    "pmid": "40658853",
+    "claim": "Structural and microscopic work shows cytochalasin D caps and severs actin filaments."
+   },
+   {
+    "pmid": "22728040",
+    "claim": "Cytochalasin D acts as an inhibitor of the actin-cofilin interaction."
+   }
+  ],
+  "next_experiment": "Phalloidin actin fiber imaging plus phospho-histone H3 and pericentrin/alpha-tubulin spindle imaging across 0.1-10 uM with actin-disruptor versus Eg5-inhibitor controls to test fiber loss/collapse versus true monopolar arrest.",
+  "citations_cited": [
+   "3023337",
+   "40658853",
+   "22728040"
+  ],
+  "citations_removed": []
+ },
+ "status": "finished",
+ "error": null,
+ "turns": 14,
+ "model_calls": [
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 1",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 3171,
+   "output_tokens": 90,
+   "reasoning_tokens": 5,
+   "cost_usd": 0.00434625,
+   "seconds": 1.229,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 2",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 3635,
+   "output_tokens": 647,
+   "reasoning_tokens": 441,
+   "cost_usd": 0.0072935,
+   "seconds": 4.491,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 3",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 5721,
+   "output_tokens": 561,
+   "reasoning_tokens": 326,
+   "cost_usd": 0.009535499999999999,
+   "seconds": 3.836,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 7047,
+   "output_tokens": 3144,
+   "reasoning_tokens": 2519,
+   "cost_usd": 0.022170750000000003,
+   "seconds": 16.111,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 4",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 7684,
+   "output_tokens": 2582,
+   "reasoning_tokens": 2094,
+   "cost_usd": 0.0205785,
+   "seconds": 11.355,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 5",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 10254,
+   "output_tokens": 893,
+   "reasoning_tokens": 583,
+   "cost_usd": 0.016612750000000003,
+   "seconds": 4.329,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 6",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 12133,
+   "output_tokens": 3212,
+   "reasoning_tokens": 2904,
+   "cost_usd": 0.02881725,
+   "seconds": 13.961,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 7",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 12718,
+   "output_tokens": 1561,
+   "reasoning_tokens": 1342,
+   "cost_usd": 0.02253175,
+   "seconds": 7.11,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-wonder-1.0",
+   "purpose": "reviewer",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 10926,
+   "output_tokens": 5829,
+   "reasoning_tokens": 5739,
+   "cost_usd": 0.160284,
+   "seconds": 44.928,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 8",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 13291,
+   "output_tokens": 5697,
+   "reasoning_tokens": 5396,
+   "cost_usd": 0.040826,
+   "seconds": 20.581,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "microscopist",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 7044,
+   "output_tokens": 3094,
+   "reasoning_tokens": 2372,
+   "cost_usd": 0.021954500000000002,
+   "seconds": 14.875,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 9",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 14889,
+   "output_tokens": 3573,
+   "reasoning_tokens": 3383,
+   "cost_usd": 0.0337965,
+   "seconds": 13.344,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 10",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 15522,
+   "output_tokens": 301,
+   "reasoning_tokens": 0,
+   "cost_usd": 0.02068175,
+   "seconds": 1.67,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 11",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 14936,
+   "output_tokens": 2056,
+   "reasoning_tokens": 1826,
+   "cost_usd": 0.027408,
+   "seconds": 8.65,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 12",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 15520,
+   "output_tokens": 345,
+   "reasoning_tokens": 214,
+   "cost_usd": 0.02086625,
+   "seconds": 2.044,
+   "attempts": 1,
+   "finish_reason": "tool_calls"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "scientist turn 13",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 16156,
+   "output_tokens": 450,
+   "reasoning_tokens": 211,
+   "cost_usd": 0.022107500000000002,
+   "seconds": 2.77,
+   "attempts": 1,
+   "finish_reason": "stop"
+  },
+  {
+   "model": "muse-spark-1.3",
+   "purpose": "reflection",
+   "provider": "meta",
+   "billing": "usd",
+   "input_tokens": 4732,
+   "output_tokens": 2751,
+   "reasoning_tokens": 1883,
+   "cost_usd": 0.01760675,
+   "seconds": 10.436,
+   "attempts": 1,
+   "finish_reason": "stop"
+  }
+ ],
+ "cost_usd": 0.4974175,
+ "model_ids": {
+  "scientist": "muse-spark-1.3",
+  "microscopist": "muse-spark-1.3",
+  "reviewer": "muse-wonder-1.0",
+  "segmentation": "classical (scikit-image)",
+  "provider": "meta",
+  "atlas": "ResNet50 (ImageNet) + TVN",
+  "agent": "v5"
+ },
+ "started_at": "2026-10-31T19:34:01.343393Z"
+}

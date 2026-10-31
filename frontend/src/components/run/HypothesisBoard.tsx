@@ -47,6 +47,9 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
           {rows.map((h, i) => {
             const isCall = verdict ? h.moa === verdict.agent_moa : conclusion?.top_moa === h.moa;
             const isTruth = verdict?.truth_moa === h.moa;
+            // the Scientist's own conclusion; from v5 it can differ from the final call (the protocol's vote)
+            const isConcl = conclusion?.top_moa === h.moa;
+            const dissent = !!verdict && verdict.call_source === "protocol" && isConcl && !isCall;
             const expanded = open === h.moa;
             return (
               <li key={h.moa} className={i === 0 ? "pb-2 mb-1 border-b border-rule" : ""}>
@@ -72,9 +75,14 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
                       style={{ width: `${Math.max(1, h.probability * 100)}%` }}
                     />
                   </span>
-                  {(isCall || isTruth) && (
+                  {(isCall || isTruth || dissent) && (
                     <span className="mt-1 flex flex-wrap gap-x-3 text-[11px]">
-                      {isCall && conclusion && (!verdict || Math.abs(conclusion.probability - h.probability) >= 0.005) && (
+                      {dissent && conclusion && (
+                        <span className={verdict!.scientist_correct ? "text-verdict-yes" : "text-verdict-no"}>
+                          Scientist's conclusion{Math.abs(conclusion.probability - h.probability) >= 0.005 ? ` stated ${prob(conclusion.probability)}` : ""} · dissents from the vote, {verdict!.scientist_correct ? "right" : "wrong"}
+                        </span>
+                      )}
+                      {isCall && isConcl && conclusion && (!verdict || Math.abs(conclusion.probability - h.probability) >= 0.005) && (
                         <span className="text-graphite">
                           {verdict ? "Conclusion" : "Submitted conclusion"}
                           {Math.abs(conclusion.probability - h.probability) >= 0.005 ? ` stated ${prob(conclusion.probability)}` : ""}
@@ -83,7 +91,7 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
                       {isCall && verdict && (
                         <span className={`flex items-center gap-1 ${verdict.correct ? "text-verdict-yes" : "text-verdict-no"}`}>
                           {verdict.correct ? <Check aria-hidden className="h-3 w-3" /> : <X aria-hidden className="h-3 w-3" />}
-                          Agent's call · {verdict.correct ? "matches the annotation" : "does not match"}
+                          {verdict.call_source === "protocol" ? "Final call (NSC vote)" : "Agent's call"} · {verdict.correct ? "matches the annotation" : "does not match"}
                         </span>
                       )}
                       {isTruth && !isCall && (
