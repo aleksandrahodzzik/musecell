@@ -37,7 +37,7 @@ export function staticPath(path: string): string | null {
   const p = path.split("?")[0];
   const simple: Record<string, string> = {
     "/api/health": "health.json", "/api/specimens": "specimens.json", "/api/recorded": "recorded.json",
-    "/api/gallery": "gallery.json",
+    "/api/gallery": "gallery.json", "/api/demo-fields": "demo-fields.json",
   };
   if (simple[p]) return dataUrl(simple[p]);
   let m = p.match(/^\/api\/eval\/(\w+)$/);
@@ -46,6 +46,8 @@ export function staticPath(path: string): string | null {
   if (m) return dataUrl(`runs/${sourceOf(decodeURIComponent(m[1]))}.dossier.${m[2]}`);
   m = p.match(/^\/api\/runs\/([^/]+)$/);
   if (m) return dataUrl(`runs/${sourceOf(decodeURIComponent(m[1]))}.json`);
+  m = p.match(/^\/api\/fields\/(f_[0-9a-f]+)\/(cells|labels)$/);
+  if (m) return dataUrl(`fields/${m[1]}.${m[2] === "cells" ? "cells.json" : "labels.gz"}`);
   m = p.match(/^\/api\/images\/(.+)$/);
   if (m) return shippedImages && !shippedImages.has(m[1]) ? NO_IMAGE : dataUrl(`images/${m[1]}.png`);
   return null;

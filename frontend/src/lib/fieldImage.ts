@@ -2,7 +2,7 @@
 // (spec §8: DNA, tubulin, actin each have one fixed colour), and the segmentation label maps used for mask
 // outlines and hover hit-testing. Everything is cached per field id.
 
-import { imageUrl } from "./api";
+import { apiUrl, imageUrl } from "./api";
 import type { CellRow, CellTable } from "./types";
 
 export type Channel = "dna" | "tubulin" | "actin";
@@ -151,15 +151,30 @@ export const STAIN_MATRIX = (() => {
   return [0, 1, 2].map((k) => `${n(a[k])} ${n(t[k])} ${n(d[k])} 0 0`).join("  ") + "  0 0 0 1 0";
 })();
 
+// Without the BBBC021 data, masks exist only for the demo fields (demo/fields): ask for those, never 404 the rest.
+let demoFields: Promise<Set<string>> | null = null;
+const shippedSegmentation = () => (demoFields ??= fetch(apiUrl("/api/demo-fields"))
+  .then((r) => (r.ok ? r.json() : [])).then((ids: string[]) => new Set(ids)).catch(() => new Set<string>()));
+
+/** Label-map bytes: a server sends them with Content-Encoding: gzip (already undone by the browser); the static
+ * demo ships a plain .gz file, which is unpacked here. */
+async function labelBytes(res: Response): Promise<ArrayBuffer> {
+  const buf = await res.arrayBuffer();
+  const head = new Uint8Array(buf, 0, Math.min(2, buf.byteLength));
+  if (head[0] !== 0x1f || head[1] !== 0x8b) return buf;
+  const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Response(stream).arrayBuffer();
+}
+
 async function fetchSegmentation(fieldId: string): Promise<FieldSegmentation | null> {
-  if (compositeOnly) return null; // masks need the BBBC021 data, which a replay-only server does not have
-  const [tRes, lRes] = await Promise.all([fetch(`/api/fields/${fieldId}/cells`), fetch(`/api/fields/${fieldId}/labels`)]);
+  if (compositeOnly && !(await shippedSegmentation()).has(fieldId)) return null;
+  const [tRes, lRes] = await Promise.all([fetch(apiUrl(`/api/fields/${fieldId}/cells`)),
+    fetch(apiUrl(`/api/fields/${fieldId}/labels`))]);
   if (!tRes.ok || !lRes.ok) return null;
-  const table = (await tRes.json()) as CellTable;
-  const lw = Number(lRes.headers.get("X-Label-Width"));
-  const lh = Number(lRes.headers.get("X-Label-Height"));
-  const buf = await lRes.arrayBuffer(); // the browser has already undone Content-Encoding: gzip
-  const all = new Uint16Array(buf);
+  const table = (await tRes.json()) as CellTable & { label_width?: number; label_height?: number };
+  const lw = Number(lRes.headers.get("X-Label-Width")) || table.label_width || 0;
+  const lh = Number(lRes.headers.get("X-Label-Height")) || table.label_height || 0;
+  const all = new Uint16Array(await labelBytes(lRes));
   if (!lw || !lh || all.length !== 2 * lw * lh) return null;
   return {
     table, lw, lh, byLabel: new Map(table.cells.map((c) => [c.label, c])),

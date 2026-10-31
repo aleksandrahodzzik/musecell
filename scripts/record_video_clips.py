@@ -207,7 +207,8 @@ async def bench_act(page, base, run):
 
 
 async def github_setup(page, base, run):
-    await page.goto(REPO)
+    await page.goto(REPO, wait_until="domcontentloaded", timeout=60_000)  # GitHub's full "load" can take long
+    await page.get_by_text("TL;DR").first.wait_for(timeout=60_000)
     await page.wait_for_timeout(2500)
 
 

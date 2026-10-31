@@ -66,6 +66,7 @@ def main_() -> int:
             recorded = [r for r in get("/api/recorded").json() if r.get("source") != "local"]
             save("recorded.json", recorded)
             save("gallery.json", get("/api/gallery").json())
+            save("demo-fields.json", get("/api/demo-fields").json())
             for name in ("results", "baseline"):
                 save(f"eval/{name}.json", get(f"/api/eval/{name}").json())
             for r in recorded:
@@ -80,6 +81,8 @@ def main_() -> int:
         main.app.state.manager = None
 
     shutil.copytree(main.DEMO_THUMBS, out / "images")
+    if main.DEMO_FIELDS.exists():  # masks + cell tables: outlines and cell hover in the microscope
+        shutil.copytree(main.DEMO_FIELDS, out / "fields")
     # The browser asks only for images in this list, so fields a recording does not ship are never requested (no 404s).
     (out / "images.json").write_text(json.dumps(sorted(p.stem for p in (out / "images").glob("*.png"))),
                                      encoding="utf-8")

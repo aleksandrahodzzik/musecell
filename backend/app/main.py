@@ -29,6 +29,7 @@ IMAGE_ID = re.compile(r"^(f_[0-9a-f]{6,64})\.(composite|dna|tubulin|actin)$")
 FIELD_ID = re.compile(r"^f_[0-9a-f]{6,64}$")
 EVAL_FILES = {"results": ROOT / "eval" / "results.json", "baseline": ROOT / "eval" / "baseline.json"}
 DEMO_THUMBS = ROOT / "demo" / "thumbnails"
+DEMO_FIELDS = ROOT / "demo" / "fields"  # masks + cell tables of the demo fields (scripts/export_demo_fields.py)
 DEMO_LABELS = ROOT / "demo" / "specimen_labels.json"  # opaque specimen id -> "Specimen N" (no compound, dose or MoA)
 FRONTEND_DIST = ROOT / "frontend" / "dist"
 
@@ -169,12 +170,21 @@ async def gallery() -> list[str]:
     return sorted(p.name.removesuffix(".png") for p in DEMO_THUMBS.glob("f_*.composite.png"))
 
 
+@app.get("/api/demo-fields")
+async def demo_fields() -> list[str]:
+    """Field ids whose masks and cell tables ship in demo/fields (they work without the BBBC021 data)."""
+    return sorted(p.name.removesuffix(".cells.json") for p in DEMO_FIELDS.glob("f_*.cells.json"))
+
+
 @app.get("/api/fields/{field_id}/cells")
 async def field_cells(field_id: str, request: Request) -> dict:
     m = mgr(request)
-    if not FIELD_ID.match(field_id) or m.catalog is None:
+    if not FIELD_ID.match(field_id):
         raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
-    table = fields.cell_table(m.settings.cells_dir, field_id, m.reference)
+    table = fields.cell_table(m.settings.cells_dir, field_id, m.reference) if m.catalog else None
+    shipped = DEMO_FIELDS / f"{field_id}.cells.json"
+    if table is None and shipped.exists():
+        table = json.loads(shipped.read_text(encoding="utf-8"))
     if table is None:
         raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
     return table
@@ -185,6 +195,10 @@ async def field_labels(field_id: str, request: Request):
     """Half-resolution label maps, gzip([cells | nuclei] uint16 LE); size in X-Label-Width / X-Label-Height."""
     m = mgr(request)
     maps = fields.label_maps(m.settings.cells_dir, field_id) if FIELD_ID.match(field_id) and m.catalog else None
+    shipped = DEMO_FIELDS / f"{field_id}.labels.gz"
+    if maps is None and FIELD_ID.match(field_id) and shipped.exists():
+        meta = json.loads((DEMO_FIELDS / f"{field_id}.cells.json").read_text(encoding="utf-8"))
+        maps = shipped.read_bytes(), meta["label_width"], meta["label_height"]
     if maps is None:
         raise HTTPException(status_code=404, detail="No segmentation for this field on this machine.")
     body, w, h = maps

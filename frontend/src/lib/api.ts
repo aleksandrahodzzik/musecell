@@ -48,6 +48,9 @@ export const postJSON = <T>(path: string, body?: unknown) =>
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
+/** URL for a GET to the API: the path itself on a server, the matching data file in the static demo. */
+export const apiUrl = (path: string) => (STATIC ? staticPath(path) ?? path : path);
+
 export const imageUrl = (imageId: string) => (STATIC ? staticPath(`/api/images/${imageId}`)! : `/api/images/${imageId}`);
 
 /** Download link for a run's dossier (Markdown or JSON). */

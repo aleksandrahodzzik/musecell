@@ -13,7 +13,7 @@
 
 ![A recorded blinded run replayed at 6×: the agent acquires wells, the hypothesis board converges, the PI reviewer asks for one more experiment, then the compound is unblinded and the call is checked](docs/hero.gif)
 
-<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist first concludes "Actin disruptors"; the reviewer asks for one more well; after it the Scientist switches to "Eg5 inhibitors"; the vote over its 4 wells splits 2/1/1 and stays on "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
+<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist first concludes "Actin disruptors"; the reviewer sends it back for another look at a well it already had; on re-examination the Scientist switches to "Eg5 inhibitors"; the vote over its 4 wells splits 2/1/1 and stays on "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
 
 ## Why this matters
 
@@ -112,7 +112,7 @@ cd frontend; npm ci; npm run build; cd ..
 python -m uvicorn app.main:app --app-dir backend --port 8787
 ```
 
-Open http://127.0.0.1:8787, choose **Watch a recorded run**, and pick one of the four recorded runs (agent v5; one of them on open weights). Without a key and data the app says that live runs are off; replays, dossiers and the benchmark page work. Cell masks and hover measurements need the data.
+Open http://127.0.0.1:8787, choose **Watch a recorded run**, and pick one of the four recorded runs (agent v5; one of them on open weights). Without a key and data the app says that live runs are off; replays, dossiers and the benchmark page work. Cell masks and hover measurements work on the 40 fields the demo ships (`demo/fields/`); other fields need the data.
 
 macOS / Linux: the same, with `python3.12 -m venv .venv`, `source .venv/bin/activate`, and `&&` or new lines instead of `;`.
 
@@ -243,7 +243,7 @@ Compound identity and mechanisms after unblinding come from [PubChem](https://pu
 - **Features.** The agent reads hand-built per-cell features (intensity, shape, GLCM texture) from classical segmentation; similarity search uses ImageNet ResNet50 embeddings, not a model trained on cells. Classical cell bodies have no independent check; SAM 3.1 was used to check nuclei only.
 - **The language model does not add accuracy here.** The Scientist alone reaches 81.6% (Muse Spark 1.3). MuseCell's 89.5% comes from the Scientist choosing the wells and the NSC protocol making the call, and a fixed "4 highest doses" rule reaches the same 89.5%. v1–v5 were developed on these 38 compounds; v4/v5 have a held-out check on the test half of a frozen split, which is still only 19 compounds.
 - **Small eval.** 38 compounds is small, so differences of a few compounds are within noise (see the bootstrap intervals). The 38 compounds are the only annotated set: v1–v3 were tuned on all of them, and v4/v5 on the dev half of a split frozen before v4.
-- **Replay without data.** In a fresh clone without `DATA_DIR`, masks, hover measurements and fields beyond the 40 shipped thumbnails are unavailable (the UI says so).
+- **Replay without data.** In a fresh clone without `DATA_DIR` (and in the live demo), only the 40 fields the demo runs show are shipped, with their masks and per-cell measurements; other fields, and the per-channel images, are unavailable (the UI says so).
 
 ## Built during the hackathon
 

@@ -229,3 +229,25 @@ def test_provider_switch_per_run(client):
     run_id = c.post("/api/runs", json={"specimen_id": sid, "budget": 3, "provider": "baseten"}).json()["run_id"]
     assert m.runs[run_id].model_ids["provider"] == "baseten"
     sse_events(c, run_id)
+
+
+def test_demo_fields_serve_masks_without_data(tmp_path):
+    """A replay-only server (no BBBC021 data) answers cells/labels for the shipped demo fields, and 404s others."""
+    shipped = main.DEMO_FIELDS
+    ids = sorted(p.name.removesuffix(".cells.json") for p in shipped.glob("f_*.cells.json"))
+    if not ids:
+        pytest.skip("no demo fields shipped")
+    m = RunManager(Settings(_env_file=None, model_api_key=None, data_dir=str(tmp_path)), runs_dir=tmp_path)
+    main.app.state.manager = m
+    try:
+        with TestClient(main.app) as c:
+            assert c.get("/api/demo-fields").json() == ids
+            table = c.get(f"/api/fields/{ids[0]}/cells").json()
+            assert table["cells"] and {"label", "x", "y"} <= set(table["cells"][0])
+            r = c.get(f"/api/fields/{ids[0]}/labels")
+            w, h = int(r.headers["X-Label-Width"]), int(r.headers["X-Label-Height"])
+            assert len(r.content) == 2 * 2 * w * h  # [cells | nuclei], uint16, gzip already undone by the client
+            assert c.get("/api/fields/f_000000000000/cells").status_code == 404
+            assert c.get("/api/fields/..%2Fx/cells").status_code == 404
+    finally:
+        main.app.state.manager = None
