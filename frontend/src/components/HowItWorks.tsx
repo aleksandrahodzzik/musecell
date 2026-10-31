@@ -97,7 +97,7 @@ export default function HowItWorks({ ids }: { ids?: ModelIds }) {
               </a>
             </div>
           </Reveal>
-          <Reveal><Finding rows={results.data.rows} /></Reveal>
+          <Reveal><Finding rows={results.data.rows} wellChoice={results.data.well_choice} /></Reveal>
         </section>
       )}
     </>

@@ -23,7 +23,18 @@ export interface ResultRow {
   split_accuracy?: { dev?: number; test?: number };
   scientist_accuracy?: number | null; // agent v5+: the Scientist's own call (the final call is the protocol's)
 }
+/** scripts/well_choice.py: label-free well-choice rules vs the agent, same vote, paired bootstrap. */
+interface Tally { correct: number; n: number }
+interface Diff { mean: number; ci95: [number, number] }
+export interface WellChoice {
+  budget: number;
+  n: number;
+  best_rule: string;
+  rows: ({ name: string } & Record<string, Tally | string>)[];
+  differences: ({ vs: string; best_rule: boolean } & Record<string, Diff | string | boolean>)[];
+}
 export interface Results {
+  well_choice?: WellChoice | null;
   generated_at?: string;
   models?: Record<string, string>;
   n_compounds?: number;
@@ -56,7 +67,7 @@ export default function Benchmark() {
         </p>
       </div>
 
-      {results.data && <Finding rows={results.data.rows} />}
+      {results.data && <Finding rows={results.data.rows} wellChoice={results.data.well_choice} />}
 
       <section className="panel p-5 flex flex-col gap-3" aria-labelledby="agent-h">
         <h2 id="agent-h" className="font-serif text-[20px] font-semibold">Agent against baselines, by budget</h2>
@@ -158,7 +169,7 @@ const DASH = ["", "5 4", "1.5 3", "8 3 2 3"];
 const isAgent = (pts: ResultRow[]) => pts.some((p) => p.method === "agent");
 
 /** The headline: the agent and both baselines at the largest budget the eval ran, read from the rows. */
-export function Finding({ rows }: { rows: ResultRow[] }) {
+export function Finding({ rows, wellChoice }: { rows: ResultRow[]; wellChoice?: WellChoice | null }) {
   const agent = rows.filter((x) => x.method === "agent" && x.budget != null);
   if (!agent.length) return null;
   const b = Math.max(...agent.map((x) => x.budget!));
@@ -173,11 +184,20 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
   const protocol = a.scientist_accuracy != null; // v5+: the final call is the NSC vote over the agent's wells
   const scientist: ResultRow | undefined = protocol
     ? { ...a, accuracy: a.scientist_accuracy!, correct: Math.round(a.scientist_accuracy! * (a.n ?? 0)) } : undefined;
+  // the best label-free rule, scored with the same vote (present for v5+, where the agent's lever is the wells)
+  const wc = wellChoice && wellChoice.budget === b ? wellChoice : null;
+  const ruleTally = wc?.rows.find((r) => r.name === wc.best_rule)?.all as Tally | undefined;
+  const rule: ResultRow | undefined = ruleTally
+    ? { ...a, accuracy: ruleTally.correct / ruleTally.n, correct: ruleTally.correct, n: ruleTally.n } : undefined;
+  const vsRule = wc?.differences.find((d) => d.best_rule)?.all as Diff | undefined;
+  const vsRandom = wc?.differences.find((d) => d.vs.startsWith("random"))?.all as Diff | undefined;
+  const pp = (x: number) => `${x >= 0 ? "+" : "−"}${Math.abs(x * 100).toFixed(1)}`;
   const tiles: [string, ResultRow | undefined, string][] = protocol ? [
     ["MuseCell", a, `final call from the ${b} wells the agent chose`],
+    ...(rule ? [[`Fixed rule: ${wc!.best_rule}`, rule, `${b} wells, no model, same vote`] as [string, ResultRow, string]]
+      : [["The Scientist alone", scientist, "its own conclusion, same runs"] as [string, ResultRow | undefined, string]]),
     ["NSC on random wells", rand, `${b} wells drawn at random`],
     ["NSC on all wells", all, "every well of the compound"],
-    ["The Scientist alone", scientist, "its own conclusion, same runs"],
   ] : [
     ["MuseCell agent", a, `its own call, ${b} wells per compound`],
     ["NSC on the agent's wells", chosen, `the ${b} wells the agent chose`],
@@ -190,7 +210,13 @@ export function Finding({ rows }: { rows: ResultRow[] }) {
       <div aria-hidden className="absolute inset-0 overflow-hidden"><div className="grain" /></div>
       {rand && (
         <p className="relative display text-[clamp(24px,2.4vw,34px)] leading-[1.1] tracking-[-0.04em] text-white max-w-[34ch]">
-          {protocol ? (
+          {protocol && vsRule && vsRandom ? (
+            <>From {b} wells the agent chose, MuseCell is right on {a.correct} of {a.n} compounds
+              {test != null && <> ({pct(test)} on held-out ones)</>}. A fixed rule, the {wc!.best_rule}, does{" "}
+              {vsRule.ci95[0] > 0 ? "worse" : vsRule.ci95[1] < 0 ? "better" : "as well within noise"}; against {b} random
+              wells the difference is {pp(vsRandom.mean)} points (95% interval {pp(vsRandom.ci95[0])} to {pp(vsRandom.ci95[1])}).
+              {scientist && <> The Scientist's own conclusion: {pct(scientist.accuracy)}.</>}</>
+          ) : protocol ? (
             <>From {b} wells chosen by the agent, MuseCell is {below ? "below" : "above"} the nearest-neighbour baseline on {b} random
               wells{all && <> and {Math.round(((all.accuracy - a.accuracy) * (a.n ?? 0)))} compound{Math.round((all.accuracy - a.accuracy) * (a.n ?? 0)) === 1 ? "" : "s"} short of using every well</>}
               {test != null && <>; {pct(test)} on held-out compounds</>}.</>

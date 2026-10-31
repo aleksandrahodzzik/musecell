@@ -369,6 +369,9 @@ function HeadlineNumber() {
   const test = a.split_accuracy?.test;
   const deep = a.atlas?.startsWith("ResNet50") ? "_deep" : "";
   const rand = rows.find((r) => r.method === "nsc_random" + deep && r.budget === a.budget);
+  const wc = results.data?.well_choice;
+  const rule = wc && wc.budget === a.budget
+    ? (wc.rows.find((r) => r.name === wc.best_rule)?.all as { correct: number; n: number } | undefined) : undefined;
   return (
     <a href="#/benchmark" className="group mt-5 self-start flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 rounded-[18px] bg-white/[0.06] ring-1 ring-white/10 px-5 py-3.5 backdrop-blur hover:bg-white/[0.09] transition-colors">
       <span className="display text-lime text-[44px] leading-none">{(a.accuracy * 100).toFixed(1)}%</span>
@@ -379,6 +382,7 @@ function HeadlineNumber() {
         <span className="text-mist">
           {a.correct}/{a.n} compounds{test != null && <> · {(test * 100).toFixed(0)}% on held-out ones</>}
           {rand && <> · random wells {(rand.accuracy * 100).toFixed(1)}%</>}
+          {rule && <> · fixed rule ({results.data!.well_choice!.best_rule}) {(rule.correct / rule.n * 100).toFixed(1)}%</>}
         </span>
       </span>
       <span aria-hidden className="hidden sm:inline text-mist group-hover:text-white transition-colors">→</span>
