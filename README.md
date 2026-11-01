@@ -2,7 +2,7 @@
 
 > **TL;DR**
 > 1. **What:** a blinded screening agent on real BBBC021 cell images. Muse Spark plans which 4 of ~24 wells to image, Muse Wonder reviews the call, and only then is the compound unblinded and checked against PubChem, ChEMBL and PubMed.
-> 2. **Result (Muse Spark 1.3, agent v5):** right mechanism for **34/38** compounds, **18/19** on the held-out half of a frozen split. With only a well budget, Muse Spark converged on the strategy a screening biologist would use (140 of its 152 wells at the top doses) and matched that fixed rule compound for compound; it did not beat it. When its own judgement overrode the published NSC vote, it was usually wrong (1 of 7 in v4), so MuseCell lets the model plan, argue and explain, and lets the protocol make the call.
+> 2. **Result (Muse Spark 1.3, agent v5):** right mechanism for **34/38** compounds, **18/19** on the held-out half of a frozen split. With only a well budget, Muse Spark converged on the strategy a screening biologist would use (140 of its 152 wells at the top doses) and matched that fixed rule compound for compound; it did not beat it. When its own judgement overrode the published NSC vote, it was usually wrong (1 of 7 in v4), so MuseCell lets the model plan, argue and explain, and lets the protocol make the call. [Benchmark](eval/RESULTS.md).
 > 3. **Cost:** about $0.29 and 1.5 minutes per run on Muse Spark 1.3 (mean of 38 runs). **[Live demo](https://aleksandrahodzzik.github.io/musecell/)** · Video: *link added at submission*.
 
 **MuseCell is an autonomous screening scientist.** Give it a blinded compound and a small budget of microscope wells. It images real cells, measures them, forms mechanism-of-action hypotheses, chooses the next experiment that best separates them, has its conclusion reviewed by a second model, and only then unblinds the compound and checks itself against chemistry databases and literature.
@@ -207,12 +207,12 @@ Muse Spark 1.3 runs: 0 failed, 0 blinding leaks in the offline re-scan, 110/110 
 | Uniform guess, 1 in 12 (expected) | 8.3% | 8.3% | 8.3% |
 
 - **The registered test is not met.** Agent minus the label-only guess: +2.6 points, paired bootstrap 95% interval −8.6 to +15.8 over the 38 compounds. The criterion was an interval that excludes zero, so this result is not a claim in the TL;DR.
-- **The right calls come from the classes it over-calls.** All 5 are Microtubule stabilizers (3 of 3 right; it called that class 17 times) and Aurora kinase inhibitors (2 of 3; called 11 times). The other 10 classes: 0 of 32.
+- **The right calls come from the classes it over-calls.** All 5 are Microtubule stabilizers (3 of 3 right; it called that class 17 times) and Aurora kinase inhibitors (2 of 3; called 11 times). None of the other 10 classes was named right.
 - **It did leave the library.** Its call differed from the NSC vote over its own wells in 17/38 runs (closed world: 5/38). In 13/38 it named a class no reference it saw had shown (closed world: 0/38). Those departures were right 5 times.
 - **In words it called the vote weak, not wrong.** It wrote "weak", "split" or "low similarity" rather than "the references don't fit"; the registered wording check matched 0/38 runs (closed world 0/38).
 - 0 failed runs, 0 blinding leaks, citations 107/107, $14.47 for the 38 runs. The full tables are in [`eval/RESULTS.md`](eval/RESULTS.md).
 
-Reading: without its class in the library, Muse Spark leaves a misleading vote, but the alternative it picks is mostly one of two visually striking classes, not the missing one. This is the same pull that made its overrides of the vote wrong in the closed world. It supports the split above: the model plans, argues and explains, and the protocol makes the call where the reference library covers the mechanism.
+Reading: without its class in the library, Muse Spark leaves a misleading vote, but the alternative it picks is mostly one of two visually striking classes, not the missing one. This is the same pull that made its overrides of the vote wrong in the closed world. With its class removed, the Scientist did no better than always guessing the most common class: 5/38 against 4/38 expected, a difference of +2.6 points with a 95% interval of −8.6 to +15.8. That is why the protocol, not the model, makes the call.
 
 Rebuild everything from the log without API calls (needs the data and the run logs):
 
