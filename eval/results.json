@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T08:18:22+00:00",
+ "generated_at": "2026-11-01T08:58:59+00:00",
  "models": {
   "scientist": "muse-spark-1.3",
   "microscopist": "muse-spark-1.3",
@@ -34,7 +34,7 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 89 deselected in 7.77s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 95 deselected in 26.40s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
   "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. Full-price `muse-spark-1.3` (the live app's default) was benchmarked with agent v5 only.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
@@ -765,5 +765,389 @@
    "top_doses": "the 4 highest of 8 doses"
   },
   "agent_label": "MuseCell agent, muse-spark-1.3, agent v5"
+ },
+ "open_world": {
+  "budget": 4,
+  "n": 38,
+  "resamples": 10000,
+  "seed": 6,
+  "rows": [
+   {
+    "name": "MuseCell v5-open (the Scientist's call)",
+    "key": "agent",
+    "all": {
+     "correct": 5.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 3.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 2.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "Scientist's first conclusion, before review",
+    "key": "first",
+    "all": {
+     "correct": 4.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 2.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 2.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "NSC on all wells (published protocol), under the exclusion",
+    "key": "nsc_all",
+    "all": {
+     "correct": 0.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 0.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 0.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "NSC on the 4 highest doses, under the exclusion",
+    "key": "nsc_top4",
+    "all": {
+     "correct": 0.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 0.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 0.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "Majority-class guess, all 38 labels (expected; DNA damage, DNA replication, Microtubule destabilizers, Protein degradation tie)",
+    "key": "majority",
+    "all": {
+     "correct": 4.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 2.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 2.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "Majority-class guess under the exclusion",
+    "key": "majority_excluded",
+    "all": {
+     "correct": 0.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 0.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 0.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "Uniform guess, 1/12 (expected)",
+    "key": "uniform",
+    "all": {
+     "correct": 3.17,
+     "n": 38
+    },
+    "dev": {
+     "correct": 1.58,
+     "n": 19
+    },
+    "test": {
+     "correct": 1.58,
+     "n": 19
+    }
+   },
+   {
+    "name": "Check, same code on the full library (LOCO): NSC on all wells",
+    "key": "nsc_all_full_library",
+    "all": {
+     "correct": 35.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 18.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 17.0,
+     "n": 19
+    }
+   },
+   {
+    "name": "Check, same code on the full library (LOCO): NSC on the 4 highest doses",
+    "key": "nsc_top4_full_library",
+    "all": {
+     "correct": 34.0,
+     "n": 38
+    },
+    "dev": {
+     "correct": 16.0,
+     "n": 19
+    },
+    "test": {
+     "correct": 18.0,
+     "n": 19
+    }
+   }
+  ],
+  "bootstrap": {
+   "agent_minus_majority": {
+    "all": {
+     "mean": 0.0263,
+     "ci95": [
+      -0.0855,
+      0.1579
+     ]
+    },
+    "dev": {
+     "mean": 0.0526,
+     "ci95": [
+      -0.1184,
+      0.2632
+     ]
+    },
+    "test": {
+     "mean": 0.0,
+     "ci95": [
+      -0.1447,
+      0.1842
+     ]
+    }
+   },
+   "agent_accuracy": {
+    "all": {
+     "mean": 0.1316,
+     "ci95": [
+      0.0263,
+      0.2368
+     ]
+    },
+    "dev": {
+     "mean": 0.1579,
+     "ci95": [
+      0.0,
+      0.3158
+     ]
+    },
+    "test": {
+     "mean": 0.1053,
+     "ci95": [
+      0.0,
+      0.2632
+     ]
+    }
+   },
+   "agent_minus_uniform": {
+    "all": {
+     "mean": 0.0482,
+     "ci95": [
+      -0.057,
+      0.1535
+     ]
+    },
+    "dev": {
+     "mean": 0.0746,
+     "ci95": [
+      -0.0833,
+      0.2325
+     ]
+    },
+    "test": {
+     "mean": 0.0219,
+     "ci95": [
+      -0.0833,
+      0.1798
+     ]
+    }
+   }
+  },
+  "excludes_zero": false,
+  "exclusion_leak_check": {
+   "nsc_all": 0,
+   "nsc_top4": 0
+  },
+  "per_class": {
+   "Actin disruptors": {
+    "compounds": 3,
+    "correct": 0,
+    "called": {
+     "Microtubule stabilizers": 3
+    }
+   },
+   "Aurora kinase inhibitors": {
+    "compounds": 3,
+    "correct": 2,
+    "called": {
+     "Aurora kinase inhibitors": 2,
+     "DNA damage": 1
+    }
+   },
+   "Cholesterol-lowering": {
+    "compounds": 2,
+    "correct": 0,
+    "called": {
+     "Actin disruptors": 1,
+     "Microtubule stabilizers": 1
+    }
+   },
+   "DNA damage": {
+    "compounds": 4,
+    "correct": 0,
+    "called": {
+     "Aurora kinase inhibitors": 3,
+     "DNA replication": 1
+    }
+   },
+   "DNA replication": {
+    "compounds": 4,
+    "correct": 0,
+    "called": {
+     "Aurora kinase inhibitors": 2,
+     "DNA damage": 1,
+     "Microtubule stabilizers": 1
+    }
+   },
+   "Eg5 inhibitors": {
+    "compounds": 2,
+    "correct": 0,
+    "called": {
+     "Microtubule destabilizers": 2
+    }
+   },
+   "Epithelial": {
+    "compounds": 3,
+    "correct": 0,
+    "called": {
+     "Protein synthesis": 2,
+     "Microtubule stabilizers": 1
+    }
+   },
+   "Kinase inhibitors": {
+    "compounds": 3,
+    "correct": 0,
+    "called": {
+     "DNA damage": 1,
+     "Microtubule stabilizers": 1,
+     "Aurora kinase inhibitors": 1
+    }
+   },
+   "Microtubule destabilizers": {
+    "compounds": 4,
+    "correct": 0,
+    "called": {
+     "Aurora kinase inhibitors": 2,
+     "Microtubule stabilizers": 2
+    }
+   },
+   "Microtubule stabilizers": {
+    "compounds": 3,
+    "correct": 3,
+    "called": {
+     "Microtubule stabilizers": 3
+    }
+   },
+   "Protein degradation": {
+    "compounds": 4,
+    "correct": 0,
+    "called": {
+     "Microtubule stabilizers": 2,
+     "DNA replication": 1,
+     "Aurora kinase inhibitors": 1
+    }
+   },
+   "Protein synthesis": {
+    "compounds": 3,
+    "correct": 0,
+    "called": {
+     "Microtubule stabilizers": 3
+    }
+   }
+  },
+  "signals": {
+   "leaves_vote": {
+    "open_world": {
+     "n": 17,
+     "of": 38
+    },
+    "closed_world_control": {
+     "n": 5,
+     "of": 38
+    }
+   },
+   "leaves_all_refs": {
+    "open_world": {
+     "n": 13,
+     "of": 38
+    },
+    "closed_world_control": {
+     "n": 0,
+     "of": 38
+    }
+   },
+   "says_dont_fit": {
+    "open_world": {
+     "n": 0,
+     "of": 38
+    },
+    "closed_world_control": {
+     "n": 0,
+     "of": 38
+    }
+   },
+   "right_when_leaving_vote": {
+    "n": 5,
+    "of": 17
+   }
+  },
+  "elimination": {
+   "classes_seen_mean": 3.63,
+   "saw_all_library_classes": 0,
+   "right_among_those": 0
+  },
+  "microscopist_named_truth": {
+   "n": 12,
+   "of": 38
+  },
+  "review": {
+   "request_experiment": 14,
+   "approve": 24,
+   "wrong_to_right": 1,
+   "right_to_wrong": 0
+  },
+  "failed": [],
+  "total_cost_usd": 14.47,
+  "mean_cost_usd": 0.3809,
+  "mean_latency_s": 137.7,
+  "leak_hits": 0,
+  "citations": "107/107",
+  "prereg_commit": "8065716",
+  "label": "MuseCell agent v5-open, muse-spark-1.3, open world (leave-one-MoA-out)"
  }
 }

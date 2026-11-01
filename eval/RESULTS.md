@@ -1,11 +1,11 @@
 # MuseCell evaluation
 
-Generated 2026-11-01T08:18:22+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
+Generated 2026-11-01T08:58:59+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
 
 - Compounds: 38 MoA-annotated BBBC021 compounds, leave-one-compound-out (the atlas never contains the compound under test).
 - Metric: compound-level MoA accuracy (one call per compound).
 - Models: scientist `muse-spark-1.3`, microscopist `muse-spark-1.3`, reviewer `muse-wonder-1.0`, segmentation `classical (scikit-image)`.
-- Blinding-leak test: pytest leak/blinding tests: 13 passed, 89 deselected in 7.77s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
+- Blinding-leak test: pytest leak/blinding tests: 13 passed, 95 deselected in 26.40s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
 
 | Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
 |---|---|---|---|---|---|---|---|---|
@@ -121,6 +121,57 @@ Agent minus each alternative, percentage points, mean over compounds with a pair
 Of the 152 wells the Scientist chose, 140 were among the 4 highest of 8 doses.
 
 Reading: on these 38 compounds the agent's well choice is not distinguishable from the best fixed rule ("top doses"); it is right or wrong on exactly the same compounds as the rule (all 38); against random wells the interval is [-0.7, +16.9] points. What the agent adds beyond a rule is the blinded, audited record: why each well, the reviewer's critique, the explanation, and a dossier with verified citations.
+
+## Open world: the mechanism left out of the reference library (pre-registered)
+
+Protocol registered in `docs/DECISIONS.md` ("Open-world eval, pre-registered", commit `8065716`) before any code for it was written; one shot. For each compound, every atlas read in its run (neighbours, NSC vote, protocol call) excludes **all compounds of its MoA class**, so NSC and any well-choice rule cannot name it. Agent v5-open: v5 tools and loop, Muse Spark 1.3 (Scientist + Microscopist), `muse-wonder-1.0` reviewer, budget 4; one prompt change (the reference library may not contain the mechanism; name one of the 12 classes from all the evidence); the final call is the Scientist's own.
+
+| Method | All | Dev half | Held-out test half |
+|---|---|---|---|
+| MuseCell v5-open (the Scientist's call) | 5/38 (13.2%) | 3/19 (15.8%) | 2/19 (10.5%) |
+| Scientist's first conclusion, before review | 4/38 (10.5%) | 2/19 (10.5%) | 2/19 (10.5%) |
+| NSC on all wells (published protocol), under the exclusion | 0/38 (0.0%) | 0/19 (0.0%) | 0/19 (0.0%) |
+| NSC on the 4 highest doses, under the exclusion | 0/38 (0.0%) | 0/19 (0.0%) | 0/19 (0.0%) |
+| Majority-class guess, all 38 labels (expected; DNA damage, DNA replication, Microtubule destabilizers, Protein degradation tie) | 4/38 (10.5%) | 2/19 (10.5%) | 2/19 (10.5%) |
+| Majority-class guess under the exclusion | 0/38 (0.0%) | 0/19 (0.0%) | 0/19 (0.0%) |
+| Uniform guess, 1/12 (expected) | 3.2/38 (8.3%) | 1.6/19 (8.3%) | 1.6/19 (8.3%) |
+| Check, same code on the full library (LOCO): NSC on all wells | 35/38 (92.1%) | 18/19 (94.7%) | 17/19 (89.5%) |
+| Check, same code on the full library (LOCO): NSC on the 4 highest doses | 34/38 (89.5%) | 16/19 (84.2%) | 18/19 (94.7%) |
+
+Paired bootstrap over compounds (10,000 resamples, percentile 95% interval), percentage points:
+
+| | All | Dev | Test |
+|---|---|---|---|
+| Agent minus majority-class guess (primary) | +2.6 [-8.6, +15.8] | +5.3 [-11.8, +26.3] | +0.0 [-14.5, +18.4] |
+| Agent minus uniform guess | +4.8 [-5.7, +15.3] | +7.5 [-8.3, +23.2] | +2.2 [-8.3, +18.0] |
+| Agent accuracy | +13.2 [+2.6, +23.7] | +15.8 [+0.0, +31.6] | +10.5 [+0.0, +26.3] |
+
+Reading (registered criterion): the interval of agent minus the majority-class guess on all 38 compounds is [-8.6, +15.8] points, so it **does not exclude zero**.
+
+| True class | Compounds | Right | What the Scientist called |
+|---|---|---|---|
+| Actin disruptors | 3 | 0 | Microtubule stabilizers ×3 |
+| Aurora kinase inhibitors | 3 | 2 | Aurora kinase inhibitors ×2; DNA damage ×1 |
+| Cholesterol-lowering | 2 | 0 | Actin disruptors ×1; Microtubule stabilizers ×1 |
+| DNA damage | 4 | 0 | Aurora kinase inhibitors ×3; DNA replication ×1 |
+| DNA replication | 4 | 0 | Aurora kinase inhibitors ×2; DNA damage ×1; Microtubule stabilizers ×1 |
+| Eg5 inhibitors | 2 | 0 | Microtubule destabilizers ×2 |
+| Epithelial | 3 | 0 | Protein synthesis ×2; Microtubule stabilizers ×1 |
+| Kinase inhibitors | 3 | 0 | DNA damage ×1; Microtubule stabilizers ×1; Aurora kinase inhibitors ×1 |
+| Microtubule destabilizers | 4 | 0 | Aurora kinase inhibitors ×2; Microtubule stabilizers ×2 |
+| Microtubule stabilizers | 3 | 3 | Microtubule stabilizers ×3 |
+| Protein degradation | 4 | 0 | Microtubule stabilizers ×2; DNA replication ×1; Aurora kinase inhibitors ×1 |
+| Protein synthesis | 3 | 0 | Microtubule stabilizers ×3 |
+
+"The nearest references don't fit" (registered measures; control = the 38 closed-world v5 Muse Spark 1.3 runs, where the class is in the library):
+
+| Measure | Open world | Closed-world control |
+|---|---|---|
+| Final call differs from the NSC vote over its own wells | 17/38 | 5/38 |
+| Final call is a class no atlas output it saw named | 13/38 | 0/38 |
+| Says so in words (registered regex) | 0/38 | 0/38 |
+
+When the final call left the vote it was right 5/17 times. Elimination check: the atlas outputs of a run showed 3.63 of the 11 library classes on average; 0 run(s) saw all 11 (0 of them right). The Microscopist listed the true class among its candidates in 12/38 runs. Review: 14 requests, 24 approvals; the Scientist's call changed wrong→right 1 times and right→wrong 0 times. Failed runs: 0. Cost $14.47 in total, $0.381 and 138 s per run; blinding re-scan 0 hits; citations verified 107/107.
 
 ## Where the agent goes wrong
 
