@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T08:58:59+00:00",
+ "generated_at": "2026-11-01T09:14:13+00:00",
  "models": {
   "scientist": "muse-spark-1.3",
   "microscopist": "muse-spark-1.3",
@@ -34,7 +34,7 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 95 deselected in 26.40s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 95 deselected in 9.24s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
   "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. Full-price `muse-spark-1.3` (the live app's default) was benchmarked with agent v5 only.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
@@ -997,6 +997,7 @@
    "Actin disruptors": {
     "compounds": 3,
     "correct": 0,
+    "times_called": 1,
     "called": {
      "Microtubule stabilizers": 3
     }
@@ -1004,6 +1005,7 @@
    "Aurora kinase inhibitors": {
     "compounds": 3,
     "correct": 2,
+    "times_called": 11,
     "called": {
      "Aurora kinase inhibitors": 2,
      "DNA damage": 1
@@ -1012,6 +1014,7 @@
    "Cholesterol-lowering": {
     "compounds": 2,
     "correct": 0,
+    "times_called": 0,
     "called": {
      "Actin disruptors": 1,
      "Microtubule stabilizers": 1
@@ -1020,6 +1023,7 @@
    "DNA damage": {
     "compounds": 4,
     "correct": 0,
+    "times_called": 3,
     "called": {
      "Aurora kinase inhibitors": 3,
      "DNA replication": 1
@@ -1028,6 +1032,7 @@
    "DNA replication": {
     "compounds": 4,
     "correct": 0,
+    "times_called": 2,
     "called": {
      "Aurora kinase inhibitors": 2,
      "DNA damage": 1,
@@ -1037,6 +1042,7 @@
    "Eg5 inhibitors": {
     "compounds": 2,
     "correct": 0,
+    "times_called": 0,
     "called": {
      "Microtubule destabilizers": 2
     }
@@ -1044,6 +1050,7 @@
    "Epithelial": {
     "compounds": 3,
     "correct": 0,
+    "times_called": 0,
     "called": {
      "Protein synthesis": 2,
      "Microtubule stabilizers": 1
@@ -1052,6 +1059,7 @@
    "Kinase inhibitors": {
     "compounds": 3,
     "correct": 0,
+    "times_called": 0,
     "called": {
      "DNA damage": 1,
      "Microtubule stabilizers": 1,
@@ -1061,6 +1069,7 @@
    "Microtubule destabilizers": {
     "compounds": 4,
     "correct": 0,
+    "times_called": 2,
     "called": {
      "Aurora kinase inhibitors": 2,
      "Microtubule stabilizers": 2
@@ -1069,6 +1078,7 @@
    "Microtubule stabilizers": {
     "compounds": 3,
     "correct": 3,
+    "times_called": 17,
     "called": {
      "Microtubule stabilizers": 3
     }
@@ -1076,6 +1086,7 @@
    "Protein degradation": {
     "compounds": 4,
     "correct": 0,
+    "times_called": 0,
     "called": {
      "Microtubule stabilizers": 2,
      "DNA replication": 1,
@@ -1085,6 +1096,7 @@
    "Protein synthesis": {
     "compounds": 3,
     "correct": 0,
+    "times_called": 2,
     "called": {
      "Microtubule stabilizers": 3
     }

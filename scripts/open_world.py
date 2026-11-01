@@ -160,9 +160,11 @@ def report(records: list[dict], specimens, base: dict, n_classes: int, split: di
     lo = bootstrap["agent_minus_majority"]["all"]["ci95"][0]
 
     per_class = {}
+    times_called = Counter(r.get("agent_moa") for r in records)
     for m in sorted({sp.moa for sp in sps}):
         rs = [by_id[sp.specimen_id] for sp in sps if sp.moa == m]
         per_class[m] = {"compounds": len(rs), "correct": sum(r["correct"] for r in rs),
+                        "times_called": times_called.get(m, 0),  # over all runs, any true class
                         "called": dict(Counter(r.get("agent_moa") or "(no conclusion)" for r in rs).most_common())}
 
     def rate(rs: list[dict], key: str) -> dict:
@@ -235,10 +237,11 @@ def markdown(rep: dict, prereg: str) -> list[str]:
     lines += ["", f"Reading (registered criterion): the interval of agent minus the majority-class guess on all "
               f"{rep['n']} compounds is [{pp(lo)}, {pp(hi)}] points, so it "
               + ("**excludes zero**." if rep["excludes_zero"] else "**does not exclude zero**."), "",
-              "| True class | Compounds | Right | What the Scientist called |", "|---|---|---|---|"]
+              f"| True class | Compounds | Right | What the Scientist called | Times it called this class (of {rep['n']} runs) |",
+              "|---|---|---|---|---|"]
     for m, c in rep["per_class"].items():
         lines.append(f"| {m} | {c['compounds']} | {c['correct']} | "
-                     + "; ".join(f"{k} ×{v}" for k, v in c["called"].items()) + " |")
+                     + "; ".join(f"{k} ×{v}" for k, v in c["called"].items()) + f" | {c.get('times_called', '–')} |")
     s = rep["signals"]
 
     def r_(x):

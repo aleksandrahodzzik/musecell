@@ -1,11 +1,11 @@
 # MuseCell evaluation
 
-Generated 2026-11-01T08:58:59+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
+Generated 2026-11-01T09:14:13+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
 
 - Compounds: 38 MoA-annotated BBBC021 compounds, leave-one-compound-out (the atlas never contains the compound under test).
 - Metric: compound-level MoA accuracy (one call per compound).
 - Models: scientist `muse-spark-1.3`, microscopist `muse-spark-1.3`, reviewer `muse-wonder-1.0`, segmentation `classical (scikit-image)`.
-- Blinding-leak test: pytest leak/blinding tests: 13 passed, 95 deselected in 26.40s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
+- Blinding-leak test: pytest leak/blinding tests: 13 passed, 95 deselected in 9.24s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
 
 | Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
 |---|---|---|---|---|---|---|---|---|
@@ -148,20 +148,20 @@ Paired bootstrap over compounds (10,000 resamples, percentile 95% interval), per
 
 Reading (registered criterion): the interval of agent minus the majority-class guess on all 38 compounds is [-8.6, +15.8] points, so it **does not exclude zero**.
 
-| True class | Compounds | Right | What the Scientist called |
-|---|---|---|---|
-| Actin disruptors | 3 | 0 | Microtubule stabilizers ×3 |
-| Aurora kinase inhibitors | 3 | 2 | Aurora kinase inhibitors ×2; DNA damage ×1 |
-| Cholesterol-lowering | 2 | 0 | Actin disruptors ×1; Microtubule stabilizers ×1 |
-| DNA damage | 4 | 0 | Aurora kinase inhibitors ×3; DNA replication ×1 |
-| DNA replication | 4 | 0 | Aurora kinase inhibitors ×2; DNA damage ×1; Microtubule stabilizers ×1 |
-| Eg5 inhibitors | 2 | 0 | Microtubule destabilizers ×2 |
-| Epithelial | 3 | 0 | Protein synthesis ×2; Microtubule stabilizers ×1 |
-| Kinase inhibitors | 3 | 0 | DNA damage ×1; Microtubule stabilizers ×1; Aurora kinase inhibitors ×1 |
-| Microtubule destabilizers | 4 | 0 | Aurora kinase inhibitors ×2; Microtubule stabilizers ×2 |
-| Microtubule stabilizers | 3 | 3 | Microtubule stabilizers ×3 |
-| Protein degradation | 4 | 0 | Microtubule stabilizers ×2; DNA replication ×1; Aurora kinase inhibitors ×1 |
-| Protein synthesis | 3 | 0 | Microtubule stabilizers ×3 |
+| True class | Compounds | Right | What the Scientist called | Times it called this class (of 38 runs) |
+|---|---|---|---|---|
+| Actin disruptors | 3 | 0 | Microtubule stabilizers ×3 | 1 |
+| Aurora kinase inhibitors | 3 | 2 | Aurora kinase inhibitors ×2; DNA damage ×1 | 11 |
+| Cholesterol-lowering | 2 | 0 | Actin disruptors ×1; Microtubule stabilizers ×1 | 0 |
+| DNA damage | 4 | 0 | Aurora kinase inhibitors ×3; DNA replication ×1 | 3 |
+| DNA replication | 4 | 0 | Aurora kinase inhibitors ×2; DNA damage ×1; Microtubule stabilizers ×1 | 2 |
+| Eg5 inhibitors | 2 | 0 | Microtubule destabilizers ×2 | 0 |
+| Epithelial | 3 | 0 | Protein synthesis ×2; Microtubule stabilizers ×1 | 0 |
+| Kinase inhibitors | 3 | 0 | DNA damage ×1; Microtubule stabilizers ×1; Aurora kinase inhibitors ×1 | 0 |
+| Microtubule destabilizers | 4 | 0 | Aurora kinase inhibitors ×2; Microtubule stabilizers ×2 | 2 |
+| Microtubule stabilizers | 3 | 3 | Microtubule stabilizers ×3 | 17 |
+| Protein degradation | 4 | 0 | Microtubule stabilizers ×2; DNA replication ×1; Aurora kinase inhibitors ×1 | 0 |
+| Protein synthesis | 3 | 0 | Microtubule stabilizers ×3 | 2 |
 
 "The nearest references don't fit" (registered measures; control = the 38 closed-world v5 Muse Spark 1.3 runs, where the class is in the library):
 
