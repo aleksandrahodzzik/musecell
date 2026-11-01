@@ -2,7 +2,7 @@
 
 > **TL;DR**
 > 1. **What:** a blinded screening agent on real BBBC021 cell images. Muse Spark plans which 4 of ~24 wells to image, Muse Wonder reviews the call, and only then is the compound unblinded and checked against PubChem, ChEMBL and PubMed.
-> 2. **Result (Muse Spark 1.3, agent v5):** right mechanism for **34/38** compounds; on the held-out half of a frozen split, **18/19**. The Scientist chooses the wells and the published NSC protocol makes the call. A fixed "4 highest doses" rule is right on exactly the same 34 compounds, so the model's measured value is not extra accuracy. It is the blinded, audited record: why each well, the reviewer's critique, and a dossier with verified citations. [Benchmark](eval/RESULTS.md).
+> 2. **Result (Muse Spark 1.3, agent v5):** right mechanism for **34/38** compounds, **18/19** on the held-out half of a frozen split. With only a well budget, Muse Spark converged on the strategy a screening biologist would use (140 of its 152 wells at the top doses) and matched that fixed rule compound for compound; it did not beat it. When its own judgement overrode the published NSC vote, it was usually wrong (1 of 7 in v4), so MuseCell lets the model plan, argue and explain, and lets the protocol make the call.
 > 3. **Cost:** about $0.29 and 1.5 minutes per run on Muse Spark 1.3 (mean of 38 runs). **[Live demo](https://aleksandrahodzzik.github.io/musecell/)** · Video: *link added at submission*.
 
 **MuseCell is an autonomous screening scientist.** Give it a blinded compound and a small budget of microscope wells. It images real cells, measures them, forms mechanism-of-action hypotheses, chooses the next experiment that best separates them, has its conclusion reviewed by a second model, and only then unblinds the compound and checks itself against chemistry databases and literature.
@@ -11,9 +11,15 @@
 
 *Research tool for cell-biology screening data. Not for clinical use.*
 
-![A recorded blinded run replayed at 6×: the agent acquires wells, the hypothesis board converges, the PI reviewer asks for one more experiment, then the compound is unblinded and the call is checked](docs/hero.gif)
+![A recorded blinded run replayed at 6×: the agent acquires four wells, the hypothesis board converges on one class, the PI reviewer approves, the NSC vote over the four wells agrees, then the compound is unblinded and the call is checked](docs/hero.gif)
 
-<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist first concludes "Actin disruptors"; the reviewer sends it back for another look at a well it already had; on re-examination the Scientist switches to "Eg5 inhibitors"; the vote over its 4 wells splits 2/1/1 and stays on "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
+<sub>Replay of a recorded live run (`run_64e9e01ca04e`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.23, 31 Oct), sped up 6×. The Scientist images the highest dose first, then three wells at the next two doses, and concludes "Microtubule stabilizers" (probability 0.93); the reviewer approves; the NSC vote over its 4 wells is 4/4 for the same class; the compound is docetaxel, so the final call and the Scientist's call are both right. Demo specimens are picked by phenotype strength before they run, not by outcome. Replays are labelled as such in the app.</sub>
+
+**Why the protocol makes the call**
+
+![A second recorded run replayed at 6×: the Scientist dissents from the NSC vote after the reviewer's request; the vote stays on the annotated class and the dissent is wrong](docs/protocol_call.gif)
+
+<sub>Replay of a recorded live run (`run_9afbd903a2d2`, agent v5, Muse Spark 1.3 + Muse Wonder 1.0, 4 wells, $0.50, 31 Oct), sped up 6×. The Scientist first concludes "Actin disruptors"; the reviewer sends it back for another look at a well it already had; on re-examination the Scientist switches to "Eg5 inhibitors"; the vote over its 4 wells splits 2/1/1 and stays on "Actin disruptors"; the compound is cytochalasin D, so the final call is right and the Scientist's dissent is shown as wrong.</sub>
 
 ## Why this matters
 
@@ -23,7 +29,7 @@ Users are screening and computational biologists working with cell lines and sma
 
 ## How it uses Meta AI
 
-Three Meta models play different roles in one run; every call is metered and capped. Which model produced which number: the **benchmark headline is agent v5 on full-price `muse-spark-1.3`** with `muse-wonder-1.0` reviewing, which is also the live app's default; the same agent on Muse Spark Open (Baseten) is reported next to it; the **recorded demo runs** are agent v5, three on `muse-spark-1.3` and one on Muse Spark Open.
+Four Meta models fill the five roles in the table. In every run Muse Spark 1.3 is the Scientist and the Microscopist and Muse Wonder 1.0 is the PI reviewer; Muse Spark Open (open weights, on Baseten) can take the Scientist and Microscopist roles instead; SAM 3.1 checked the segmentation and is not called during a run. Every call is metered and capped. Which model produced which number: the **benchmark headline is agent v5 on full-price `muse-spark-1.3`** with `muse-wonder-1.0` reviewing, which is also the live app's default; the same agent on Muse Spark Open (Baseten) is reported next to it; the **recorded demo runs** are agent v5, three on `muse-spark-1.3` and one on Muse Spark Open.
 
 | Role | Model | What it does | Code |
 |---|---|---|---|
@@ -58,20 +64,25 @@ flowchart LR
     end
     subgraph Backend["FastAPI (one process, port 8787)"]
         API["/api/runs + SSE events"]
-        Loop["AgentLoop<br/>blinded → review → unblinding → reflection"]
+        Loop["AgentLoop<br/>blinded → review → protocol call → unblinding → reflection"]
         Tools["9 tools<br/>budget, schemas, phase gating"]
+        Protocol["Protocol call (code, still blinded)<br/>NSC vote over the agent's wells → final call"]
         Guard["Guardrails<br/>blinding scanner · citation validator · cost caps"]
         Store["Run store<br/>runs/*.jsonl · replay"]
     end
     subgraph Meta["Meta Model API"]
         Spark["muse-spark-1.3<br/>Scientist + Microscopist"]
         Wonder["muse-wonder-1.0<br/>PI reviewer"]
-        SAM["sam-3.1<br/>segmentation check"]
+        SAM["sam-3.1<br/>segmentation check (offline)"]
+    end
+    subgraph Baseten["Baseten (open weights)"]
+        Open["muse-spark-open-1026<br/>Scientist + Microscopist"]
     end
     subgraph Science["Measurement (no model)"]
         Seg["Segmentation<br/>scikit-image"]
-        Feat["Per-cell features<br/>robust z vs same-plate DMSO"]
-        Atlas["LOCO reference atlas<br/>38 compounds"]
+        Feat["Per-cell features<br/>robust z vs same-plate DMSO<br/>(what the agent reads)"]
+        Emb["ResNet50 (ImageNet) embeddings<br/>per stain"]
+        Atlas["Deep reference atlas, LOCO<br/>ResNet50 + TVN (DMSO-whitened)<br/>38 compounds"]
     end
     subgraph External["Public databases (after unblinding only)"]
         PubChem["PubChem"]
@@ -83,9 +94,14 @@ flowchart LR
     UI <-->|SSE| API
     API --> Loop
     Loop <--> Spark
+    Loop -.->|open-weights mode| Open
     Loop <--> Wonder
     Loop --> Tools
-    Tools --> Seg --> Feat --> Atlas
+    Tools --> Seg --> Feat
+    Data --> Emb --> Atlas
+    Tools -->|similarity search| Atlas
+    Loop --> Protocol
+    Protocol -->|1-NN per acquired well| Atlas
     Seg -.->|bake-off| SAM
     Data --> Seg
     Tools --> PubChem & ChEMBL & PubMed
@@ -93,7 +109,7 @@ flowchart LR
     Loop --> Store
 ```
 
-A run: the Scientist spends its well budget with `acquire_well` (a virtual microscope over real BBBC021 images), looks with `describe_phenotype`, compares with `compare_to_reference_atlas` and `dose_response`, updates its hypotheses, and calls `submit_conclusion`. The reviewer approves or asks for one more experiment. Only then do `lookup_compound` and `search_literature` unlock; code computes the verdict ([`loop.py#L263`](backend/app/agent/loop.py#L263)), and the agent writes a reflection and a dossier (Markdown + JSON) that cites only papers it actually retrieved.
+A run: the Scientist spends its well budget with `acquire_well` (a virtual microscope over real BBBC021 images), looks with `describe_phenotype`, compares with `compare_to_reference_atlas` and `dose_response`, updates its hypotheses, and calls `submit_conclusion`. The reviewer approves or asks for one more experiment. Code then takes the NSC vote over the wells the Scientist acquired, in the deep atlas, as the run's final call ([`loop.py#L247`](backend/app/agent/loop.py#L247)); the Scientist's own conclusion is kept and scored next to it. Only then do `lookup_compound` and `search_literature` unlock; code computes the verdict ([`loop.py#L279`](backend/app/agent/loop.py#L279)), and the agent writes a reflection and a dossier (Markdown + JSON) that cites only papers it actually retrieved.
 
 Layout: `backend/app/agent` (loop, tools, reviewer, guardrails), `backend/app/science` (segmentation, features, atlas, stats), `backend/app/external` (PubChem, ChEMBL, PubMed clients), `backend/app/runs` (event store, replay), `frontend/` (UI), `scripts/` (data pipeline, eval, demo recording), `demo/` (4 recorded runs + 40 thumbnails), `eval/` (benchmark results).
 

@@ -3,7 +3,10 @@
 Needs the backend running with the built frontend (see scripts/screenshots.py). No API credits are spent: the run
 is a replay of a recorded live run. ffmpeg comes from the `imageio-ffmpeg` package (requirements-dev.txt).
 
-    python scripts/record_hero_gif.py [--base http://127.0.0.1:8787] [--run run_19b4ee810120] [--speed 6]
+    python scripts/record_hero_gif.py [--base http://127.0.0.1:8787] [--run run_64e9e01ca04e] [--speed 6]
+    python scripts/record_hero_gif.py --run run_9afbd903a2d2 --out docs/protocol_call.gif   # the README's second GIF
+
+The source video is kept next to the GIF as <name>.webm (gitignored) for the demo video edit.
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ import imageio_ffmpeg
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs" / "hero.gif"
+OUT = ROOT / "docs" / "hero.gif"  # default output
 VIEWPORT = {"width": 1280, "height": 720}
 MAX_BYTES = 8 * 1024 * 1024
 
@@ -74,20 +77,24 @@ def to_gif(src: Path, dst: Path, width: int, fps: int, trim_start: float) -> Non
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default="http://127.0.0.1:8787")
-    ap.add_argument("--run", default="run_19b4ee810120", help="recorded run to replay")
+    # hero: the first agent-v5 Muse Spark 1.3 demo run (recorder's phenotype-strength order) where the Scientist and
+    # the NSC vote agree and the call is right
+    ap.add_argument("--run", default="run_64e9e01ca04e", help="recorded run to replay")
+    ap.add_argument("--out", type=Path, default=OUT, help="GIF path; the source video is kept as <name>.webm")
     ap.add_argument("--speed", type=float, default=6.0)
     ap.add_argument("--trim-start", type=float, default=0.5, help="seconds cut from the start (blank first frames)")
     args = ap.parse_args()
 
     with tempfile.TemporaryDirectory() as tmp:
+        out = args.out if args.out.is_absolute() else ROOT / args.out
         video = film(args.base, args.run, args.speed, Path(tmp))
-        kept = ROOT / "docs" / "hero.webm"  # gitignored; kept for the demo video edit
+        kept = out.with_suffix(".webm")  # gitignored; kept for the demo video edit
         shutil.copyfile(video, kept)
         # shrink until it fits the 8 MB README budget
         for width, fps in ((960, 10), (880, 8), (800, 8), (720, 6)):
-            to_gif(kept, OUT, width, fps, args.trim_start)
-            size = OUT.stat().st_size
-            print(f"{OUT.relative_to(ROOT)}: {width}px, {fps} fps, {size / 1e6:.2f} MB")
+            to_gif(kept, out, width, fps, args.trim_start)
+            size = out.stat().st_size
+            print(f"{out.relative_to(ROOT)}: {width}px, {fps} fps, {size / 1e6:.2f} MB")
             if size <= MAX_BYTES:
                 return 0
     print("GIF is still over 8 MB.", file=sys.stderr)
