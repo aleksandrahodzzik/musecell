@@ -54,6 +54,11 @@ def allowed(res: dict) -> tuple[set[str], set[str]]:
                 pcts.add(f"{100 * c / n:.1f}")
                 if float(c).is_integer():
                     fracs.add(f"{int(c)}/{n}")
+    if ow.get("citations"):
+        fracs.add(ow["citations"])
+    for sig in (ow.get("signals") or {}).values():
+        for c in (sig.values() if "open_world" in sig else [sig]):
+            fracs.add(f"{c['n']}/{c['of']}")
     for comparison in (ow.get("bootstrap") or {}).values():
         for d in comparison.values():
             for x in (d["mean"], *d["ci95"]):

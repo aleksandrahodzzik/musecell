@@ -197,6 +197,23 @@ Muse Spark 1.3 runs: 0 failed, 0 blinding leaks in the offline re-scan, 110/110 
 - **Held-out check.** A dev/test split was frozen before v4 was explored ([`eval/split.json`](eval/split.json)), and v4 and v5 were decided on dev evidence. The test half was then read for v4 (17/19) and v5 on Muse Spark Open (17/19), and once more for the v5 report on `muse-spark-1.3` (18/19), which changed nothing in the agent.
 - **Caveat.** v1–v3 were developed on all 38 compounds, and BBBC021 has no other annotated compounds. Treat the overall numbers as development results and the test-half numbers as the cleaner estimate.
 
+**Open world: the mechanism left out of the reference library (pre-registered).** When a compound's whole mechanism class is removed from the reference library, can the Scientist still name it from the phenotype? NSC and the dose rule cannot, by construction. The protocol was registered in [`docs/DECISIONS.md`](docs/DECISIONS.md) (commit `8065716`) before any code for it was written, and run once. The agent was v5-open: v5 tools and loop on Muse Spark 1.3, Muse Wonder 1.0 reviewing, 4 wells. Its prompt said only that the library may not contain the mechanism, and its own call was final. Every atlas read in a run excluded all compounds of the specimen's class.
+
+| Mechanism left out of the library | All 38 | Dev half | Held-out test half |
+|---|---|---|---|
+| MuseCell v5-open, the Scientist's call | 5/38 (13.2%) | 3/19 | 2/19 |
+| NSC on all wells, and NSC on the 4 highest doses | 0/38 (0.0%) | 0/19 | 0/19 |
+| Always the most common class (label-only guess, expected) | 4/38 (10.5%) | 2/19 | 2/19 |
+| Uniform guess, 1 in 12 (expected) | 8.3% | 8.3% | 8.3% |
+
+- **The registered test is not met.** Agent minus the label-only guess: +2.6 points, paired bootstrap 95% interval −8.6 to +15.8 over the 38 compounds. The criterion was an interval that excludes zero, so this result is not a claim in the TL;DR.
+- **The right calls come from the classes it over-calls.** All 5 are Microtubule stabilizers (3 of 3 right; it called that class 17 times) and Aurora kinase inhibitors (2 of 3; called 11 times). The other 10 classes: 0 of 32.
+- **It did leave the library.** Its call differed from the NSC vote over its own wells in 17/38 runs (closed world: 5/38). In 13/38 it named a class no reference it saw had shown (closed world: 0/38). Those departures were right 5 times.
+- **In words it called the vote weak, not wrong.** It wrote "weak", "split" or "low similarity" rather than "the references don't fit"; the registered wording check matched 0/38 runs (closed world 0/38).
+- 0 failed runs, 0 blinding leaks, citations 107/107, $14.47 for the 38 runs. The full tables are in [`eval/RESULTS.md`](eval/RESULTS.md).
+
+Reading: without its class in the library, Muse Spark leaves a misleading vote, but the alternative it picks is mostly one of two visually striking classes, not the missing one. This is the same pull that made its overrides of the vote wrong in the closed world. It supports the split above: the model plans, argues and explains, and the protocol makes the call where the reference library covers the mechanism.
+
 Rebuild everything from the log without API calls (needs the data and the run logs):
 
 ```powershell
