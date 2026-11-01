@@ -11,6 +11,8 @@ Two feature spaces (Settings.atlas_features): "handcrafted" (the 24 measured fea
 
 from __future__ import annotations
 
+import copy
+from collections.abc import Iterable
 from pathlib import Path
 
 import numpy as np
@@ -51,6 +53,19 @@ class Atlas:
         self._matrix = self._embed(ref[features].to_numpy(dtype=float))
         self.space = "handcrafted"
         self._wells: pd.DataFrame | None = None  # deep atlas only: well_key -> vector
+        self.excluded_moa: str | None = None  # open-world eval: a whole class left out of the reference library
+
+    def without_moa(self, moa: str, drop_well_keys: Iterable[str] = ()) -> Atlas:
+        """A copy with no reference treatment of `moa` and no per-well vector in `drop_well_keys` (open-world eval,
+        leave-one-MoA-out; docs/DECISIONS.md). The space, whitening and every other reference are unchanged."""
+        out = copy.copy(self)
+        keep = (self.reference["moa"].astype(str) != moa).to_numpy()
+        out.reference = self.reference[keep].reset_index(drop=True)
+        out._matrix = self._matrix[keep]
+        if self._wells is not None:
+            out._wells = self._wells.drop(index=[k for k in set(drop_well_keys) if k in self._wells.index])
+        out.excluded_moa = moa
+        return out
 
     @classmethod
     def load_deep(cls, deep_dir: Path) -> Atlas:

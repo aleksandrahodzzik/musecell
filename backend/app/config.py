@@ -110,6 +110,9 @@ class Settings(BaseSettings):
     # Who makes the run's final MoA call (agent v5): "protocol" = NSC vote over the wells the Scientist chose (the
     # Scientist's conclusion is kept as its own call); "scientist" = the Scientist's conclusion (v1-v4).
     final_call: Literal["protocol", "scientist"] = "protocol"
+    # Open-world eval (agent "v5-open", docs/DECISIONS.md): set per run by RunManager.create_run(open_world=True),
+    # together with final_call="scientist" and a reference library without the specimen's MoA class.
+    open_world: bool = False
     nuclei_segmenter: Segmenter = "classical"
     cell_segmenter: Segmenter = "classical"
 

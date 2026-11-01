@@ -15,6 +15,7 @@ from app.agent import AGENT_VERSION
 from app.agent import tools as T
 from app.agent.guardrails import BlindingScanner, load_moa_classes
 from app.agent.loop import AgentLoop
+from app.agent.open_world import OPEN_WORLD_VERSION, REFERENCE_LIBRARY, restricted_atlas
 from app.agent.schemas import AgentRun, RunMode
 from app.agent.specimens import Specimen, SpecimenCatalog
 from app.config import MAX_BUDGET_WELLS, PROVIDERS, Settings, get_settings
@@ -141,7 +142,9 @@ class RunManager:
         return sp.blinding_terms(synonyms)
 
     async def create_run(self, specimen_id: str, budget: int, mode: RunMode = "blinded",
-                         provider: str | None = None) -> AgentLoop:
+                         provider: str | None = None, open_world: bool = False) -> AgentLoop:
+        """open_world: the pre-registered open-world eval (agent "v5-open", app/agent/open_world.py) — the
+        specimen's whole MoA class is left out of this run's reference library and the Scientist's call is final."""
         if not self.live_enabled:
             raise RunRequestError(self.data_error or self.llm_error or "Live runs are not available.")
         provider = provider or self.settings.provider
@@ -155,10 +158,15 @@ class RunManager:
             sp = self.catalog.get(specimen_id)
         except KeyError as exc:
             raise RunRequestError(str(exc.args[0])) from None
+        atlas, model_ids = self.atlas, self.model_ids(provider)
+        if open_world:
+            settings = settings.model_copy(update={"open_world": True, "final_call": "scientist"})
+            atlas = restricted_atlas(self.atlas, self.catalog, sp)
+            model_ids |= {"agent": OPEN_WORLD_VERSION, "reference_library": REFERENCE_LIBRARY}
         run_id = "run_" + uuid.uuid4().hex[:12]
         run = AgentRun(run_id=run_id, mode=mode, specimen_id=sp.specimen_id, budget_total=budget,
-                       model_ids=self.model_ids(provider))
-        ctx = T.ToolContext(run=run, specimen=sp, catalog=self.catalog, atlas=self.atlas, moa_classes=self.moa_classes,
+                       model_ids=model_ids)
+        ctx = T.ToolContext(run=run, specimen=sp, catalog=self.catalog, atlas=atlas, moa_classes=self.moa_classes,
                             meter=CostMeter(run_id=run_id, cap_usd=self.settings.run_cost_cap_usd), llm=self.llm,
                             pubchem=self.pubchem, chembl=self.chembl, pubmed=self.pubmed, settings=settings)
         scanner = BlindingScanner(await self._blinding_terms(sp)) if mode == "blinded" else None

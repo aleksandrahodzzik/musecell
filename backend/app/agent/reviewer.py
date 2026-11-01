@@ -33,6 +33,21 @@ SYSTEM = (
     "blinding guard then stops the run. Refer to controls by class (agent v3 eval: one review was stopped so)."
 )
 
+# Agent "v5-open" (pre-registered open-world eval, docs/DECISIONS.md): the scoring rule is the one sentence that changes.
+V5_FINAL_CALL = (
+    "The run's final call is made by protocol: the NSC vote over the wells the agent "
+    "acquired (`protocol_call`, the latest one the atlas tool reported). When that vote is split or weak, or the "
+    "conclusion disagrees with it, ask for the one affordable well (dose index and replicate) or free analysis "
+    "most likely to make the vote decisive, if the budget allows."
+)
+OPEN_WORLD_FINAL_CALL = (
+    "The run's final call is the agent's own conclusion. The reference library may not contain this compound's "
+    "mechanism, so the NSC vote (`protocol_call`) and the nearest references may all point to other classes; judge "
+    "the conclusion from all the evidence."
+)
+assert SYSTEM.count(V5_FINAL_CALL) == 1
+OPEN_WORLD_SYSTEM = SYSTEM.replace(V5_FINAL_CALL, OPEN_WORLD_FINAL_CALL)
+
 
 def response_schema() -> dict:
     return {"type": "object", "additionalProperties": False,
@@ -75,16 +90,16 @@ def _protocol(run: AgentRun) -> dict | None:
             "agrees_with_conclusion": bool(run.conclusion and run.conclusion.top_moa == nsc["moa"])}
 
 
-def build_messages(run: AgentRun, specimen: Specimen, moa_classes: list[str]) -> list[dict]:
-    return [{"role": "system", "content": SYSTEM},
+def build_messages(run: AgentRun, specimen: Specimen, moa_classes: list[str], open_world: bool = False) -> list[dict]:
+    return [{"role": "system", "content": OPEN_WORLD_SYSTEM if open_world else SYSTEM},
             {"role": "user", "content": (f"MoA classes: {moa_classes}\n\nEvidence ledger and conclusion:\n"
                                          + json.dumps(ledger(run, specimen), indent=1, default=str))}]
 
 
 async def review(llm: LLMClient, model: str, run: AgentRun, specimen: Specimen, moa_classes: list[str],
-                 meter: CostMeter) -> tuple[Review, CallRecord, list[dict]]:
+                 meter: CostMeter, open_world: bool = False) -> tuple[Review, CallRecord, list[dict]]:
     """Returns the review, its call record and the messages that were sent (for the leak guard and tests)."""
-    messages = build_messages(run, specimen, moa_classes)
+    messages = build_messages(run, specimen, moa_classes, open_world)
     result, record = await llm.chat_json(model=model, messages=messages, meter=meter, purpose="reviewer",
                                          schema_name="pi_review", schema=response_schema(),
                                          max_tokens=REVIEWER_MAX_TOKENS)

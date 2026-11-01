@@ -95,7 +95,8 @@ class AgentLoop:
                        doses=len(ctx.specimen.concentrations_uM))
             self.messages = [
                 {"role": "system", "content": prompts.scientist_system(ctx.moa_classes, run.budget_total,
-                                                                       BLINDED_TURNS, run.mode)},
+                                                                       BLINDED_TURNS, run.mode,
+                                                                       open_world=ctx.settings.open_world)},
                 {"role": "user", "content": prompts.scientist_start(
                     run.specimen_id, run.budget_total, ctx.specimen.compound if run.mode == "open" else None)}]
             if not await self._tool_phase(BLINDED_TURNS, until="conclusion"):
@@ -228,7 +229,7 @@ class AgentLoop:
         run, ctx = self.run, self.ctx
         self._check(reviewer.ledger(run, ctx.specimen), "the reviewer's ledger")
         review, record, _ = await reviewer.review(ctx.llm, ctx.settings.reviewer_model, run, ctx.specimen,
-                                                  ctx.moa_classes, ctx.meter)
+                                                  ctx.moa_classes, ctx.meter, open_world=ctx.settings.open_world)
         run.review = review
         self._cost(record)
         self._emit("review", round=1, model=record.model, **review.model_dump())

@@ -22,6 +22,11 @@ Usage
       # open weights: Scientist + Microscopist on meta-models/muse-spark-open-1026 (Baseten), reviewer stays
       # muse-wonder-1.0 (Meta API); the outputs keep --model as the main agent and add the open model as a
       # comparison (same as --compare meta-models/muse-spark-open-1026)
+  python scripts/evaluate.py --open-world --model muse-spark-1.3@v5 --compare ...   # baselines + estimate, no API
+  python scripts/evaluate.py --open-world --budgets 4 --yes --model muse-spark-1.3@v5 --compare ...
+      # the pre-registered open-world eval (docs/DECISIONS.md): agent v5-open, the specimen's whole MoA class left
+      # out of the reference library; logs to eval/open_world_runs.jsonl. Every rebuild adds its section when the
+      # log exists, so pass the usual --model/--compare for the closed-world rows.
 """
 
 from __future__ import annotations
@@ -41,6 +46,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 from app.agent import AGENT_VERSION  # noqa: E402
+from app.agent.open_world import OPEN_WORLD_VERSION  # noqa: E402
 from app.agent.guardrails import BlindingScanner  # noqa: E402
 from app.agent.specimens import Specimen  # noqa: E402
 from app.config import OPEN_WEIGHTS_MODEL, PRICES, PROVIDERS, Settings, provider_of  # noqa: E402
@@ -49,10 +55,15 @@ from app.runs.manager import RunManager  # noqa: E402
 from app.runs.store import RunBus  # noqa: E402
 from app.science.atlas import Atlas, compound_level, nsc_baseline  # noqa: E402
 from well_choice import load_agent_wells, markdown as well_choice_markdown, well_choice_report  # noqa: E402
+import open_world as OW  # noqa: E402
 
 EVAL = ROOT / "eval"
 RUNS_LOG = EVAL / "agent_runs.jsonl"
 EVAL_RUNS_DIR = ROOT / "runs" / "eval"
+OPEN_LOG = EVAL / "open_world_runs.jsonl"  # pre-registered open-world eval (agent v5-open)
+OPEN_RUNS_DIR = ROOT / "runs" / "eval_open_world"
+OPEN_PREREG = "8065716"  # the commit that registered the open-world protocol, before its code
+OPEN_COST_GATE = 25.0  # USD: above this estimate the open-world eval refuses to run (registered gate)
 BUDGETS = (2, 4, 6)
 RECORDED = ("run_87e2787d1f1e", "run_39e2d32f1edc", "run_93391a0830e0")  # Phase-4 runs, budget 4
 # Stretch: the same three specimens on Muse Spark Open via Baseten (scripts/run_agent_cli.py, budget 4)
@@ -175,10 +186,10 @@ def estimate(n_specimens: int, budgets: tuple[int, ...], model: str, reviewer: s
 
 # --- agent runs -----------------------------------------------------------------------------------
 
-def load_log() -> list[dict]:
-    if not RUNS_LOG.exists():
+def load_log(path: Path = RUNS_LOG) -> list[dict]:
+    if not path.exists():
         return []
-    return [json.loads(line) for line in RUNS_LOG.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 async def leak_hits(manager: RunManager, sp: Specimen, bus: RunBus) -> int:
@@ -193,8 +204,8 @@ async def leak_hits(manager: RunManager, sp: Specimen, bus: RunBus) -> int:
     return hits
 
 
-async def one_run(manager: RunManager, sp: Specimen, budget: int) -> dict:
-    loop = await manager.create_run(sp.specimen_id, budget, "blinded")
+async def one_run(manager: RunManager, sp: Specimen, budget: int, open_world: bool = False) -> dict:
+    loop = await manager.create_run(sp.specimen_id, budget, "blinded", open_world=open_world)
     run = await loop.run_all()
     events = loop.bus.events
     report = next((e.data for e in events if e.type == "report_ready"), None)
@@ -216,15 +227,20 @@ async def one_run(manager: RunManager, sp: Specimen, budget: int) -> dict:
         "latency_s": round((events[-1].ts - events[0].ts).total_seconds(), 1),
         "citations_cited": cited, "citations_removed": removed, "report": report is not None,
         "leak_hits": await leak_hits(manager, sp, loop.bus),
+        # open world: the registered "references don't fit" measures (the vote is over the restricted library)
+        **(OW.run_signals([e.model_dump(mode="json") for e in events], sp.moa,
+                          run.verdict.scientist_moa if run.verdict else None,
+                          (run.verdict.protocol or {}).get("moa") if run.verdict else None) if open_world else {}),
     }
 
 
 async def run_agents(manager: RunManager, specimens: list[Specimen], budgets: tuple[int, ...],
-                     concurrency: int, model: str) -> None:
-    done = {(r["specimen_id"], r["budget"]) for r in load_log()
-            if r["models"]["scientist"] == model and version_of(r) == AGENT_VERSION}
+                     concurrency: int, model: str, open_world: bool = False) -> None:
+    log, version = (OPEN_LOG, OPEN_WORLD_VERSION) if open_world else (RUNS_LOG, AGENT_VERSION)
+    done = {(r["specimen_id"], r["budget"]) for r in load_log(log)
+            if r["models"]["scientist"] == model and version_of(r) == version}
     todo = [(sp, b) for b in budgets for sp in specimens if (sp.specimen_id, b) not in done]
-    print(f"agent runs: {len(done)} already in {RUNS_LOG.relative_to(ROOT)}, {len(todo)} to go")
+    print(f"agent runs: {len(done)} already in {log.relative_to(ROOT)}, {len(todo)} to go")
     sem, lock, stop = asyncio.Semaphore(concurrency), asyncio.Lock(), asyncio.Event()
     ledger, cap = manager.llm.ledger, manager.settings.daily_cost_cap_usd
 
@@ -237,13 +253,14 @@ async def run_agents(manager: RunManager, specimens: list[Specimen], budgets: tu
                 stop.set()
                 return
             try:
-                rec = await one_run(manager, sp, b)
+                rec = await one_run(manager, sp, b, open_world)
             except Exception as exc:  # noqa: BLE001 - recorded as a failed run, visible in the outputs
                 rec = {"specimen_id": sp.specimen_id, "compound": sp.compound, "truth_moa": sp.moa, "budget": b,
-                       "models": manager.model_ids(), "status": "failed", "error": f"{type(exc).__name__}: {exc}",
+                       "models": manager.model_ids() | ({"agent": version} if open_world else {}),
+                       "status": "failed", "error": f"{type(exc).__name__}: {exc}",
                        "correct": False, "first_correct": False, "wells_used": 0, "cost_usd": 0.0}
             async with lock:
-                with RUNS_LOG.open("a", encoding="utf-8") as f:
+                with log.open("a", encoding="utf-8") as f:
                     f.write(json.dumps(rec) + "\n")
             mark = "ok " if rec["correct"] else "x  "
             print(f"[{i:>3}/{len(todo)}] {mark} b={b} {sp.specimen_id} {rec['status']:<8} "
@@ -340,6 +357,18 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
                 notes.append(f"{label}, budget {b}, {r['specimen_id']}: run {r['status']} {outcome}: "
                              f"{(r.get('error') or '').splitlines()[0]}")
     return rows, notes
+
+
+def control_signals(records: list[dict]) -> list[dict]:
+    """The open-world "references don't fit" measures on closed-world runs (their logs), as the registered control:
+    the Scientist's final conclusion against the protocol's vote over its wells."""
+    out = []
+    for r in records:
+        path = EVAL_RUNS_DIR / f"{r.get('run_id')}.jsonl"
+        if path.exists() and r.get("scientist_moa"):
+            events = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            out.append(OW.run_signals(events, r["truth_moa"], r["scientist_moa"], r.get("agent_moa")))
+    return out
 
 
 def analysis(records: list[dict]) -> dict:
@@ -461,6 +490,8 @@ def write_markdown(res: dict, path: Path) -> None:
     lines += comparison_markdown(res)
     if res.get("well_choice"):
         lines += well_choice_markdown(res["well_choice"], res["well_choice"]["agent_label"])
+    if res.get("open_world"):
+        lines += OW.markdown(res["open_world"], res["open_world"]["prereg_commit"])
     if res.get("analysis"):
         lines += analysis_markdown(res["analysis"])
     if res.get("notes"):
@@ -536,9 +567,13 @@ async def main() -> int:
     p.add_argument("--seed", type=int, default=6)
     p.add_argument("--yes", action="store_true", help="run the agent (spends API credits)")
     p.add_argument("--aggregate-only", action="store_true")
+    p.add_argument("--open-world", action="store_true",
+                   help="the pre-registered open-world eval (agent v5-open, leave-one-MoA-out); budget 4 only")
     args = p.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     budgets = tuple(args.budgets)
+    if args.open_world and not args.aggregate_only and budgets != (OW.BUDGET,):
+        p.error(f"--open-world runs budget {OW.BUDGET} only (pre-registered): pass --budgets {OW.BUDGET}")
 
     main_model, main_ver = parse_spec(args.model)  # the main agent rows (and the error analysis)
     contributor = main_model.endswith("-contributor")
@@ -554,7 +589,8 @@ async def main() -> int:
         if m not in PRICES:
             p.error(f"no price for '{m}'")
     EVAL_RUNS_DIR.mkdir(parents=True, exist_ok=True)
-    manager = RunManager(settings, runs_dir=EVAL_RUNS_DIR)
+    OPEN_RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    manager = RunManager(settings, runs_dir=OPEN_RUNS_DIR if args.open_world else EVAL_RUNS_DIR)
     await manager.startup(check_models=args.yes)
     try:
         if manager.catalog is None:
@@ -585,7 +621,38 @@ async def main() -> int:
             print(f"  {r['label']:<30} budget {str(r['budget'] or 'all'):>3}  accuracy {r['accuracy']:.3f}"
                   + (f" ± {r['sd']:.3f}" if r.get("sd") else ""))
 
-        if not args.aggregate_only:
+        open_base = None
+        if args.open_world or OPEN_LOG.exists():  # open world: baselines under the exclusion (gate: exactly 0)
+            if manager.atlas is None or manager.atlas.space != "resnet50_tvn":
+                print("The open-world eval needs the deep atlas (scripts/build_deep_atlas.py).")
+                return 1
+            open_base = OW.baselines(manager.atlas, manager.catalog, specimens)
+            print("\nopen world (leave-one-MoA-out): NSC calls right, per baseline")
+            for k, calls in open_base.items():
+                print(f"  {k:<24} {sum(calls[sp.specimen_id] == sp.moa for sp in specimens)}/{len(specimens)}")
+            leaks = {k: sum(open_base[k][sp.specimen_id] == sp.moa for sp in specimens) for k in ("nsc_all", "nsc_top4")}
+            if any(leaks.values()):
+                print(f"!! STOP: NSC under the exclusion is not 0/{len(specimens)} ({leaks}): the exclusion leaks.")
+                return 2
+
+        if args.open_world and not args.aggregate_only:
+            v5 = [r for r in load_log() if r["models"]["scientist"] == run_model and version_of(r) == "v5"
+                  and r["budget"] == OW.BUDGET]
+            mean = float(np.mean([r["cost_usd"] for r in v5]))
+            est = mean * len(specimens)
+            print(f"\ncost estimate: {len(specimens)} open-world runs x ${mean:.3f} (mean of the {len(v5)} closed-world v5 "
+                  f"runs of {run_model}, reviewer {args.reviewer_model}) = ~${est:.2f}; with 30% margin "
+                  f"~${est * 1.3:.2f}; gate ${OPEN_COST_GATE:.2f}")
+            print(f"  spent today so far: ${manager.llm.ledger.total_today():.2f} of the "
+                  f"${settings.daily_cost_cap_usd:.2f} daily cap" if manager.llm else "  (no MODEL_API_KEY)")
+            if est * 1.3 > OPEN_COST_GATE:
+                print("!! STOP: the estimate is above the registered gate; ask before running.")
+                return 3
+            if not args.yes:
+                print("\nNo agent runs started. Re-run with --yes to spend the credits.")
+                return 0
+            await run_agents(manager, specimens, budgets, args.concurrency, run_model, open_world=True)
+        elif not args.aggregate_only:
             recorded = RECORDED if run_model == main_model else RECORDED_OPEN
             est = estimate(len(specimens), budgets, run_model, args.reviewer_model, recorded)
             print(f"\ncost estimate ({est['runs']} agent runs; scientist/microscopist/reflection {run_model} on "
@@ -665,12 +732,25 @@ async def main() -> int:
                 load_agent_wells(EVAL_RUNS_DIR, rs),
                 json.loads(split_path.read_text(encoding="utf-8")) if split_path.exists() else None, b)
             well_choice["agent_label"] = main_row["label"]
+        open_section = None
+        if open_base is not None and OPEN_LOG.exists():
+            o_recs = [r for r in load_log(OPEN_LOG) if version_of(r) == OPEN_WORLD_VERSION and r["budget"] == OW.BUDGET]
+            split = json.loads(split_path.read_text(encoding="utf-8")) if split_path.exists() else None
+            open_section = OW.report(o_recs, specimens, open_base, len(manager.moa_classes), split,
+                                     control_signals([r for r in used if r["budget"] == OW.BUDGET]))
+            open_section["prereg_commit"] = OPEN_PREREG
+            open_section["label"] = "MuseCell agent v5-open, muse-spark-1.3, open world (leave-one-MoA-out)"
+            agent_all = open_section["rows"][0]["all"]
+            print(f"\nopen world: agent {agent_all['correct']:.0f}/{agent_all['n']}; agent minus majority guess "
+                  f"{open_section['bootstrap']['agent_minus_majority']['all']}; excludes zero: "
+                  f"{open_section['excludes_zero']}")
         res = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "models": {"scientist": main_model, "microscopist": main_model, "reviewer": args.reviewer_model,
                           "segmentation": manager.model_ids()["segmentation"]},
                "comparisons": [{"model": m, "agent_version": v, "label": short_label(m, v)} for m, v in compare],
                "n_compounds": len(specimens), "blinding_leak_test": leak, "notes": notes, "rows": rows + a_rows,
-               "analysis": analysis(used) if used else None, "well_choice": well_choice}
+               "analysis": analysis(used) if used else None, "well_choice": well_choice,
+               **({"open_world": open_section} if open_section else {})}
         (EVAL / "results.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
         write_markdown(res, EVAL / "RESULTS.md")
         plot(res, EVAL / "accuracy_vs_budget.png")
