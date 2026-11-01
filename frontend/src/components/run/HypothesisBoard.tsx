@@ -19,6 +19,9 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
   const [view, setView] = useState<"now" | "time">("now");
   const rows = [...hypotheses].sort((a, b) => b.probability - a.probability);
   const truthMissing = verdict && !rows.some((h) => h.moa === verdict.truth_moa);
+  // v5: when the protocol's final call differs from the Scientist's top hypothesis, the final call leads the panel
+  // and the Scientist's top row is shown at the size of the others
+  const protocolLeads = !!verdict && verdict.call_source === "protocol" && rows.length > 0 && rows[0].moa !== verdict.agent_moa;
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -43,6 +46,14 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
             No hypotheses yet. The agent posts its first board after it has looked at some wells.
           </p>
         )}
+        {protocolLeads && (
+          <p role="status" className="mb-1.5 pb-2 border-b border-rule px-1.5 pt-1 font-serif text-[19px] leading-tight font-semibold">
+            Final call (protocol): {verdict!.agent_moa}{" "}
+            {verdict!.correct
+              ? <Check aria-label="matches the annotation" className="inline-block align-[-0.15em] h-5 w-5 text-verdict-yes" strokeWidth={3} />
+              : <X aria-label="does not match the annotation" className="inline-block align-[-0.15em] h-5 w-5 text-verdict-no" strokeWidth={3} />}
+          </p>
+        )}
         <ul className="flex flex-col gap-0.5">
           {rows.map((h, i) => {
             const isCall = verdict ? h.moa === verdict.agent_moa : conclusion?.top_moa === h.moa;
@@ -51,14 +62,15 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
             const isConcl = conclusion?.top_moa === h.moa;
             const dissent = !!verdict && verdict.call_source === "protocol" && isConcl && !isCall;
             const expanded = open === h.moa;
+            const lead = i === 0 && !protocolLeads;
             return (
-              <li key={h.moa} className={i === 0 ? "pb-2 mb-1 border-b border-rule" : ""}>
+              <li key={h.moa} className={lead ? "pb-2 mb-1 border-b border-rule" : ""}>
                 <button
                   className="w-full text-left rounded-control px-1.5 py-1.5 hover:bg-white/70"
                   aria-expanded={expanded}
                   onClick={() => setOpen(expanded ? null : h.moa)}
                 >
-                  {i === 0 ? (
+                  {lead ? (
                     <span className="flex items-end gap-2">
                       <span className="flex-1 font-serif text-[17px] leading-tight font-semibold">{h.moa}</span>
                       <span className="font-serif text-[34px] leading-none font-semibold tracking-tight">{prob(h.probability)}</span>
@@ -69,9 +81,9 @@ export default function HypothesisBoard({ hypotheses, history, conclusion, verdi
                       <span className="text-graphite">{prob(h.probability)}</span>
                     </span>
                   )}
-                  <span className={`block rounded-full bg-ink/10 overflow-hidden ${i === 0 ? "mt-2 h-2" : "mt-1 h-1"}`}>
+                  <span className={`block rounded-full bg-ink/10 overflow-hidden ${lead ? "mt-2 h-2" : "mt-1 h-1"}`}>
                     <span
-                      className={`block h-full rounded-full transition-[width] duration-500 ease-out ${i === 0 ? "bg-ink" : "bg-graphite/60"}`}
+                      className={`block h-full rounded-full transition-[width] duration-500 ease-out ${lead ? "bg-ink" : "bg-graphite/60"}`}
                       style={{ width: `${Math.max(1, h.probability * 100)}%` }}
                     />
                   </span>
