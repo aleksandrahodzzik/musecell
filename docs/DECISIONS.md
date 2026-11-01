@@ -399,3 +399,47 @@ Owner approved both after the cost estimate (rule 12).
 - **Eyepiece speed** (owner: clicking it changed the field far too slowly): it kept a 0.5 s fade to black and loaded three full-size channel PNGs per click. Now it keeps the current field until the next is decoded, loads one composite scaled to ≤ 720 px, and prefetches the next two: 140–280 ms per click locally.
 - Demo run correction: in `run_9afbd903a2d2` the reviewer asked for a well the Scientist had already acquired, so no well was spent; the Scientist re-examined with the free tools and then switched from Actin disruptors to Eg5 inhibitors.
 
+## Open-world eval, pre-registered (2026-11-01)
+
+Written and committed before any code for it exists. Code state at registration: `0065b95`. The closed-world agent (v5), its numbers and its headline are not changed by anything below.
+
+**Question.** When the specimen's mechanism class is absent from the reference library, can the Scientist (Muse Spark 1.3 with vision) still name it from the phenotype? NSC and any well-choice rule cannot, by construction.
+
+### Design
+- **Leave-one-MoA-out.** For each of the 38 annotated compounds, every atlas read in its run uses a reference library with **all compounds of the specimen's MoA class removed** (in closed-world runs only the specimen's own compound is removed). Implementation: a per-run copy of the deep atlas (ResNet50 + TVN, otherwise unchanged) without the reference treatments of that class and without the per-well vectors of the class's other compounds (the specimen's own wells stay: they are what the tools query). `ToolContext.atlas` is this copy, so `compare_to_reference_atlas` (neighbours, NSC vote, k-neighbour summary, thumbnails), the post-review `protocol_call`, and anything else that reads `ctx.atlas` see only the other 11 classes. `acquire_well`, `dose_response` and `describe_phenotype` read the specimen's own wells against same-plate DMSO and no reference; they are unchanged. TVN and the DMSO centring use DMSO wells only (no labels), so they are unchanged.
+- **Agent "v5-open"** (recorded as `model_ids.agent = "v5-open"`, `model_ids.reference_library = "leave-one-MoA-out"`): v5 tools and loop; Scientist and Microscopist `muse-spark-1.3` (full price), reviewer `muse-wonder-1.0`; budget 4; the same caps, turn limits, blinding guard and no-naming rules. **Final call = the Scientist's own (final) conclusion** (`final_call = "scientist"`); the NSC vote over its wells is still computed after the review and shown as a non-final "NSC vote".
+- **The one prompt change.** In the Scientist's system prompt, the v5 bullet that makes the NSC vote the final call ("How the run is scored: the run's final call is made by protocol, … disagree only with evidence, and say so.") is replaced by: *"How the run is scored: your own conclusion is the run's final call. The reference library may not contain this compound's mechanism. Name one of the 12 classes above from all the evidence."* Every other line is unchanged, including the "Weighing the evidence" bullet that treats the NSC vote as a starting prior. The PI reviewer's system prompt also states the scoring rule, so the same change is made in the same place there: its sentences "The run's final call is made by protocol: … most likely to make the vote decisive, if the budget allows." become *"The run's final call is the agent's own conclusion. The reference library may not contain this compound's mechanism, so the NSC vote (`protocol_call`) and the nearest references may all point to other classes; judge the conclusion from all the evidence."* Left unchanged, it would tell the reviewer something false and ask it to make decisive a vote that cannot be right. Nothing else in either prompt changes; the Microscopist's prompt is unchanged.
+- **One shot.** No prompt, tool or parameter change after any open-world output has been seen. A run that crashes on a bug in our code: fix only that bug, log it here, move the attempt's records to `eval/open_world_runs.attempt<N>.jsonl` (committed) and rerun all 38. Model-side failures (no conclusion within the turns, runaway reasoning, a blinding-guard stop) and provider errors that survive the client's retries count as wrong and are not rerun.
+- Order and concurrency as in the closed-world eval (specimens sorted by opaque id, 4 at a time). Runs log to `eval/open_world_runs.jsonl` (committed) and `runs/eval_open_world/` (gitignored).
+
+### Baselines, under the same exclusion (no API)
+- NSC on all wells (published protocol: treatment profiles, 1-NN, compound majority vote) and NSC on the 4 highest doses (`well_choice` rule "top doses" with the protocol's own `well_vote`). Both must be **exactly 0/38**; anything else means the exclusion leaks.
+- Uniform guess: 1/12 per compound (expected 3.2/38).
+- Majority-class prior. Under the exclusion a majority prior is 0/38 by construction (the true class is never in its counts; with these class sizes it is 0/38 even under plain LOCO), which makes it useless as a comparator. The comparator is therefore the **strongest label-only guesser**: always the most frequent class over all 38 labels, the specimen's own included. Four classes tie at 4 compounds (DNA damage, DNA replication, Microtubule destabilizers, Protein degradation); ties are broken uniformly, so each compound of a tied class scores 1/4 in expectation and every other compound 0 (expected 4/38 = 10.5% overall, 2/19 on each half). The 0/38 exclusion version is reported too.
+
+### Metrics
+- Accuracy of the final call on all 38 and on the dev and test halves of `eval/split.json`.
+- **Primary test:** paired bootstrap of (agent − majority prior) over compounds, 10,000 resamples, percentile 95% interval, `numpy.random.default_rng(6)`, the same `bootstrap_diff` as `scripts/well_choice.py`. The interval "excludes zero" if its lower bound is > 0. Also reported: the agent's accuracy with its bootstrap interval, and agent − uniform.
+- Per-class table: per true class, compounds, correct, and what the Scientist called.
+- **"The nearest references don't fit"**: three measures, each also computed on the 38 closed-world v5 Muse Spark 1.3 runs as a control.
+  1. *Leaves the vote:* the final conclusion differs from the NSC vote over the Scientist's own wells (under the exclusion).
+  2. *Leaves every reference it saw:* the final conclusion is a class that appears in none of the run's atlas outputs (neighbours, per-well votes, tallies) before the unblinding. In open world every right call does this.
+  3. *Says so in words:* the regex below, case-insensitive, matched within one sentence (no `.;:!?` between its parts) against the Scientist's text before the unblinding (every tool-call rationale, every visible note, the final conclusion's rationale). A match whose span contains `may`, `might`, `could`, `whether` or `if` is not counted (restating the instruction is not a judgement).
+
+```
+\b(library|atlas|references?|reference set|neighbou?rs?|nearest|nsc|vote)\b[^.;:!?]{0,80}?\b(don'?t|doesn'?t|do not|does not|not|never|no longer|fails? to|failed to|cannot|can'?t|poorly|badly)\b[^.;:!?]{0,30}?\b(fit|fits|match|matches|contain|contains|include|includes|represent|represents|cover|covers|explain|explains|capture|captures)\b
+| \b(absent|missing|lacking|unrepresented|not represented|not present|outside)\b[^.;:!?]{0,40}?\b(library|atlas|reference)
+| \b(library|atlas|reference set|references)\b[^.;:!?]{0,40}?\b(lacks?|lacking|is missing|are missing|has no|have no|without)\b
+| \bno (close|good|clear|matching|fitting|convincing|true) (match|reference|neighbou?r|analog|analogue)
+| \b(novel|unrepresented|missing) (mechanism|class|moa)\b
+```
+
+- Secondary: the Scientist's first conclusion (before review); review requests and changes; failures; cost and latency; how often the Microscopist listed the true class among its candidates; **elimination check:** how many of the 11 library classes the run's atlas outputs showed, and the accuracy of the runs that saw all 11 (only those could name the missing class by elimination; the atlas tool returns at most 10 neighbours per call).
+
+### Gates before any paid run
+1. Full test suite green, including a new test that no reference of the held-out class is reachable from any tool.
+2. Both NSC baselines under the exclusion exactly 0/38; otherwise STOP and report.
+3. Cost estimate ≤ $25 (from the 38 closed-world v5 full-price runs: mean $0.29/run, $11.09 in total, +30% margin) → proceed; > $25 → STOP and ask. The eval process gets a daily cap of the day's spend so far + $25, so the bound is enforced.
+
+### Reporting
+`scripts/evaluate.py` writes the numbers into `eval/results.json` (`open_world`) and `eval/RESULTS.md`. If the primary interval excludes zero, the README TL;DR gets one line under the closed-world result: "When the mechanism is missing from the reference library, NSC and the dose rule score 0% by construction; MuseCell names it for X/38 (95% CI …)". Otherwise the result goes, plainly, into the README's results section only. The UI gets an "Open-world eval" badge on these runs and no other change. Hard stop for this part: 2026-11-02 21:00 UTC; if it is not finished by then, the repository goes back to the state after Part A (`0065b95`).
