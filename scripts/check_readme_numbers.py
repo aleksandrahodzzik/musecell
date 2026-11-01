@@ -46,6 +46,18 @@ def allowed(res: dict) -> tuple[set[str], set[str]]:
     if t:
         fracs.add(f"{t['wells']}/{t['of']}")
         fracs.add(f"{t['wells']} of its {t['of']} wells")
+    ow = res.get("open_world") or {}  # the pre-registered open-world eval
+    for row in ow.get("rows", []):
+        for part in ("all", "dev", "test"):
+            if part in row:
+                c, n = row[part]["correct"], row[part]["n"]
+                pcts.add(f"{100 * c / n:.1f}")
+                if float(c).is_integer():
+                    fracs.add(f"{int(c)}/{n}")
+    for comparison in (ow.get("bootstrap") or {}).values():
+        for d in comparison.values():
+            for x in (d["mean"], *d["ci95"]):
+                pcts.add(f"{abs(100 * x):.1f}")
     return pcts, fracs
 
 
