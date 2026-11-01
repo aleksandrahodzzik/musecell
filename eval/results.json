@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-31T19:52:16+00:00",
+ "generated_at": "2026-11-01T08:18:22+00:00",
  "models": {
   "scientist": "muse-spark-1.3",
   "microscopist": "muse-spark-1.3",
@@ -34,7 +34,7 @@
   }
  ],
  "n_compounds": 38,
- "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 88 deselected in 7.02s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
+ "blinding_leak_test": "pytest leak/blinding tests: 13 passed, 89 deselected in 7.77s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits",
  "notes": [
   "The v1 budget 2/4/6 rows used `muse-spark-1.3-contributor` (same model, cheaper tier that lets Meta train on prompts; allowed only because BBBC021 is public). Rows labelled Muse Spark Open ran on Baseten. Full-price `muse-spark-1.3` (the live app's default) was benchmarked with agent v5 only.",
   "MuseCell agent, Muse Spark Open (Baseten), agent v4, budget 4: chosen on the dev half of a split frozen before it was explored (eval/split.json); dev 13/19, held-out test 17/19.",
@@ -149,6 +149,11 @@
    "reviewer_requests": 4,
    "scientist_accuracy": 0.8158,
    "nsc_on_chosen_wells": 0.8947,
+   "scientist_overrides": {
+    "overrides": 5,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "meta",
    "provider_label": "Meta Model API",
    "billing": "usd",
@@ -178,6 +183,11 @@
    "reviewer_requests": 2,
    "scientist_accuracy": 0.7895,
    "nsc_on_chosen_wells": 0.8947,
+   "scientist_overrides": {
+    "overrides": 5,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits",
@@ -207,6 +217,11 @@
    "reviewer_requests": 10,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.9211,
+   "scientist_overrides": {
+    "overrides": 7,
+    "right": 1,
+    "runs": 38
+   },
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits",
@@ -236,6 +251,11 @@
    "reviewer_requests": 14,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.6316,
+   "scientist_overrides": {
+    "overrides": 6,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits"
@@ -261,6 +281,11 @@
    "reviewer_requests": 21,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.6053,
+   "scientist_overrides": {
+    "overrides": 15,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "baseten",
    "provider_label": "Baseten",
    "billing": "credits"
@@ -286,6 +311,11 @@
    "reviewer_requests": 15,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.4737,
+   "scientist_overrides": {
+    "overrides": 10,
+    "right": 2,
+    "runs": 38
+   },
    "provider": "meta",
    "provider_label": "Meta Model API",
    "billing": "usd"
@@ -311,6 +341,11 @@
    "reviewer_requests": 18,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.6053,
+   "scientist_overrides": {
+    "overrides": 14,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "meta",
    "provider_label": "Meta Model API",
    "billing": "usd"
@@ -336,6 +371,11 @@
    "reviewer_requests": 13,
    "scientist_accuracy": null,
    "nsc_on_chosen_wells": 0.6316,
+   "scientist_overrides": {
+    "overrides": 12,
+    "right": 0,
+    "runs": 38
+   },
    "provider": "meta",
    "provider_label": "Meta Model API",
    "billing": "usd"

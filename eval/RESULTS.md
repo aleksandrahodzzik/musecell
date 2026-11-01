@@ -1,11 +1,11 @@
 # MuseCell evaluation
 
-Generated 2026-10-31T19:52:16+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
+Generated 2026-11-01T08:18:22+00:00 by `scripts/evaluate.py`. Numbers are written by the script, never edited by hand.
 
 - Compounds: 38 MoA-annotated BBBC021 compounds, leave-one-compound-out (the atlas never contains the compound under test).
 - Metric: compound-level MoA accuracy (one call per compound).
 - Models: scientist `muse-spark-1.3`, microscopist `muse-spark-1.3`, reviewer `muse-wonder-1.0`, segmentation `classical (scikit-image)`.
-- Blinding-leak test: pytest leak/blinding tests: 13 passed, 88 deselected in 7.02s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
+- Blinding-leak test: pytest leak/blinding tests: 13 passed, 89 deselected in 7.77s; offline re-scan of 38 eval run logs (events before unblinding): 0 hits
 
 | Method | Wells / compound | Accuracy | Correct | Before review | Mean wells used | Mean cost | Mean latency | Citations verified |
 |---|---|---|---|---|---|---|---|---|

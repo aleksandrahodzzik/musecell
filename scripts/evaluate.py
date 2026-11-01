@@ -274,7 +274,7 @@ def nsc_on_chosen_wells(manager: RunManager, records: list[dict]) -> None:
             continue
         acquired = [wells[w] for w in json.loads(path.read_text(encoding="utf-8"))["acquired_well_ids"] if w in wells]
         if not acquired:
-            r["nsc_chosen"] = False
+            r["nsc_chosen"], r["nsc_chosen_moa"] = False, None
             continue
         atlas = deep if deep is not None and r["models"].get("atlas", "").startswith("ResNet50") else handcrafted
         votes: dict[str, list[float]] = {}
@@ -283,7 +283,18 @@ def nsc_on_chosen_wells(manager: RunManager, records: list[dict]) -> None:
             hit = atlas.neighbors(manager.catalog.profile(w.well_key) if vec is None else vec, 1,
                                   exclude_compound=sp.compound)[0]
             votes.setdefault(hit.moa, []).append(hit.similarity)
-        r["nsc_chosen"] = max(votes, key=lambda m: (len(votes[m]), sum(votes[m]))) == r["truth_moa"]
+        r["nsc_chosen_moa"] = max(votes, key=lambda m: (len(votes[m]), sum(votes[m])))
+        r["nsc_chosen"] = r["nsc_chosen_moa"] == r["truth_moa"]
+
+
+def scientist_overrides(rs: list[dict]) -> dict | None:
+    """How often the Scientist's own call differed from the NSC vote over the wells it chose, and how often it was
+    then right (v1-v4: the run's call; v5: the Scientist's conclusion). None without the run logs."""
+    if not rs or not all("nsc_chosen_moa" in r for r in rs):
+        return None
+    own = [(r.get("scientist_moa") or r.get("agent_moa"), r) for r in rs]
+    over = [(m, r) for m, r in own if m is not None and r["nsc_chosen_moa"] is not None and m != r["nsc_chosen_moa"]]
+    return {"overrides": len(over), "right": sum(m == r["truth_moa"] for m, r in over), "runs": len(rs)}
 
 
 def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: str,
@@ -317,6 +328,7 @@ def agent_rows(records: list[dict], specimens: list[Specimen], budgets, model: s
             # the NSC protocol on exactly the wells this agent chose (its own atlas space); None without run logs
             "nsc_on_chosen_wells": (round(sum(r["nsc_chosen"] for r in rs) / len(rs), 4)
                                     if all("nsc_chosen" in r for r in rs) else None),
+            "scientist_overrides": scientist_overrides(rs),
         })
         if len(rs) < len(specimens):
             notes.append(f"{label}, budget {b}: {len(rs)} of {len(specimens)} specimens have a recorded run.")

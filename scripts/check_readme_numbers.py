@@ -20,6 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def allowed(res: dict) -> tuple[set[str], set[str]]:
     pcts, fracs = set(), set()
     for r in res["rows"]:
+        o = r.get("scientist_overrides")
+        if o:  # "1 of 7 in v4": the Scientist overrode the NSC vote on its own wells 7 times, right once
+            fracs.add(f"{o['right']} of {o['overrides']} in {r.get('agent_version', 'v1')}")
         for k in ("accuracy", "accuracy_before_review", "scientist_accuracy", "nsc_on_chosen_wells", "sd"):
             if r.get(k) is not None:
                 pcts.add(f"{100 * r[k]:.1f}")
@@ -42,6 +45,7 @@ def allowed(res: dict) -> tuple[set[str], set[str]]:
     t = wc.get("agent_wells_in_top_doses")
     if t:
         fracs.add(f"{t['wells']}/{t['of']}")
+        fracs.add(f"{t['wells']} of its {t['of']} wells")
     return pcts, fracs
 
 
@@ -60,6 +64,9 @@ def main() -> int:
         if n in (19, 38) or (m.group(1) == m.group(2) and n >= 50) or (t and n == t["of"]):  # x/x < 50: demo runs
             if m.group(0) not in fracs:
                 bad.append(m.group(0))
+    for m in re.finditer(r"\d+ of \d+ in v\d+(?:\.\d+)?|\d+ of its \d+ wells", text):
+        if m.group(0) not in fracs:
+            bad.append(m.group(0))
     for m in re.finditer(r"([+−-]\d+\.\d) (?:points|to)|to ([+−-]\d+\.\d)", text):
         v = (m.group(1) or m.group(2)).lstrip("+−-")
         if v not in pcts:
