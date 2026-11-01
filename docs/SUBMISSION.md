@@ -35,4 +35,4 @@ The benchmark headline is agent v5 on full-price `muse-spark-1.3` (about $0.29 a
 
 ## Links
 - Repo: https://github.com/aleksandrahodzzik/musecell
-- Video (≤ 3:00): *to add*
+- Video (≤ 3:00): https://youtu.be/KhQGvyS5fXo

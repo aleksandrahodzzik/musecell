@@ -3,7 +3,7 @@
 > **TL;DR**
 > 1. **What:** a blinded screening agent on real BBBC021 cell images. Muse Spark plans which 4 of ~24 wells to image, Muse Wonder reviews the call, and only then is the compound unblinded and checked against PubChem, ChEMBL and PubMed.
 > 2. **Result (Muse Spark 1.3, agent v5):** right mechanism for **34/38** compounds, **18/19** on the held-out half of a frozen split. With only a well budget, Muse Spark converged on the strategy a screening biologist would use (140 of its 152 wells at the top doses) and matched that fixed rule compound for compound; it did not beat it. When its own judgement overrode the published NSC vote, it was usually wrong (1 of 7 in v4), so MuseCell lets the model plan, argue and explain, and lets the protocol make the call. [Benchmark](eval/RESULTS.md).
-> 3. **Cost:** about $0.29 and 1.5 minutes per run on Muse Spark 1.3 (mean of 38 runs). **[Live demo](https://aleksandrahodzzik.github.io/musecell/)** · Video: *link added at submission*.
+> 3. **Cost:** about $0.29 and 1.5 minutes per run on Muse Spark 1.3 (mean of 38 runs). **[Live demo](https://aleksandrahodzzik.github.io/musecell/)** · **[Video](https://youtu.be/KhQGvyS5fXo)**.
 
 **MuseCell is an autonomous screening scientist.** Give it a blinded compound and a small budget of microscope wells. It images real cells, measures them, forms mechanism-of-action hypotheses, chooses the next experiment that best separates them, has its conclusion reviewed by a second model, and only then unblinds the compound and checks itself against chemistry databases and literature.
 

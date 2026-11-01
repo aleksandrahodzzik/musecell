@@ -158,6 +158,9 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
                 <>
                   <button className="btn-primary h-12 text-[15px] pl-5 pr-11" onClick={() => go("recorded")}>Watch a recorded run</button>
                   <a className="btn h-10 px-4" href="#/benchmark">See the benchmark</a>
+                  <a className="btn h-10 px-4" href={VIDEO_URL} target="_blank" rel="noreferrer">
+                    <Play aria-hidden className="h-3.5 w-3.5" /> Watch the video
+                  </a>
                 </>
               ) : (
                 <>
@@ -165,6 +168,9 @@ export default function ChooseSpecimen({ health }: { health?: Health; healthErro
                   <button className="btn h-10 px-4" onClick={() => go("recorded")}>
                     <Play aria-hidden className="h-3.5 w-3.5" /> Watch a recorded run
                   </button>
+                  <a className="btn h-10 px-4" href={VIDEO_URL} target="_blank" rel="noreferrer">
+                    <Play aria-hidden className="h-3.5 w-3.5" /> Watch the video
+                  </a>
                 </>
               )}
             </div>
@@ -332,6 +338,7 @@ function DriftingField() {
 }
 
 const REPO_URL = "https://github.com/aleksandrahodzzik/musecell";
+const VIDEO_URL = "https://youtu.be/KhQGvyS5fXo";
 
 /** On a replay-only server (the public demo) the bench explains itself instead of showing setup errors. */
 function DemoNotice({ reasons, onWatch }: { reasons: string[]; onWatch: () => void }) {
