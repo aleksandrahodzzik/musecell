@@ -361,7 +361,7 @@ Daily cap raised per process (`DAILY_COST_CAP_USD=70`) because Baseten credits c
   - UI: "Final call" and "Scientist's call · agrees/dissents" in the unblinding stamp, notebook and dossier. The headline compares MuseCell's call with NSC on random and all wells, and shows the Scientist alone.
 - **Result, Muse Spark Open, 38 compounds, budget 4: 89.5 % (34/38).**
   - Dev 17/19, held-out test 17/19.
-  - Scientist alone 79.0 %. It agreed with the vote in all 38 runs: the prompt change alone removed the dissents.
+  - Scientist alone 79.0 %. Its final conclusion differed from the vote over its wells in 5 of the 38 runs, and it was wrong in all 5 (the vote was right in 4 of them). *Corrected 2026-11-01:* this line first said it agreed with the vote in all 38 runs; the run logs say 5 dissents (`scientist_overrides` in eval/results.json, and the same 5 against the last vote the atlas tool showed it).
   - 0 failures, 0 leak hits, citations 117/117, mean 129 s, nominal $0.30/run, 2 reviewer requests.
   - Above NSC on 4 random wells (81.3 % ± 4.9, ≈ 1.7 sd), one compound below NSC on all wells (92.1 %).
 - Some text-only edits were made after the v5 eval had started: the unblinded brief now names both calls, and the dossier wording changed. They do not affect calls or scoring.
