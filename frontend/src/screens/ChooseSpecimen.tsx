@@ -11,6 +11,7 @@ import { EmptyState, ErrorNote, Loading } from "../components/States";
 import { ApiError, imageUrl, postJSON } from "../lib/api";
 import type { Results } from "./Benchmark";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
+import OpenWorldBadge from "../components/OpenWorldBadge";
 import { PROVIDER_LABEL, dateTime, isOpenWeights, modelName, providerOf, usd } from "../lib/format";
 import { CHANNELS, CHANNEL_LABEL, compose, loadPreviewPixels, setCompositeOnly, type Channel, type FieldPixels } from "../lib/fieldImage";
 import { navigate } from "../lib/router";
@@ -666,6 +667,7 @@ function RecordedRuns() {
               <span className="text-mist">{usd(r.cost_usd)}</span>
               <span className="text-mist truncate hidden xl:inline">{modelName(r.model_ids.scientist)} · {modelName(r.model_ids.reviewer)}</span>
               <OpenWeightsBadge ids={r.model_ids} />
+              <OpenWorldBadge ids={r.model_ids} />
               {r.status !== "finished" && <span className="chip">Ended early</span>}
               <button className="btn ml-auto" disabled={busy !== null} onClick={() => play(r.run_id)}
                       aria-label={`Replay ${r.specimen_label ?? "run"} recorded ${dateTime(r.recorded_at)}`}>

@@ -5,6 +5,7 @@ import { postJSON } from "../../lib/api";
 import { dateOnly, isOpenWeights, modelName, usd } from "../../lib/format";
 import { href } from "../../lib/router";
 import OpenWeightsBadge from "../OpenWeightsBadge";
+import OpenWorldBadge from "../OpenWorldBadge";
 import type { Phase, RunState } from "../../lib/runState";
 
 const PHASE: Record<Phase, string> = {
@@ -76,6 +77,7 @@ export default function RunHeader({ run, label }: { run: RunState; label: string
       </span>
 
       <OpenWeightsBadge ids={run.started?.model_ids} />
+      <OpenWorldBadge ids={run.started?.model_ids} />
       {replay && (
         <span className="chip h-7 px-2.5 border-white/25 text-haze min-w-0 overflow-hidden whitespace-nowrap" role="note">
           <History aria-hidden className="h-3.5 w-3.5 shrink-0" />

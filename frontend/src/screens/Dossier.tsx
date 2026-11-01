@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { EmptyState, ErrorNote, Loading } from "../components/States";
 import FieldThumb from "../components/FieldThumb";
 import OpenWeightsBadge from "../components/OpenWeightsBadge";
+import OpenWorldBadge from "../components/OpenWorldBadge";
 import { PROVIDER_LABEL, dateTime, featureName, isOpenWeights, modelName, prob, providerOf, signed, toolName, uM, usd } from "../lib/format";
 import { dossierUrl } from "../lib/api";
 import { href } from "../lib/router";
@@ -129,6 +130,7 @@ export default function Dossier({ runId, labels }: { runId: string; labels: Reco
           </div>
           <p className="text-[12px] text-mist print:text-graphite flex flex-wrap items-center gap-x-3 gap-y-2">
             <OpenWeightsBadge ids={d.model_ids} className="print:text-ink print:border-rule" />
+            <OpenWorldBadge ids={d.model_ids} className="print:text-ink print:border-rule" />
             <span>
               Scientist {modelName(d.model_ids.scientist)}{isOpenWeights(d.model_ids) && ` (${PROVIDER_LABEL[providerOf(d.model_ids)]})`} · Reviewer {modelName(d.model_ids.reviewer)}{isOpenWeights(d.model_ids) && " (Meta API)"} · Segmentation {modelName(d.model_ids.segmentation)}
             </span>

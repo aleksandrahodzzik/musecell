@@ -15,6 +15,8 @@ export const modelName = (id?: string | null) => (id ? MODEL_NAMES[id] ?? id : "
 export const PROVIDER_LABEL: Record<string, string> = { meta: "Meta API", baseten: "Baseten" };
 export const providerOf = (ids?: Record<string, string> | null) => ids?.provider ?? "meta"; // older runs: Meta only
 export const isOpenWeights = (ids?: Record<string, string> | null) => providerOf(ids) !== "meta";
+// Pre-registered open-world eval (agent v5-open): the specimen's mechanism class was left out of the reference library.
+export const isOpenWorld = (ids?: Record<string, string> | null) => ids?.reference_library === "leave-one-MoA-out";
 export const openWeightsLabel = (ids?: Record<string, string> | null) =>
   `Open weights · ${modelName(ids?.scientist)} via ${PROVIDER_LABEL[providerOf(ids)] ?? providerOf(ids)}`;
 
